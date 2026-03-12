@@ -10,46 +10,46 @@ This project is built with **React + Vite** and provides an intuitive dashboard 
 
 ## Authentication
 
-* User registration
-* User sign in
-* Secure account management
+- User registration
+- User sign in
+- Secure account management
 
 ## Dashboard
 
-* Overview of platform statistics
-* Recent events
-* Top students
-* Latest quizzes
+- Overview of platform statistics
+- Recent events
+- Top students
+- Latest quizzes
 
 ## Quiz Management
 
-* Create new quizzes
-* Manage quiz list
-* View quiz details
-* Share quizzes with participants
-* Students can take quizzes via shared links or QR codes
+- Create new quizzes
+- Manage quiz list
+- View quiz details
+- Share quizzes with participants
+- Students can take quizzes via shared links or QR codes
 
 ## Event Management
 
-* Create and manage events
-* Track event participation
-* View recent events
+- Create and manage events
+- Track event participation
+- View recent events
 
 ## Student Management
 
-* View student list
-* Track student performance
-* Manage participants
+- View student list
+- Track student performance
+- Manage participants
 
 ## Settings
 
 Users can customize their account with:
 
-* Profile settings
-* Account security
-* Notification preferences
-* Appearance settings
-* Privacy settings
+- Profile settings
+- Account security
+- Notification preferences
+- Appearance settings
+- Privacy settings
 
 ---
 
@@ -57,17 +57,17 @@ Users can customize their account with:
 
 The platform includes the following main pages:
 
-* **Landing Page** – Introduction to the platform
-* **Register Page** – Create a new account
-* **Sign In Page** – User authentication
-* **Dashboard** – Main overview panel
-* **Quizzes** – Manage quizzes
-* **Events** – Manage events
-* **Students** – Manage participants
-* **Settings** – User configuration
-* **Create Quiz** – Build new quizzes
-* **Share Quiz** – Share quizzes via link or QR
-* **Quiz Player** – Interface for taking quizzes
+- **Landing Page** – Introduction to the platform
+- **Register Page** – Create a new account
+- **Sign In Page** – User authentication
+- **Dashboard** – Main overview panel
+- **Quizzes** – Manage quizzes
+- **Events** – Manage events
+- **Students** – Manage participants
+- **Settings** – User configuration
+- **Create Quiz** – Build new quizzes
+- **Share Quiz** – Share quizzes via link or QR
+- **Quiz Player** – Interface for taking quizzes
 
 ---
 
@@ -75,11 +75,11 @@ The platform includes the following main pages:
 
 Frontend technologies used in this project:
 
-* React
-* Vite
-* React Router
-* Axios
-* CSS / Tailwind CSS (optional)
+- React
+- Vite
+- React Router
+- Axios
+- CSS / Tailwind CSS (optional)
 
 ---
 
@@ -118,11 +118,11 @@ src
 This project is designed for a team development workflow.
 Each member can work on separate features such as:
 
-* Landing & Authentication
-* Dashboard
-* Quiz Management
-* Event & Student Management
-* Settings & User Profile
+- Landing & Authentication
+- Dashboard
+- Quiz Management
+- Event & Student Management
+- Settings & User Profile
 
 Git branching is recommended for collaboration.
 
@@ -173,11 +173,11 @@ http://localhost:5173
 
 # Future Improvements
 
-* Backend integration
-* Real-time quiz sessions
-* Leaderboard system
-* Advanced analytics
-* Mobile responsive improvements
+- Backend integration
+- Real-time quiz sessions
+- Leaderboard system
+- Advanced analytics
+- Mobile responsive improvements
 
 ---
 
