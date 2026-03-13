@@ -1,3 +1,4 @@
+import bookIcon from "../../assets/openbook.png";
 export default function EventItem({ title, status, color }) {
 
   const statusColor = {
@@ -12,9 +13,9 @@ export default function EventItem({ title, status, color }) {
       {/* LEFT */}
       <div className="flex items-center gap-4">
 
-        <div className="w-10 h-10 bg-purple-600/20 rounded-lg flex items-center justify-center">
-          📘
-        </div>
+        <div className="w-10 h-10 rounded-full bg-[#2a1a45] flex items-center justify-center">
+          <img src={bookIcon} className="w-5 h-5 brightness-0 invert" />
+      </div>
 
         <div>
           <div className="flex items-center gap-2">
