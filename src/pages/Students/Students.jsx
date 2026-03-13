@@ -1,4 +1,4 @@
-import StudentRow from "./StudentRow";
+import StudentRow from "./components/StudentRow.jsx";
 
 export default function Students() {
   return (

@@ -1,7 +1,7 @@
-import StatsCard from "./StatsCard";
-import EventItem from "./EventItem";
-import StudentItem from "./StudentItem";
-import QuizCard from "./QuizCard";
+import StatsCard from "./components/StatsCard.jsx";
+import EventItem from "./components/EventItem.jsx";
+import StudentItem from "./components/StudentItem.jsx";
+import QuizCard from "./components/QuizCard.jsx";
 
 export default function Dashboard() {
   return (
