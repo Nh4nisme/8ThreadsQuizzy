@@ -1,4 +1,4 @@
-import bookIcon from "../../assets/openbook.png";
+import bookIcon from "../../../assets/openbook.png";
 export default function EventItem({ title, status, color }) {
 
   const statusColor = {

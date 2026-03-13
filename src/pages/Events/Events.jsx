@@ -1,4 +1,4 @@
-import EventItem from "./EventItem";
+import EventItem from "./components/EventItem.jsx";
 
 export default function Events() {
   return (

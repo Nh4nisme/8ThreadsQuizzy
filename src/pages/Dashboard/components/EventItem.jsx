@@ -1,4 +1,4 @@
-import calendarIcon from "../../assets/calendar.png";
+import calendarIcon from "../../../assets/calendar.png";
 
 export default function EventItem({ title, time, participants, button }) {
   return (

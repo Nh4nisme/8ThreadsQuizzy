@@ -1,4 +1,4 @@
-import userIcon from "../../assets/user.png";
+import userIcon from "../../../assets/user.png";
 
 export default function StudentItem({ rank, name, subject, score, icon }) {
   return (

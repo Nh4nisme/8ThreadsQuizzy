@@ -1,4 +1,4 @@
-import moreIcon from "../../assets/more.png";
+import moreIcon from "../../../assets/more.png";
 
 export default function QuizCard({
   title,
