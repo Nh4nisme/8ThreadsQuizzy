@@ -5,7 +5,7 @@ const Navbar = () => {
     return (
         <nav className="bg-[#101010] shadow-md p-4 flex justify-between items-center">
             <div className="flex items-center space-x-2">
-                <SearchInput className="border border-transparent bg-[#23232b] rounded-[10px] h-10 py-1 focus:outline-none focus:ring-2 focus:border-[#a78bfa] pr-3" />
+                <SearchInput className="border border-transparent bg-[#23232b] rounded-[10px] h-10 py-1 focus:border-[#a78bfa] pr-3" />
             </div>
             <div>
                 <button
