@@ -1,5 +1,4 @@
 import { useState, useRef, useEffect } from "react";
-import bookIcon from '../assets/bookIcon.png'
 import { BookOpen, Clock, Users, EllipsisVertical, Search, Filter, SquarePen, Copy, Trash2, ChevronDown} from 'lucide-react'
 
 const quizzes = [
