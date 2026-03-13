@@ -2,7 +2,7 @@ import { FaThLarge, FaRegListAlt, FaRegCalendarAlt, FaUserGraduate, FaCog } from
 
 export const menuConfig = [
     {
-        path: "/",
+        path: "/dashboard",
         label: "Dashboard",
         icon: FaThLarge,
         section: "main"
