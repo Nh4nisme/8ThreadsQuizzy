@@ -1,6 +1,7 @@
 import { NavLink } from "react-router-dom";
 import { menuConfig } from "../../utils/menuConfig.js";
 import Logo from "../../assets/logo.png";
+import SearchInput from "./SearchInput"; // Import the SearchInput component
 
 const SideBar = () => {
     const mainMenu = menuConfig.filter(item => item.section === "main");
@@ -14,11 +15,9 @@ const SideBar = () => {
                 <span className="bg-gradient-to-r from-pink-500 to-purple-500 bg-clip-text text-transparent text-2xl font-bold">8ThreadsQuizzy</span>
             </div>
             {/* Search */}
-            <input
-                type="text"
-                placeholder="Search"
-                className="bg-[#23232b] rounded-md px-4 py-2 mb-6 outline-none border border-[#23232b] focus:border-[#a78bfa] text-sm"
-            />
+            <div className="mb-6">
+                <SearchInput className="bg-[#23232b] rounded-[6px] border border-[#23232b] focus:border-[#a78bfa]" />
+            </div>
             {/* Navigation */}
             <nav className="flex flex-col gap-2">
                 {mainMenu.map((item) => (
