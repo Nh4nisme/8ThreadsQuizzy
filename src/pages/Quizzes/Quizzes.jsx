@@ -1,10 +1,11 @@
-const Quizzes = () => {
-    return (
-        <div>
-            <h1>Quizzes</h1>
-            <p>Manage your quizzes here.</p>
-        </div>
-    );
-};
+import QuizDetail from "./QuizDetail.jsx";
+import QuizLibrary from "./QuizLibrary.jsx";
 
-export default Quizzes;
+export default function Quizzes() {
+    return (
+        <>
+            <QuizDetail/>
+            <QuizLibrary/>
+        </>
+    )
+}
