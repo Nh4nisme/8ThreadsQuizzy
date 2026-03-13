@@ -3,6 +3,12 @@ import EventItem from "./components/EventItem.jsx";
 import StudentItem from "./components/StudentItem.jsx";
 import QuizCard from "./components/QuizCard.jsx";
 
+import achieveIcon from "../../assets/achieve.png";
+import calendarIcon from "../../assets/calendar.png";
+import studentsIcon from "../../assets/students.png";
+import bookIcon from "../../assets/openbook.png";
+import averageIcon from "../../assets/average.png";
+
 export default function Dashboard() {
   return (
     <div className=" text-white p-8">
@@ -23,10 +29,35 @@ export default function Dashboard() {
 
       {/* STATS */}
       <div className="grid grid-cols-4 gap-4 mb-6">
-        <StatsCard title="Total Quizzes" number="2,543" percent="+12.5%" />
-        <StatsCard title="Active Events" number="2,543" percent="+12.5%" />
-        <StatsCard title="Students" number="2,543" percent="+12.5%" />
-        <StatsCard title="Avg. Completion" number="2,543" percent="-12.5%" />
+
+        <StatsCard
+          title="Total Quizzes"
+          number="2,543"
+          percent="+12.5%"
+          icon={bookIcon}
+        />
+
+        <StatsCard
+          title="Active Events"
+          number="2,543"
+          percent="+12.5%"
+          icon={calendarIcon}
+        />
+
+        <StatsCard
+          title="Students"
+          number="2,543"
+          percent="+12.5%"
+          icon={studentsIcon}
+        />
+
+        <StatsCard
+          title="Avg. Completion"
+          number="2,543"
+          percent="-12.5%"
+          icon={averageIcon}
+        />
+
       </div>
 
       {/* EVENTS + STUDENTS */}
@@ -66,11 +97,11 @@ export default function Dashboard() {
         <div className="bg-[#1a1a1f] p-6 rounded-xl">
           <h2 className="text-lg font-semibold mb-4">Top Students</h2>
 
-          <StudentItem rank="1" name="Alex John" subject="Science" score="950" />
-          <StudentItem rank="2" name="Emma Watson" subject="Mathematics" score="920" />
-          <StudentItem rank="3" name="Michael Clark" subject="Physics" score="980" />
-          <StudentItem rank="4" name="Sophia Green" subject="English" score="890" />
-          <StudentItem rank="5" name="Lucia Wilde" subject="Science" score="870" />
+          <StudentItem rank="1" name="Alex John" subject="Science" score="950" icon={achieveIcon}/>
+          <StudentItem rank="2" name="Emma Watson" subject="Mathematics" score="920" icon={achieveIcon}/>
+          <StudentItem rank="3" name="Michael Clark" subject="Physics" score="980" icon={achieveIcon}/>
+          <StudentItem rank="4" name="Sophia Green" subject="English" score="890" icon={achieveIcon}/>
+          <StudentItem rank="5" name="Lucia Wilde" subject="Science" score="870" icon={achieveIcon}/>
         </div>
       </div>
 
@@ -85,6 +116,8 @@ export default function Dashboard() {
             questions="15"
             completions="28"
             percent={75}
+            questionIcon={bookIcon}
+            completionIcon={studentsIcon}
           />
 
           <QuizCard
@@ -92,6 +125,8 @@ export default function Dashboard() {
             questions="15"
             completions="28"
             percent={40}
+            questionIcon={bookIcon}
+            completionIcon={studentsIcon}
           />
 
           <QuizCard
@@ -99,6 +134,8 @@ export default function Dashboard() {
             questions="15"
             completions="28"
             percent={90}
+            questionIcon={bookIcon}
+            completionIcon={studentsIcon}
           />
 
           <div className="border border-dashed border-gray-600 rounded-xl flex items-center justify-center">

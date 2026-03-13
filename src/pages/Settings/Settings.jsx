@@ -1,4 +1,22 @@
+import { useRef, useState } from "react";
+import uploadIcon from "../../assets/upload.png";
+
 export default function Settings() {
+
+  const [avatar, setAvatar] = useState(null);
+  const fileRef = useRef();
+
+  const handleChangePhoto = () => {
+    fileRef.current.click();
+  };
+
+  const handleFileChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      setAvatar(URL.createObjectURL(file));
+    }
+  };
+
   return (
     <div className="text-white">
 
@@ -55,11 +73,31 @@ export default function Settings() {
           {/* AVATAR */}
           <div className="flex flex-col items-center gap-4">
 
-            <div className="w-24 h-24 bg-gray-300 rounded-full"></div>
+            <div className="w-24 h-24 bg-gray-300 rounded-full overflow-hidden">
+              {avatar && (
+                <img
+                  src={avatar}
+                  alt="avatar"
+                  className="w-full h-full object-cover"
+                />
+              )}
+            </div>
 
-            <button className="border border-gray-700 px-4 py-2 rounded-lg text-sm">
-              Change Photo
+            <button
+              onClick={handleChangePhoto}
+              className="border border-gray-700 px-4 py-2 rounded-lg text-sm flex items-center gap-2"
+              >
+              <img src={uploadIcon} className="w-4 h-4 invert" />
+                Change Photo
             </button>
+
+            <input
+              type="file"
+              accept="image/*"
+              ref={fileRef}
+              onChange={handleFileChange}
+              className="hidden"
+            />
 
           </div>
 
