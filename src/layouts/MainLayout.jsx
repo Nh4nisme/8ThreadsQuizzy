@@ -1,7 +1,6 @@
 import SideBar from "../components/ui/SideBar.jsx";
 import Navbar from "../components/ui/Navbar.jsx";
 import { Outlet } from "react-router-dom";
-import SubNavbar from "../components/ui/SubNavbar.jsx";
 
 const MainLayout = () => {
     return (
