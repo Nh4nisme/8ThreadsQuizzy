@@ -1,11 +1,8 @@
 import './App.css'
-import MainLayout from "./layouts/MainLayout.jsx";
+import AppRouter from "./router/AppRouter.jsx";
 
 function App() {
-    return (
-        <MainLayout>
-        </MainLayout>
-    );
+    return <AppRouter />;
 }
 
 export default App
