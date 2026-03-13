@@ -10,7 +10,6 @@ const MainLayout = () => {
             <SideBar/>
             <div className="flex flex-col flex-1">
                 <Navbar />
-                <SubNavbar />
                 <main className="flex-1 p-6 bg-amber-200 overflow-auto">
                     <Outlet />
                 </main>
