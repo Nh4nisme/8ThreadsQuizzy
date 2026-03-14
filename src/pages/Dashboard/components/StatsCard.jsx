@@ -1,7 +1,6 @@
 export default function StatsCard({ title, number, percent, icon }) {
   return (
     <div className="bg-[#1a1a1f] p-4 rounded-xl relative">
-
       {/* ICON */}
       <div className="absolute top-3 right-3 w-8 h-8 bg-[#2a1a45] rounded-full flex items-center justify-center">
         <img src={icon} className="w-4 h-4 brightness-0 invert" />

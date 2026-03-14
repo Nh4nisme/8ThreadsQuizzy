@@ -12,7 +12,6 @@ import averageIcon from "../../assets/average.png";
 export default function Dashboard() {
   return (
     <div className=" text-white p-8">
-
       {/* HEADER */}
       <div className="flex justify-between items-center mb-6">
         <div>
@@ -29,7 +28,6 @@ export default function Dashboard() {
 
       {/* STATS */}
       <div className="grid grid-cols-4 gap-4 mb-6">
-
         <StatsCard
           title="Total Quizzes"
           number="2,543"
@@ -57,15 +55,13 @@ export default function Dashboard() {
           percent="-12.5%"
           icon={averageIcon}
         />
-
       </div>
 
       {/* EVENTS + STUDENTS */}
       <div className="grid grid-cols-3 gap-6 mb-6">
-
         {/* EVENTS */}
-      <div className="col-span-2 bg-[#1a1a1f] p-6 rounded-xl">
-        <h1 className="text-lg font-semibold mb-1">Recent Events</h1>
+        <div className="col-span-2 bg-[#1a1a1f] p-6 rounded-xl">
+          <h1 className="text-lg font-semibold mb-1">Recent Events</h1>
 
           <p className="text-gray-400 mb-4">
             Manage your upcoming and active quiz events
@@ -91,17 +87,47 @@ export default function Dashboard() {
             participants="45 participants"
             button="Manage"
           />
-      </div>
+        </div>
 
         {/* STUDENTS */}
         <div className="bg-[#1a1a1f] p-6 rounded-xl">
           <h2 className="text-lg font-semibold mb-4">Top Students</h2>
 
-          <StudentItem rank="1" name="Alex John" subject="Science" score="950" icon={achieveIcon}/>
-          <StudentItem rank="2" name="Emma Watson" subject="Mathematics" score="920" icon={achieveIcon}/>
-          <StudentItem rank="3" name="Michael Clark" subject="Physics" score="980" icon={achieveIcon}/>
-          <StudentItem rank="4" name="Sophia Green" subject="English" score="890" icon={achieveIcon}/>
-          <StudentItem rank="5" name="Lucia Wilde" subject="Science" score="870" icon={achieveIcon}/>
+          <StudentItem
+            rank="1"
+            name="Alex John"
+            subject="Science"
+            score="950"
+            icon={achieveIcon}
+          />
+          <StudentItem
+            rank="2"
+            name="Emma Watson"
+            subject="Mathematics"
+            score="920"
+            icon={achieveIcon}
+          />
+          <StudentItem
+            rank="3"
+            name="Michael Clark"
+            subject="Physics"
+            score="980"
+            icon={achieveIcon}
+          />
+          <StudentItem
+            rank="4"
+            name="Sophia Green"
+            subject="English"
+            score="890"
+            icon={achieveIcon}
+          />
+          <StudentItem
+            rank="5"
+            name="Lucia Wilde"
+            subject="Science"
+            score="870"
+            icon={achieveIcon}
+          />
         </div>
       </div>
 
@@ -110,7 +136,6 @@ export default function Dashboard() {
         <h2 className="text-lg font-semibold mb-4">Recent Quizzes</h2>
 
         <div className="grid grid-cols-4 gap-4">
-
           <QuizCard
             title="Introduction to Biology"
             questions="15"
@@ -141,10 +166,8 @@ export default function Dashboard() {
           <div className="border border-dashed border-gray-600 rounded-xl flex items-center justify-center">
             <button className="text-purple-400 text-lg">+ Create Quiz</button>
           </div>
-
         </div>
       </div>
-
     </div>
   );
 }

@@ -13,4 +13,3 @@ export default function useFloatAnimation() {
     animation: "floatY 10s ease-in-out infinite",
   };
 }
-

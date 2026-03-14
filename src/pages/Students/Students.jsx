@@ -3,7 +3,6 @@ import StudentRow from "./components/StudentRow.jsx";
 export default function Students() {
   return (
     <div className="text-white">
-
       {/* PAGE HEADER */}
       <div className="flex justify-between items-center mb-6">
         <div>
@@ -20,27 +19,19 @@ export default function Students() {
 
       {/* CARD */}
       <div className="bg-[#1a1a1f] border border-gray-800 rounded-xl p-6">
-
         <h2 className="text-xl font-semibold mb-1">Student Directory</h2>
 
-        <p className="text-gray-400 mb-6">
-          View and manage all your students
-        </p>
+        <p className="text-gray-400 mb-6">View and manage all your students</p>
 
         {/* FILTER BAR */}
         <div className="flex justify-between items-center mb-6">
-
           {/* class tabs */}
           <div className="flex gap-2 bg-[#111115] p-1 rounded-lg">
             <button className="px-3 py-1 bg-black rounded-md">
               All Students
             </button>
-            <button className="px-3 py-1 text-gray-400">
-              10A
-            </button>
-            <button className="px-3 py-1 text-gray-400">
-              10B
-            </button>
+            <button className="px-3 py-1 text-gray-400">10A</button>
+            <button className="px-3 py-1 text-gray-400">10B</button>
           </div>
 
           {/* search */}
@@ -55,12 +46,10 @@ export default function Students() {
               Name
             </button>
           </div>
-
         </div>
 
         {/* TABLE */}
         <div className="border border-gray-800 rounded-lg overflow-hidden">
-
           {/* header */}
           <div className="grid grid-cols-5 px-6 py-3 text-gray-400 text-sm border-b border-gray-800">
             <div>Name</div>
@@ -75,12 +64,8 @@ export default function Students() {
           <StudentRow />
           <StudentRow />
           <StudentRow />
-
         </div>
-
       </div>
-
     </div>
   );
 }
-
