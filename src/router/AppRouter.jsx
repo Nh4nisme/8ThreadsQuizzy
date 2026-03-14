@@ -1,7 +1,7 @@
 import { Routes, Route } from "react-router-dom";
 import MainLayout from "../layouts/MainLayout.jsx";
 import Dashboard from "../pages/Dashboard/Dashboard.jsx";
-import Quizzes from "../pages/Quizzes/Quizzes.jsx";
+import Quizzes from "../pages/Quizzes/ShareQuiz.tsx";
 import Events from "../pages/Events/Events.jsx";
 import Students from "../pages/Students/Students.jsx";
 import Settings from "../pages/Settings/Settings.jsx";
