@@ -48,3 +48,5 @@ export const ShareQuiz = () => {
     </div>
   );
 };
+
+export default ShareQuiz;

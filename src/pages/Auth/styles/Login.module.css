@@ -1,17 +1,11 @@
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-  font-family: var(--main-font);
-}
-:root {
-  --main-font: "Geist", sans-serif;
-}
-.body {
-  width: 100vw;
-  height: 100vh;
-  display: flex;
-}
+/*:root {*/
+/*  --main-font: "Geist", sans-serif;*/
+/*}*/
+/*.body {*/
+/*  width: 100vw;*/
+/*  height: 100vh;*/
+/*  display: flex;*/
+/*}*/
 
 .bodyLeft {
   position: relative;

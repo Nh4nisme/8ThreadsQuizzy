@@ -1,4 +1,5 @@
 import { useState } from "react";
+// @ts-ignore
 import styles from "./styles/Login.module.css";
 import { SignUp } from "./components/SignUp";
 import { SignIn } from "./components/SignIn";
