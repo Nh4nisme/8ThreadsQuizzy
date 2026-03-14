@@ -1,7 +1,7 @@
 import { useState } from "react";
-import styles from "../styles/Login.module.css";
-import { SignUp } from "./SignUp";
-import { SignIn } from "./SignIn";
+import styles from "./styles/Login.module.css";
+import { SignUp } from "./components/SignUp";
+import { SignIn } from "./components/SignIn";
 export const LoginForm = () => {
   const [currentView, setCurrentView] = useState("signUp");
 

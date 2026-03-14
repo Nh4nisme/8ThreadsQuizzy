@@ -1,6 +1,13 @@
 import { useState } from "react";
 import styles from "../styles/Login.module.css";
-import { GraduationCap, Presentation } from "lucide-react";
+import {
+  GraduationCap,
+  Lock,
+  Mail,
+  Presentation,
+  UserRound,
+} from "lucide-react";
+import { FaGoogle, FaFacebookF } from "react-icons/fa";
 
 export const SignUp = ({ onSwitchSignIn }: { onSwitchSignIn: () => void }) => {
   const [role, setRole] = useState("student");
@@ -28,9 +35,11 @@ export const SignUp = ({ onSwitchSignIn }: { onSwitchSignIn: () => void }) => {
           <p>Create quizzes and manage students</p>
         </div>
         <div className={styles.smallBox}>
+          <FaGoogle />
           <p>Google</p>
         </div>
         <div className={styles.smallBox}>
+          <FaFacebookF />
           <p>Facebook</p>
         </div>
       </div>
@@ -42,35 +51,47 @@ export const SignUp = ({ onSwitchSignIn }: { onSwitchSignIn: () => void }) => {
       <div className={styles.form}>
         <div className={styles.inputSmallCard}>
           <h3>Full Name</h3>
-          <input
-            type="text"
-            placeholder="John Doe"
-            className={styles.inputBox}
-          />
+          <div className={styles.inputWrapper}>
+            <UserRound size={18} className={styles.inputIcon} />
+            <input
+              type="text"
+              placeholder="John Doe"
+              className={styles.inputBox}
+            />
+          </div>
         </div>
         <div className={styles.inputSmallCard}>
           <h3>Username</h3>
-          <input
-            type="text"
-            placeholder="John Doe"
-            className={styles.inputBox}
-          />
+          <div className={styles.inputWrapper}>
+            <UserRound size={18} className={styles.inputIcon} />
+            <input
+              type="text"
+              placeholder="John Doe"
+              className={styles.inputBox}
+            />
+          </div>
         </div>
         <div className={styles.inputCard}>
           <h3>Email</h3>
-          <input
-            type="text"
-            placeholder="John Doe"
-            className={styles.inputBox}
-          />
+          <div className={styles.inputWrapper}>
+            <Mail size={18} className={styles.inputIcon} />
+            <input
+              type="text"
+              placeholder="Name@example.come"
+              className={styles.inputBox}
+            />
+          </div>
         </div>
         <div className={styles.inputCard}>
           <h3>Password</h3>
-          <input
-            type="password"
-            placeholder="John Doe"
-            className={styles.inputBox}
-          />
+          <div className={styles.inputWrapper}>
+            <Lock size={18} className={styles.inputIcon} />
+            <input
+              type="password"
+              placeholder="************"
+              className={styles.inputBox}
+            />
+          </div>
         </div>
       </div>
       <button className={`${styles.signUpBtn} ${styles.btn}`}>Sign Up</button>
