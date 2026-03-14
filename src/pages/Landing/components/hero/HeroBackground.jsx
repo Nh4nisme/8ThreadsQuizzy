@@ -1,6 +1,10 @@
 import React from "react";
 
-export default function HeroBackground({ gridImage, parallax = {x:0, y:0}, floatAnim = {} }) {
+export default function HeroBackground({
+  gridImage,
+  parallax = { x: 0, y: 0 },
+  floatAnim = {},
+}) {
   return (
     <>
       <img
@@ -29,4 +33,3 @@ export default function HeroBackground({ gridImage, parallax = {x:0, y:0}, float
     </>
   );
 }
-

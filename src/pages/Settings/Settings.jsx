@@ -2,7 +2,6 @@ import { useRef, useState } from "react";
 import uploadIcon from "../../assets/upload.png";
 
 export default function Settings() {
-
   const [avatar, setAvatar] = useState(null);
   const fileRef = useRef();
 
@@ -19,7 +18,6 @@ export default function Settings() {
 
   return (
     <div className="text-white">
-
       {/* HEADER */}
       <div className="mb-6">
         <h1 className="text-2xl font-semibold">Settings</h1>
@@ -30,49 +28,32 @@ export default function Settings() {
 
       {/* TABS */}
       <div className="flex gap-2 bg-[#111115] p-1 rounded-lg w-fit mb-6">
-
         <button className="px-4 py-1.5 bg-purple-600 rounded-md">
           Profile
         </button>
 
-        <button className="px-4 py-1.5 text-gray-400">
-          Account
-        </button>
+        <button className="px-4 py-1.5 text-gray-400">Account</button>
 
-        <button className="px-4 py-1.5 text-gray-400">
-          Notifications
-        </button>
+        <button className="px-4 py-1.5 text-gray-400">Notifications</button>
 
-        <button className="px-4 py-1.5 text-gray-400">
-          Appearance
-        </button>
+        <button className="px-4 py-1.5 text-gray-400">Appearance</button>
 
-        <button className="px-4 py-1.5 text-gray-400">
-          Privacy
-        </button>
+        <button className="px-4 py-1.5 text-gray-400">Privacy</button>
 
-        <button className="px-4 py-1.5 text-gray-400">
-          Billing
-        </button>
-
+        <button className="px-4 py-1.5 text-gray-400">Billing</button>
       </div>
 
       {/* PROFILE CARD */}
       <div className="bg-[#1a1a1f] border border-gray-800 rounded-xl p-6">
-
-        <h2 className="text-xl font-semibold mb-1">
-          Profile Information
-        </h2>
+        <h2 className="text-xl font-semibold mb-1">Profile Information</h2>
 
         <p className="text-gray-400 mb-6">
           Update your profile information and public details
         </p>
 
         <div className="flex gap-8">
-
           {/* AVATAR */}
           <div className="flex flex-col items-center gap-4">
-
             <div className="w-24 h-24 bg-gray-300 rounded-full overflow-hidden">
               {avatar && (
                 <img
@@ -86,9 +67,9 @@ export default function Settings() {
             <button
               onClick={handleChangePhoto}
               className="border border-gray-700 px-4 py-2 rounded-lg text-sm flex items-center gap-2"
-              >
+            >
               <img src={uploadIcon} className="w-4 h-4 invert" />
-                Change Photo
+              Change Photo
             </button>
 
             <input
@@ -98,17 +79,13 @@ export default function Settings() {
               onChange={handleFileChange}
               className="hidden"
             />
-
           </div>
 
           {/* FORM */}
           <div className="flex-1 grid grid-cols-2 gap-4">
-
             {/* FIRST NAME */}
             <div>
-              <label className="text-sm text-gray-400">
-                First Name
-              </label>
+              <label className="text-sm text-gray-400">First Name</label>
 
               <input
                 defaultValue="John"
@@ -118,9 +95,7 @@ export default function Settings() {
 
             {/* LAST NAME */}
             <div>
-              <label className="text-sm text-gray-400">
-                Last Name
-              </label>
+              <label className="text-sm text-gray-400">Last Name</label>
 
               <input
                 defaultValue="Doe"
@@ -130,9 +105,7 @@ export default function Settings() {
 
             {/* EMAIL */}
             <div>
-              <label className="text-sm text-gray-400">
-                Email
-              </label>
+              <label className="text-sm text-gray-400">Email</label>
 
               <input
                 defaultValue="johndoe@gmail.com"
@@ -142,9 +115,7 @@ export default function Settings() {
 
             {/* ROLE */}
             <div>
-              <label className="text-sm text-gray-400">
-                Role
-              </label>
+              <label className="text-sm text-gray-400">Role</label>
 
               <input
                 defaultValue="Teacher"
@@ -154,9 +125,7 @@ export default function Settings() {
 
             {/* BIO */}
             <div className="col-span-2">
-              <label className="text-sm text-gray-400">
-                Bio
-              </label>
+              <label className="text-sm text-gray-400">Bio</label>
 
               <textarea
                 rows="3"
@@ -164,9 +133,7 @@ export default function Settings() {
                 className="w-full mt-1 bg-[#111115] border border-gray-700 rounded-lg px-3 py-2"
               />
             </div>
-
           </div>
-
         </div>
 
         {/* SAVE BUTTON */}
@@ -175,19 +142,13 @@ export default function Settings() {
             Save Changes
           </button>
         </div>
-
       </div>
 
       {/* FOOTER */}
       <div className="text-center text-gray-500 text-sm mt-6">
-        Need help with your account settings? 
-        <span className="text-purple-400 ml-1">
-          Contact Support
-        </span>
+        Need help with your account settings?
+        <span className="text-purple-400 ml-1">Contact Support</span>
       </div>
-
     </div>
   );
 }
-
-

@@ -18,4 +18,3 @@ export default function useMousePosition() {
 
   return { mouse, heroRef };
 }
-
