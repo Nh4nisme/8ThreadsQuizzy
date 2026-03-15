@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { ChevronLeft, ChevronRight, Clock, CircleCheck} from "lucide-react"
+import { ChevronLeft, ChevronRight, Clock, CircleCheck, Trash2, ChevronDown, Plus} from "lucide-react"
 {/* Please note that all the fields in this jsx is customized using the same styling in index.css for consistency */}
 
 function Toggle({ value, onChange }) {
@@ -25,7 +25,7 @@ function DetailCard(){
   return(
     <div className="w-full bg-[#151518] p-8 rounded-md border border-[#484848]">
       {/* Header */}
-      <div class className="">
+      <div>
         <h1 className="text-3xl font-bold text-white">Quiz Detail</h1>
         <p className="text-gray-400">Basic information about your quiz</p>
       </div>
@@ -39,7 +39,7 @@ function DetailCard(){
           <input type="text" placeholder="Enter quiz title..."/>
         </div>
 
-        {/* Quiz Title */}
+        {/* Quiz Description */}
         <div className="mb-5">
           <p>Quiz Title</p>
           <input type="text" className="pb-20" placeholder="Enter quiz description..."/>
@@ -78,7 +78,7 @@ function SettingsCard(){
   return(
     <div className="bg-[#151518] p-8 pb-5 rounded-md border border-[#484848]">
       {/* Header */}
-      <div class className="">
+      <div>
         <h1 className="text-3xl font-bold text-white">Quiz Settings</h1>
         <p className="text-gray-400">Configure how your quiz workss</p>
       </div>
@@ -124,7 +124,7 @@ function SettingsCard(){
 
         <div className="mt-6 flex">
           <div className="w-full">
-            <h1 classNames="text-lg font-bold text-white">Immediate Results</h1>
+            <h1 className="text-lg font-bold text-white">Immediate Results</h1>
             <p className="text-gray-400 mt-2">Show results for each question</p>
           </div>
           <div className="mt-3">
@@ -136,7 +136,122 @@ function SettingsCard(){
   )
 }
 
+{/* Step 1 */}
+function BasicInfo(){
+  return (
+    <div className="grid grid-cols-5 gap-5 items-start">
+      <div className="col-span-3">
+        <DetailCard></DetailCard>
+      </div>
+      
+      <div className="col-span-2">
+        <SettingsCard></SettingsCard>
+      </div>
+    </div>
+  )
+}
+
+{/* Answer Boxes AKA step 2 */}
+function AnswerOption({ label, selected, onSelect }) {
+  return (
+    <div
+      onClick={onSelect}
+      className={`flex items-center gap-3 p-4 rounded-lg border cursor-pointer transition bg-[#1f1f20]
+        ${selected ? "border-purple-600" : "border-[#484848] hover:border-gray-400"}`}
+    >
+      <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center
+        ${selected ? "border-purple-600" : "border-gray-600"}`}>
+        {selected && <div className="w-2.5 h-2.5 rounded-full bg-purple-600" />}
+      </div>
+      <span className="text-white font-semibold">{label}</span>
+    </div>
+  );
+}
+
+function QuizQuestion( quizQuestion ){
+  const [questionType, setQuestionType] = useState("Multiple_Choice");
+  
+  const [selected, setSelected] = useState(null);
+  const options = ["Solar Power", "Wind Power", "Natural Gas", "Hydroelectric Power"];
+  
+  return(
+    <div className="bg-[#151518] p-8 pb-5 rounded-md border border-[#484848]">
+      {/* Header */}
+      <div className="mb-5">
+        <h1 className="text-3xl font-bold text-white">Quiz Questions</h1>
+        <p className="text-gray-400">Create and manage your quiz questions</p>
+      </div>
+      
+      {/* Question Box */}
+      <div className="text-white bg-[#19191b] border border-[#484848] rounded-md mb-3">
+       {/* Question Box Header */}
+       <div className="flex justify-between items-center m-5">
+         <div>
+           <h1 className="font-bold text-lg">Question {1}</h1>
+         </div>
+        
+         <div className="flex">
+           <div className="flex items-center mr-5">
+             <h1 className="font-bold mr-3">Points: </h1>
+             <div className="w-20 h-10 flex items-center justify-start pl-3 border border-[#484848] rounded-lg">10</div>
+           </div>
+        
+           <div className="relative w-50 mr-5 -mt-1">
+            <select
+              value={questionType}
+              onChange={(e) => setQuestionType(e.target.value)}
+              className="w-full h-10 rounded-lg appearance-none cursor-pointer pt-1.5 font-semibold">
+              
+              <option value="Multiple_Choice">Multiple Choice</option>
+              <option value="Written">Written</option>
+              <option value="Fill_blank">Fill in the blank</option>
+            </select>
+            <ChevronDown className="absolute right-2 top-6 -translate-y-3/7 h-10 text-gray-400 pointer-events-none" />
+          </div>
+
+          <button className="flex items-center cursor-pointer" >
+            <Trash2 className="text-red-600"></Trash2>
+          </button>
+         </div>
+       </div>
+
+       {/* Question Text Box */}
+       <div>
+        <div className="m-5 -mt-2">
+          <h1 className="font-semibold">Question Text</h1>
+          <div className="border border-[#484848] bg-[#1f1f20] rounded-md mt-2">
+            <p className="m-3 font-medium h-20">Which of the folling is NOT a renewable energy source?</p>
+          </div>
+        </div>
+
+        {/* Answer boxes */}
+        <div className="flex flex-col gap-3 m-5">
+          <p className="text-white font-semibold">Answer Options</p>
+          {options.map((opt, i) => (
+            <AnswerOption
+              key={i}
+              label={opt}
+              selected={selected === i}
+              onSelect={() => setSelected(i)}
+            />
+          ))}
+        </div>
+       </div>
+      </div>
+
+      {/* Add question */}
+      <div className="flex border border-dashed border-[#4c4c4e] text-white justify-center rounded-md p-2 hover:bg-purple-600 transition cursor-pointer">
+        <Plus className="mr-3"></Plus>
+        <h1 className="font-bold">Add Question</h1>
+      </div>
+    </div>
+  )
+}
+
+{/* Final Component */}
 function CreateQuiz(){
+  const [step, setStep] = useState(1);
+
   return (
     <div className="border bg-[#101010] p-5 pb-10">
       <div className="flex justify-between w-full items-start pb-10">
@@ -153,7 +268,7 @@ function CreateQuiz(){
           </div>
         </div>
 
-        <div>
+        <div className="flex">
           <div className="flex justify-center mt-3">
             <button className="flex justify-between rounded-xl px-5 py-2.5 mr-3 border border-[#484848] text-white font-bold hover:bg-[#7c3aed] transition cursor-pointer">
               <p>Save draft</p>
@@ -166,28 +281,31 @@ function CreateQuiz(){
         </div>
       </div>
 
-      <div className="grid grid-cols-5 gap-5 items-start">
-        <div className="col-span-3">
-          <DetailCard></DetailCard>
-        </div>
-        <div className="col-span-2">
-          <SettingsCard></SettingsCard>
-        </div>
-      </div>
+      {step === 1 && <BasicInfo/>}
+      {step === 2 && <QuizQuestion />}
 
-      {/* Bottom right buttons */}
-      <div className="flex justify-end mt-5">
-        <button className="flex justify-between rounded-xl px-3 py-2.5 mr-3 border border-[#484848] text-[#484848] font-bold hover:bg-[#7c3aed] transition cursor-pointer">
-              <ChevronLeft></ChevronLeft>
-              <p>Prev</p>
-            </button>
-            
-            <button className="flex justify-between rounded-xl px-3 py-2.5 border border-[#484848] text-white font-bold bg-[#7c3aed] hover:bg-purple-500 transition cursor-pointer">
-              <p>Next</p>
-              <ChevronRight></ChevronRight>
-            </button>
+      <div className="flex justify-end gap-3 mt-5">
+        <di>
+          <button onClick={() => setStep(step - 1)} className="flex justify-between rounded-xl px-5 py-2.5 mr-3 border border-[#484848] text-white font-bold hover:bg-[#7c3aed] transition cursor-pointer">
+            <ChevronLeft /> Prev
+          </button>
+        </di>
+
+        {step === 1 && (
+          <button onClick={() => setStep(2)} className="flex justify-between rounded-xl px-5 py-2.5 border border-[#484848] text-white font-bold bg-[#7c3aed] hover:bg-purple-500 transition cursor-pointer">
+            Next <ChevronRight />
+          </button>
+        )}
+
+        {step === 2 && (
+          <button /*onClick={}*/ className="flex justify-between rounded-xl px-5 py-2.5 border border-[#484848] text-white font-bold bg-[#7c3aed] hover:bg-purple-500 transition cursor-pointer">
+            Preview & Publish
+          </button>
+        )}
       </div>
     </div>
   )
 }
+
+
 export default CreateQuiz
