@@ -3,7 +3,6 @@ import EventItem from "./components/EventItem.jsx";
 export default function Events() {
   return (
     <div className="text-white">
-
       {/* HEADER */}
       <div className="flex justify-between items-center mb-6">
         <div>
@@ -20,10 +19,7 @@ export default function Events() {
 
       {/* CARD */}
       <div className="bg-[#1a1a1f] border border-gray-800 rounded-xl p-6">
-
-        <h2 className="text-xl font-semibold mb-1">
-          Event Calendar
-        </h2>
+        <h2 className="text-xl font-semibold mb-1">Event Calendar</h2>
 
         <p className="text-gray-400 mb-6">
           View and manage your scheduled quiz events
@@ -31,21 +27,14 @@ export default function Events() {
 
         {/* FILTER */}
         <div className="flex justify-between items-center mb-6">
-
           {/* tabs */}
           <div className="flex gap-2 bg-[#111115] p-1 rounded-lg">
             <button className="px-3 py-1 bg-black rounded-md">
               All Events
             </button>
-            <button className="px-3 py-1 text-gray-400">
-              Active
-            </button>
-            <button className="px-3 py-1 text-gray-400">
-              Upcoming
-            </button>
-            <button className="px-3 py-1 text-gray-400">
-              Completed
-            </button>
+            <button className="px-3 py-1 text-gray-400">Active</button>
+            <button className="px-3 py-1 text-gray-400">Upcoming</button>
+            <button className="px-3 py-1 text-gray-400">Completed</button>
           </div>
 
           {/* search */}
@@ -59,12 +48,10 @@ export default function Events() {
               All Quizzes
             </button>
           </div>
-
         </div>
 
         {/* EVENTS */}
         <div className="space-y-4">
-
           <EventItem
             title="Science Mid-term Quiz"
             status="Active"
@@ -82,11 +69,8 @@ export default function Events() {
             status="Completed"
             color="gray"
           />
-
         </div>
-
       </div>
-
     </div>
   );
 }

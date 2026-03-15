@@ -20,7 +20,10 @@ export default function LandingHero() {
   };
 
   return (
-    <div ref={heroRef} className="min-h-screen w-full flex flex-col items-center justify-center relative overflow-hidden bg-black">
+    <div
+      ref={heroRef}
+      className="min-h-screen w-full flex flex-col items-center justify-center relative overflow-hidden bg-black"
+    >
       {/* Interactive spotlight overlay */}
       <div style={spotlightStyle} />
       {/* Animated grid background */}
