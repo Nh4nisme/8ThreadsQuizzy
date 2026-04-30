@@ -1,6 +1,7 @@
 import React from "react";
 
-export default function Header() {
+export default function Header({ onSignIn, onSignUp }) {
+
     return (
         <header className="bg-black px-10 py-4 flex items-center justify-between w-full">
             {/* Logo */}
@@ -16,8 +17,8 @@ export default function Header() {
             </nav>
             {/* Buttons */}
             <div className="flex gap-2">
-                <button className="bg-white text-black rounded-lg px-6 py-2 font-medium text-sm hover:bg-gray-200 transition">Sign In</button>
-                <button className="bg-gradient-to-r from-purple-500 to-orange-500 text-white rounded-lg px-6 py-2 font-medium text-sm hover:opacity-90 transition">Register</button>
+                <button className="bg-white text-black rounded-lg px-6 py-2 font-medium text-sm hover:bg-gray-200 transition" onClick={onSignIn}>Sign In</button>
+                <button className="bg-gradient-to-r from-purple-500 to-orange-500 text-white rounded-lg px-6 py-2 font-medium text-sm hover:opacity-90 transition" onClick={onSignUp}>Register</button>
             </div>
         </header>
     );
