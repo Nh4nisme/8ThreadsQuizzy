@@ -1,17 +1,17 @@
 import js from "@eslint/js";
+import nextVitals from "eslint-config-next/core-web-vitals";
 import globals from "globals";
 import reactHooks from "eslint-plugin-react-hooks";
-import reactRefresh from "eslint-plugin-react-refresh";
 import {defineConfig, globalIgnores} from "eslint/config";
 
 export default defineConfig([
-    globalIgnores(["dist"]),
+    globalIgnores([".next", "dist"]),
+    ...nextVitals,
     {
-        files: ["**/*.{js,jsx}"],
+        files: ["**/*.{js,jsx,ts,tsx}"],
         extends: [
             js.configs.recommended,
             reactHooks.configs.flat.recommended,
-            reactRefresh.configs.vite,
         ],
         languageOptions: {
             ecmaVersion: 2020,
@@ -24,6 +24,7 @@ export default defineConfig([
         },
         rules: {
             "no-unused-vars": ["error", {varsIgnorePattern: "^[A-Z_]"}],
+            "@next/next/no-img-element": "off",
         },
     },
     {
@@ -32,7 +33,7 @@ export default defineConfig([
             ecmaVersion: 2020,
             globals: globals.node,
             parserOptions: {
-                sourceType: "commonjs",
+                sourceType: "script",
             },
         },
     },
