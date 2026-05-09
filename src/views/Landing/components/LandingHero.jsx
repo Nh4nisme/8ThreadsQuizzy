@@ -8,7 +8,7 @@ import useMousePosition from "../../../hooks/useMousePosition.js";
 import useSpotlight from "../../../hooks/useSpotlight.js";
 import useFloatAnimation from "../../../hooks/useFloatAnimation.js";
 
-export default function LandingHero() {
+export default function LandingHero({ onExplore }) {
   // Animation hooks
   const { mouse, heroRef } = useMousePosition();
   const spotlightStyle = useSpotlight(mouse);
@@ -23,7 +23,7 @@ export default function LandingHero() {
   return (
     <div
       ref={heroRef}
-      className="min-h-screen w-full flex flex-col items-center justify-center relative overflow-hidden bg-black"
+      className="relative flex min-h-[calc(100vh-72px)] w-full flex-col items-center justify-center overflow-hidden bg-black"
     >
       {/* Interactive spotlight overlay */}
       <div style={spotlightStyle} />
@@ -47,7 +47,7 @@ export default function LandingHero() {
           Join thousands of students and teachers on the ultimate quiz platform.
           Test your knowledge, compete with peers, and win exciting rewards
         </p>
-        <HeroActions />
+        <HeroActions onExplore={onExplore} />
       </div>
     </div>
   );
