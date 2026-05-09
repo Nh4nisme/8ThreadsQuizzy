@@ -1,8 +1,7 @@
 import SideBar from "../components/ui/SideBar.jsx";
 import Navbar from "../components/ui/Navbar.jsx";
-import { Outlet } from "react-router-dom";
 
-const MainLayout = () => {
+const MainLayout = ({ children }) => {
   return (
     <div className="flex w-screen h-screen">
       <SideBar />
@@ -12,7 +11,7 @@ const MainLayout = () => {
           <div className="absolute -top-40 -left-40 w-[600px] h-[600px] bg-[#AC63E6]/30 blur-[200px] rounded-full"></div>
           <div className="absolute -bottom-40 -right-40 w-[600px] h-[600px] bg-[#C45037]/30 blur-[200px] rounded-full"></div>
 
-          <Outlet />
+          {children}
         </main>
       </div>
     </div>
