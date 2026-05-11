@@ -121,11 +121,10 @@ function CategoryDropdown({ categories, category, onChange }) {
                 onChange(item);
                 setOpen(false);
               }}
-              className={`w-full px-3 py-2.5 text-left text-sm transition ${
-                category === item
-                  ? "bg-gray-200 text-black"
-                  : "text-gray-400 hover:bg-gray-800"
-              }`}
+              className={`w-full px-3 py-2.5 text-left text-sm transition ${category === item
+                ? "bg-gray-200 text-black"
+                : "text-gray-400 hover:bg-gray-800"
+                }`}
             >
               {item}
             </button>
@@ -141,9 +140,8 @@ function QuizCard({ quiz, isSelected, onView, onEdit, onDuplicated, onDeleted })
 
   return (
     <div
-      className={`mt-5 flex items-center gap-4 rounded-lg border-2 bg-[#19191b] p-5 transition ${
-        isSelected ? "border-purple-600" : "border-gray-800 hover:border-purple-600"
-      }`}
+      className={`mt-5 flex items-center gap-4 rounded-lg border-2 bg-[#19191b] p-5 transition ${isSelected ? "border-purple-600" : "border-gray-800 hover:border-purple-600"
+        }`}
     >
       <div className="rounded-full bg-purple-900/40 p-4">
         <BookOpen className="text-[#7c3aed]" />
@@ -153,11 +151,10 @@ function QuizCard({ quiz, isSelected, onView, onEdit, onDuplicated, onDeleted })
         <div className="mb-1 flex items-center gap-2">
           <h1 className="font-bold text-white">{quiz.title}</h1>
           <span
-            className={`rounded-full px-3 py-0.75 text-xs font-bold ${
-              quiz.status === "published"
-                ? "bg-green-500 text-white"
-                : "border border-amber-500 bg-amber-950 text-orange-500"
-            }`}
+            className={`rounded-full px-3 py-0.75 text-xs font-bold ${quiz.status === "published"
+              ? "bg-green-500 text-white"
+              : "border border-amber-500 bg-amber-950 text-orange-500"
+              }`}
           >
             {quizStatusLabel}
           </span>
@@ -173,7 +170,7 @@ function QuizCard({ quiz, isSelected, onView, onEdit, onDuplicated, onDeleted })
             <Clock className="h-3.5 w-3.5" /> {quiz.durationMinutes} min
           </span>
           <span className="flex items-center gap-1">
-            <Users className="h-3.5 w-3.5" /> {quiz.estimatedPlayers || 0} completions
+            <Users className="h-3.5 w-3.5" /> {quiz.completions || 0} completions
           </span>
           <span>{quiz.category}</span>
         </div>
@@ -286,9 +283,8 @@ export default function QuizLibrary({ selectedQuizId, onSelectQuiz }) {
                 key={tab}
                 type="button"
                 onClick={() => setActive(tab)}
-                className={`rounded-lg px-4 py-2 text-sm font-medium transition ${
-                  active === tab ? "bg-[#101010] text-white" : "text-gray-400 hover:text-white"
-                }`}
+                className={`rounded-lg px-4 py-2 text-sm font-medium transition ${active === tab ? "bg-[#101010] text-white" : "text-gray-400 hover:text-white"
+                  }`}
               >
                 {tab}
               </button>
