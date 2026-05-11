@@ -116,6 +116,25 @@ exports.getStudentQuizzes = async (_req, res) => {
   }
 };
 
+exports.getStudentQuizBySlug = async (req, res) => {
+  try {
+    const quiz = await Quiz.findOne({
+      slug: req.params.slug,
+      status: "published",
+      visibility: "student",
+    }).lean();
+
+    if (!quiz) {
+      return res.status(404).json({ message: "Quiz not found" });
+    }
+
+    res.json({ quiz });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: error.message });
+  }
+};
+
 exports.getTeacherQuizzes = async (req, res) => {
   try {
     const quizzes = await Quiz.find({

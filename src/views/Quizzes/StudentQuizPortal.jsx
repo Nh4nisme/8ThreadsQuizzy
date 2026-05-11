@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 import {
   ArrowLeft,
   BookOpen,
@@ -13,11 +14,15 @@ import {
   Users,
 } from "lucide-react";
 import { useAuth } from "../../context/AuthContext.jsx";
-import { fetchStudentQuizzes } from "../../lib/quiz-client.js";
+import { 
+  fetchStudentQuizzes, 
+  createQuizAttemptRequest, 
+  submitQuizAttemptRequest 
+} from "../../lib/quiz-client.js";
 
 const difficultyOptions = ["All Levels", "Easy", "Medium", "Hard"];
 
-function StudentQuizPlayer({ quiz, onExit }) {
+export function StudentQuizPlayer({ quiz, attemptId, onExit, onComplete, isPreview = false }) {
   const [questionIndex, setQuestionIndex] = useState(0);
   const [selectedAnswers, setSelectedAnswers] = useState({});
   const [showResults, setShowResults] = useState(false);
@@ -28,8 +33,19 @@ function StudentQuizPlayer({ quiz, onExit }) {
     return total + (selectedAnswers[currentQuestion.id] === currentQuestion.correctChoiceId ? 1 : 0);
   }, 0);
 
-  const handleNext = () => {
+  const handleNext = async () => {
     if (questionIndex === quiz.questions.length - 1) {
+      if (!isPreview && attemptId) {
+        const responses = Object.entries(selectedAnswers).map(([questionId, choiceId]) => ({
+          questionId,
+          choiceId,
+        }));
+        try {
+          await submitQuizAttemptRequest(quiz._id || quiz.id, attemptId, responses);
+        } catch (error) {
+          console.error("Failed to submit attempt:", error);
+        }
+      }
       setShowResults(true);
       return;
     }
@@ -163,13 +179,35 @@ function StudentQuizPlayer({ quiz, onExit }) {
 
 export default function StudentQuizPortal() {
   const { user } = useAuth();
+  const searchParams = useSearchParams();
+  const initialQuizId = searchParams.get("quizId");
   const [search, setSearch] = useState("");
   const [difficulty, setDifficulty] = useState("All Levels");
   const [category, setCategory] = useState("All Categories");
   const [activeQuiz, setActiveQuiz] = useState(null);
+  const [activeAttemptId, setActiveAttemptId] = useState(null);
   const [quizzes, setQuizzes] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState("");
+
+  const handleJoinQuiz = async (quiz) => {
+    try {
+      const { attempt } = await createQuizAttemptRequest(quiz._id || quiz.id);
+      setActiveAttemptId(attempt._id);
+      setActiveQuiz(quiz);
+    } catch (err) {
+      alert("Failed to join quiz: " + err.message);
+    }
+  };
+
+  useEffect(() => {
+    if (initialQuizId && quizzes.length > 0) {
+      const quiz = quizzes.find(q => q._id === initialQuizId || q.id === initialQuizId);
+      if (quiz) {
+        setSearch(quiz.title);
+      }
+    }
+  }, [initialQuizId, quizzes]);
 
   useEffect(() => {
     const loadQuizzes = async () => {
@@ -207,7 +245,16 @@ export default function StudentQuizPortal() {
   }, [category, difficulty, quizzes, search]);
 
   if (activeQuiz) {
-    return <StudentQuizPlayer quiz={activeQuiz} onExit={() => setActiveQuiz(null)} />;
+    return (
+      <StudentQuizPlayer 
+        quiz={activeQuiz} 
+        attemptId={activeAttemptId}
+        onExit={() => {
+          setActiveQuiz(null);
+          setActiveAttemptId(null);
+        }} 
+      />
+    );
   }
 
   return (
@@ -352,7 +399,7 @@ export default function StudentQuizPortal() {
 
                     <button
                       type="button"
-                      onClick={() => setActiveQuiz(quiz)}
+                      onClick={() => handleJoinQuiz(quiz)}
                       className="rounded-xl bg-gradient-to-r from-purple-500 to-orange-500 px-4 py-2 text-sm font-medium text-white"
                     >
                       Join now
