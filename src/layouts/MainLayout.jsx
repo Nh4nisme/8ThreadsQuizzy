@@ -8,8 +8,8 @@ const MainLayout = ({ children }) => {
       <div className="flex flex-col flex-1">
         <Navbar />
         <main className="flex-1 p-6 overflow-y-auto overflow-x-hidden bg-black relative">
-          <div className="absolute -top-40 -left-40 w-[600px] h-[600px] bg-[#AC63E6]/30 blur-[200px] rounded-full"></div>
-          <div className="absolute -bottom-40 -right-40 w-[600px] h-[600px] bg-[#C45037]/30 blur-[200px] rounded-full"></div>
+          <div className="pointer-events-none absolute -top-40 -left-40 w-[600px] h-[600px] bg-[#AC63E6]/30 blur-[200px] rounded-full"></div>
+          <div className="pointer-events-none absolute -bottom-40 -right-40 w-[600px] h-[600px] bg-[#C45037]/30 blur-[200px] rounded-full"></div>
 
           {children}
         </main>

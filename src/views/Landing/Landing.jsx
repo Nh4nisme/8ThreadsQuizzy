@@ -7,48 +7,68 @@ import LandingSections from "./components/LandingSections.jsx";
 import AuthModal from "../Auth/AuthModal.jsx";
 
 export default function Landing() {
-    const [authMode, setAuthMode] = useState(null);
-    const [isExploreUnlocked, setIsExploreUnlocked] = useState(false);
-    const exploreSectionRef = useRef(null);
+  const [authMode, setAuthMode] = useState(null);
+  const [isExploreUnlocked, setIsExploreUnlocked] = useState(false);
+  const [pendingSectionId, setPendingSectionId] = useState(null);
+  const exploreSectionRef = useRef(null);
 
-    // null | "signin" | "signup"
-    useEffect(() => {
-        document.body.style.overflow = isExploreUnlocked ? "" : "hidden";
+  useEffect(() => {
+    document.body.style.overflow = isExploreUnlocked ? "" : "hidden";
 
-        if (isExploreUnlocked) {
-            // Đảm bảo section đã render xong mới scroll
-            setTimeout(() => {
-                exploreSectionRef.current?.scrollIntoView({
-                    behavior: "smooth",
-                    block: "start",
-                });
-            }, 0);
-        }
+    if (isExploreUnlocked && pendingSectionId) {
+      setTimeout(() => {
+        const targetSection =
+          pendingSectionId === "quiz"
+            ? exploreSectionRef.current
+            : document.getElementById(pendingSectionId);
 
-        return () => {
-            document.body.style.overflow = "";
-        };
-    }, [isExploreUnlocked]);
+        targetSection?.scrollIntoView({
+          behavior: "smooth",
+          block: "start",
+        });
+      }, 0);
+    }
 
-    const handleExplore = () => {
-        setIsExploreUnlocked(true);
+    return () => {
+      document.body.style.overflow = "";
     };
+  }, [isExploreUnlocked, pendingSectionId]);
 
-    return (
-        <>
-            <Header
-                onSignIn={() => setAuthMode("signin")}
-                onSignUp={() => setAuthMode("signup")}
-            />
-            <LandingHero onExplore={handleExplore} />
-            <LandingSections ref={exploreSectionRef} />
+  const handleSectionNavigation = (sectionId = "quiz") => {
+    setPendingSectionId(sectionId);
 
-            {authMode && (
-                <AuthModal
-                    mode={authMode}
-                    onClose={() => setAuthMode(null)}
-                />
-            )}
-        </>
-    );
+    if (!isExploreUnlocked) {
+      setIsExploreUnlocked(true);
+      return;
+    }
+
+    const targetSection =
+      sectionId === "quiz"
+        ? exploreSectionRef.current
+        : document.getElementById(sectionId);
+
+    targetSection?.scrollIntoView({
+      behavior: "smooth",
+      block: "start",
+    });
+  };
+
+  return (
+    <>
+      <Header
+        onNavigate={handleSectionNavigation}
+        onSignIn={() => setAuthMode("signin")}
+        onSignUp={() => setAuthMode("signup")}
+      />
+      <LandingHero onExplore={() => handleSectionNavigation("quiz")} />
+      <LandingSections ref={exploreSectionRef} />
+
+      {authMode && (
+        <AuthModal
+          mode={authMode}
+          onClose={() => setAuthMode(null)}
+        />
+      )}
+    </>
+  );
 }

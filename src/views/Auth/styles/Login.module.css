@@ -162,6 +162,12 @@
   gap: 16px;
   width: 100%;
 }
+.formSingle {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 16px;
+  width: 100%;
+}
 .inputSmallCard {
   width: 100%;
   display: flex;
@@ -201,4 +207,9 @@
 .switchLink {
   color: #ac63e6;
   cursor: pointer;
+}
+.errorText {
+  color: #b42318;
+  font-size: 14px;
+  font-weight: 500;
 }

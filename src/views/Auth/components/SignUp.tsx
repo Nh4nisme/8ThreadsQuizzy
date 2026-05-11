@@ -1,6 +1,7 @@
 import { useState } from "react";
 // @ts-ignore
 
+import { useRouter } from "next/navigation";
 import styles from "../styles/Login.module.css";
 import {
   GraduationCap,
@@ -10,9 +11,64 @@ import {
   UserRound,
 } from "lucide-react";
 import { FaGoogle, FaFacebookF } from "react-icons/fa";
+import { useAuth } from "../../../context/AuthContext.jsx";
+import { getDefaultRouteForRole } from "../../../lib/auth-routes.js";
 
 export const SignUp = ({ onSwitchSignIn }: { onSwitchSignIn: () => void }) => {
+  const router = useRouter();
+  const { register } = useAuth();
   const [role, setRole] = useState("student");
+  const [formData, setFormData] = useState({
+    fullName: "",
+    username: "",
+    email: "",
+    password: "",
+  });
+  const [error, setError] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const handleChange = (
+    field: "fullName" | "username" | "email" | "password",
+    value: string,
+  ) => {
+    setFormData((current) => ({ ...current, [field]: value }));
+  };
+
+  const handleSubmit = async () => {
+    if (
+      !formData.fullName.trim() ||
+      !formData.username.trim() ||
+      !formData.email.trim() ||
+      !formData.password.trim()
+    ) {
+      setError("All fields are required.");
+      return;
+    }
+
+    setIsSubmitting(true);
+    setError("");
+
+    try {
+      const user = await register({
+        ...formData,
+        fullName: formData.fullName.trim(),
+        username: formData.username.trim(),
+        email: formData.email.trim(),
+        role,
+      });
+      router.push(getDefaultRouteForRole(user?.role));
+      router.refresh();
+    } catch (submitError) {
+      setError(
+        submitError instanceof Error
+          ? submitError.message
+          : "Unable to create account.",
+      );
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
   return (
       <div className={styles.signUp}>
         <div className={styles.heading}>
@@ -59,6 +115,8 @@ export const SignUp = ({ onSwitchSignIn }: { onSwitchSignIn: () => void }) => {
                   type="text"
                   placeholder="John Doe"
                   className={styles.inputBox}
+                  value={formData.fullName}
+                  onChange={(event) => handleChange("fullName", event.target.value)}
               />
             </div>
           </div>
@@ -70,6 +128,8 @@ export const SignUp = ({ onSwitchSignIn }: { onSwitchSignIn: () => void }) => {
                   type="text"
                   placeholder="John Doe"
                   className={styles.inputBox}
+                  value={formData.username}
+                  onChange={(event) => handleChange("username", event.target.value)}
               />
             </div>
           </div>
@@ -79,8 +139,10 @@ export const SignUp = ({ onSwitchSignIn }: { onSwitchSignIn: () => void }) => {
               <Mail size={18} className={styles.inputIcon} />
               <input
                   type="text"
-                  placeholder="Name@example.come"
+                  placeholder="Name@example.com"
                   className={styles.inputBox}
+                  value={formData.email}
+                  onChange={(event) => handleChange("email", event.target.value)}
               />
             </div>
           </div>
@@ -92,11 +154,26 @@ export const SignUp = ({ onSwitchSignIn }: { onSwitchSignIn: () => void }) => {
                   type="password"
                   placeholder="************"
                   className={styles.inputBox}
+                  value={formData.password}
+                  onChange={(event) => handleChange("password", event.target.value)}
+                  onKeyDown={(event) => {
+                    if (event.key === "Enter") {
+                      handleSubmit();
+                    }
+                  }}
               />
             </div>
           </div>
         </div>
-        <button className={`${styles.signUpBtn} ${styles.btn}`}>Sign Up</button>
+        {error ? <p className={styles.errorText}>{error}</p> : null}
+        <button
+          type="button"
+          disabled={isSubmitting}
+          onClick={handleSubmit}
+          className={`${styles.signUpBtn} ${styles.btn}`}
+        >
+          {isSubmitting ? "Creating Account..." : "Sign Up"}
+        </button>
         <div style={{ display: "flex", gap: 5 }}>
           <span>Already have an account?</span>
           <span className={styles.switchLink} onClick={onSwitchSignIn}>

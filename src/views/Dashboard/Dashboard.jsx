@@ -1,16 +1,21 @@
+"use client";
+
+import { useAuth } from "../../context/AuthContext.jsx";
 import StatsCard from "./components/StatsCard.jsx";
 import EventItem from "./components/EventItem.jsx";
 import StudentItem from "./components/StudentItem.jsx";
 import QuizCard from "./components/QuizCard.jsx";
 
 export default function Dashboard() {
+  const { user } = useAuth();
+
   return (
     <div className=" text-white p-8">
       <div className="flex justify-between items-center mb-6">
         <div>
           <h1 className="text-2xl font-bold">Dashboard</h1>
           <p className="text-gray-400">
-            Welcome back, Sarah! Here&apos;s what&apos;s happening with your
+            Welcome back, {user?.fullName || user?.username || "there"}! Here&apos;s what&apos;s happening with your
             quizzes
           </p>
         </div>
