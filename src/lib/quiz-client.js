@@ -133,3 +133,28 @@ export const submitQuizAttemptRequest = async (quizId, attemptId, responses) => 
 
   return getJson(response);
 };
+
+export const fetchTeacherStudents = async () => {
+  const response = await fetch(`${QUIZ_API_BASE}/teacher/students`, {
+    headers: {
+      ...getAuthHeaders(),
+    },
+    cache: "no-store",
+  });
+
+  return getJson(response);
+};
+
+export const assignStudentToClassRequest = async (studentIds, className) => {
+  const response = await fetch(`${QUIZ_API_BASE}/teacher/students/assign`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      ...getAuthHeaders(),
+    },
+    body: JSON.stringify({ studentIds, className }),
+  });
+
+  console.log("Assigning students:", { studentIds, className });
+  return getJson(response);
+};

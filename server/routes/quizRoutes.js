@@ -13,6 +13,10 @@ const {
   createAttempt,
   submitAttempt,
 } = require("../controllers/quizAttemptController");
+const {
+  getTeacherStudents,
+  assignStudentToClass,
+} = require("../controllers/studentController");
 const authMiddleware = require("../middleware/authMiddleware");
 const requireRole = require("../middleware/requireRole");
 
@@ -33,5 +37,9 @@ router.get("/:id", authMiddleware, requireRole("teacher"), getQuizDetail);
 router.put("/:id", authMiddleware, requireRole("teacher"), updateQuiz);
 router.post("/:id/duplicate", authMiddleware, requireRole("teacher"), duplicateQuiz);
 router.delete("/:id", authMiddleware, requireRole("teacher"), deleteQuiz);
+
+// Student management
+router.get("/teacher/students", authMiddleware, requireRole("teacher"), getTeacherStudents);
+router.post("/teacher/students/assign", authMiddleware, requireRole("teacher"), assignStudentToClass);
 
 module.exports = router;
