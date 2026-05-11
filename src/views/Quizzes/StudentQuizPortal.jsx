@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import {
   ArrowLeft,
   BookOpen,
@@ -13,13 +13,9 @@ import {
   Users,
 } from "lucide-react";
 import { useAuth } from "../../context/AuthContext.jsx";
-import { studentQuizMocks } from "../../mock/studentQuizzes.js";
+import { fetchStudentQuizzes } from "../../lib/quiz-client.js";
 
 const difficultyOptions = ["All Levels", "Easy", "Medium", "Hard"];
-const categoryOptions = [
-  "All Categories",
-  ...new Set(studentQuizMocks.map((quiz) => quiz.category)),
-];
 
 function StudentQuizPlayer({ quiz, onExit }) {
   const [questionIndex, setQuestionIndex] = useState(0);
@@ -65,20 +61,6 @@ function StudentQuizPlayer({ quiz, onExit }) {
             <p className="mt-3 text-zinc-300">
               You answered {score} out of {quiz.questions.length} questions correctly.
             </p>
-            <div className="mt-6 grid gap-4 md:grid-cols-3">
-              <div className="rounded-xl border border-white/10 bg-black/30 p-4">
-                <p className="text-sm text-zinc-400">Accuracy</p>
-                <p className="mt-2 text-2xl font-semibold">{Math.round((score / quiz.questions.length) * 100)}%</p>
-              </div>
-              <div className="rounded-xl border border-white/10 bg-black/30 p-4">
-                <p className="text-sm text-zinc-400">Answered</p>
-                <p className="mt-2 text-2xl font-semibold">{answeredCount}</p>
-              </div>
-              <div className="rounded-xl border border-white/10 bg-black/30 p-4">
-                <p className="text-sm text-zinc-400">Level</p>
-                <p className="mt-2 text-2xl font-semibold">{quiz.difficulty}</p>
-              </div>
-            </div>
           </div>
         </div>
       </div>
@@ -171,10 +153,6 @@ function StudentQuizPlayer({ quiz, onExit }) {
                 <p className="text-sm text-zinc-400">Estimated time</p>
                 <p className="mt-2 text-2xl font-semibold">{quiz.durationMinutes} min</p>
               </div>
-              <div className="rounded-xl border border-white/10 bg-black/20 p-4">
-                <p className="text-sm text-zinc-400">Leaderboard position</p>
-                <p className="mt-2 text-2xl font-semibold">Live</p>
-              </div>
             </div>
           </div>
         </div>
@@ -189,9 +167,32 @@ export default function StudentQuizPortal() {
   const [difficulty, setDifficulty] = useState("All Levels");
   const [category, setCategory] = useState("All Categories");
   const [activeQuiz, setActiveQuiz] = useState(null);
+  const [quizzes, setQuizzes] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState("");
+
+  useEffect(() => {
+    const loadQuizzes = async () => {
+      try {
+        const data = await fetchStudentQuizzes();
+        setQuizzes(data.quizzes || []);
+      } catch (loadError) {
+        setError(loadError instanceof Error ? loadError.message : "Unable to load quizzes.");
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    loadQuizzes();
+  }, []);
+
+  const categoryOptions = useMemo(
+    () => ["All Categories", ...new Set(quizzes.map((quiz) => quiz.category))],
+    [quizzes],
+  );
 
   const filteredQuizzes = useMemo(() => {
-    return studentQuizMocks
+    return quizzes
       .filter((quiz) =>
         difficulty === "All Levels" ? true : quiz.difficulty === difficulty,
       )
@@ -199,11 +200,11 @@ export default function StudentQuizPortal() {
         category === "All Categories" ? true : quiz.category === category,
       )
       .filter((quiz) =>
-        `${quiz.title} ${quiz.category} ${quiz.description} ${quiz.tags.join(" ")}`
+        `${quiz.title} ${quiz.category} ${quiz.description} ${(quiz.tags || []).join(" ")}`
           .toLowerCase()
           .includes(search.toLowerCase()),
       );
-  }, [category, difficulty, search]);
+  }, [category, difficulty, quizzes, search]);
 
   if (activeQuiz) {
     return <StudentQuizPlayer quiz={activeQuiz} onExit={() => setActiveQuiz(null)} />;
@@ -234,7 +235,7 @@ export default function StudentQuizPortal() {
             <div className="grid gap-4 sm:grid-cols-3">
               <div className="rounded-2xl border border-white/10 bg-black/20 p-4">
                 <p className="text-sm text-zinc-400">Available quizzes</p>
-                <p className="mt-2 text-2xl font-semibold">{studentQuizMocks.length}</p>
+                <p className="mt-2 text-2xl font-semibold">{quizzes.length}</p>
               </div>
               <div className="rounded-2xl border border-white/10 bg-black/20 p-4">
                 <p className="text-sm text-zinc-400">Popular level</p>
@@ -301,54 +302,68 @@ export default function StudentQuizPortal() {
             </div>
           </div>
 
-          <div className="mt-8 grid gap-5 xl:grid-cols-2">
-            {filteredQuizzes.map((quiz) => (
-              <article
-                key={quiz.id}
-                className="rounded-2xl border border-white/10 bg-black/20 p-6 transition hover:border-purple-400/70"
-              >
-                <div className="flex items-start justify-between gap-4">
-                  <div>
-                    <div className="flex items-center gap-3">
-                      <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-purple-500/15 text-purple-300">
-                        <BookOpen size={22} />
+          {isLoading ? (
+            <div className="mt-8 rounded-2xl border border-white/10 bg-black/10 px-6 py-14 text-center text-zinc-400">
+              Loading quizzes...
+            </div>
+          ) : null}
+
+          {error ? (
+            <div className="mt-8 rounded-2xl border border-red-500/30 bg-red-500/10 px-6 py-6 text-center text-red-200">
+              {error}
+            </div>
+          ) : null}
+
+          {!isLoading && !error ? (
+            <div className="mt-8 grid gap-5 xl:grid-cols-2">
+              {filteredQuizzes.map((quiz) => (
+                <article
+                  key={quiz._id || quiz.slug}
+                  className="rounded-2xl border border-white/10 bg-black/20 p-6 transition hover:border-purple-400/70"
+                >
+                  <div className="flex items-start justify-between gap-4">
+                    <div>
+                      <div className="flex items-center gap-3">
+                        <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-purple-500/15 text-purple-300">
+                          <BookOpen size={22} />
+                        </div>
+                        <div>
+                          <p className="text-sm text-zinc-400">{quiz.category}</p>
+                          <h3 className="text-xl font-semibold">{quiz.title}</h3>
+                          <p className="mt-2 text-sm leading-6 text-zinc-400">{quiz.description}</p>
+                        </div>
                       </div>
-                      <div>
-                        <p className="text-sm text-zinc-400">{quiz.category}</p>
-                        <h3 className="text-xl font-semibold">{quiz.title}</h3>
-                        <p className="mt-2 text-sm leading-6 text-zinc-400">{quiz.description}</p>
+                      <div className="mt-5 flex flex-wrap gap-3 text-sm text-zinc-300">
+                        <span className="rounded-full border border-white/10 px-3 py-1">{quiz.difficulty}</span>
+                        <span className="flex items-center gap-2 rounded-full border border-white/10 px-3 py-1">
+                          <Clock3 size={14} />
+                          {quiz.durationMinutes} min
+                        </span>
+                        <span className="flex items-center gap-2 rounded-full border border-white/10 px-3 py-1">
+                          <Users size={14} />
+                          {quiz.estimatedPlayers || 0} players
+                        </span>
+                        <span className="flex items-center gap-2 rounded-full border border-white/10 px-3 py-1">
+                          <Trophy size={14} />
+                          {quiz.questions.length} questions
+                        </span>
                       </div>
                     </div>
-                    <div className="mt-5 flex flex-wrap gap-3 text-sm text-zinc-300">
-                      <span className="rounded-full border border-white/10 px-3 py-1">{quiz.difficulty}</span>
-                      <span className="flex items-center gap-2 rounded-full border border-white/10 px-3 py-1">
-                        <Clock3 size={14} />
-                        {quiz.durationMinutes} min
-                      </span>
-                      <span className="flex items-center gap-2 rounded-full border border-white/10 px-3 py-1">
-                        <Users size={14} />
-                        {quiz.estimatedPlayers} players
-                      </span>
-                      <span className="flex items-center gap-2 rounded-full border border-white/10 px-3 py-1">
-                        <Trophy size={14} />
-                        {quiz.questions.length} questions
-                      </span>
-                    </div>
+
+                    <button
+                      type="button"
+                      onClick={() => setActiveQuiz(quiz)}
+                      className="rounded-xl bg-gradient-to-r from-purple-500 to-orange-500 px-4 py-2 text-sm font-medium text-white"
+                    >
+                      Join now
+                    </button>
                   </div>
+                </article>
+              ))}
+            </div>
+          ) : null}
 
-                  <button
-                    type="button"
-                    onClick={() => setActiveQuiz(quiz)}
-                    className="rounded-xl bg-gradient-to-r from-purple-500 to-orange-500 px-4 py-2 text-sm font-medium text-white"
-                  >
-                    Join now
-                  </button>
-                </div>
-              </article>
-            ))}
-          </div>
-
-          {filteredQuizzes.length === 0 ? (
+          {!isLoading && !error && filteredQuizzes.length === 0 ? (
             <div className="mt-8 rounded-2xl border border-dashed border-white/10 bg-black/10 px-6 py-14 text-center">
               <h3 className="text-xl font-semibold">No quizzes matched that filter</h3>
               <p className="mt-3 text-zinc-400">

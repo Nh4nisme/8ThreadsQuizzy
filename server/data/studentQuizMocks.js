@@ -1,6 +1,5 @@
-export const studentQuizMocks = [
+module.exports = [
   {
-    id: "bio-sprint-001",
     title: "Biology Sprint",
     slug: "biology-sprint",
     description: "Fast revision quiz covering cells, organs, and basic biology terms.",
@@ -47,7 +46,6 @@ export const studentQuizMocks = [
     ],
   },
   {
-    id: "alg-warmup-002",
     title: "Algebra Warmup",
     slug: "algebra-warmup",
     description: "Short algebra set focused on quick equation solving and number patterns.",
@@ -94,7 +92,6 @@ export const studentQuizMocks = [
     ],
   },
   {
-    id: "hist-world-003",
     title: "World History Challenge",
     slug: "world-history-challenge",
     description: "A mixed history challenge on major civilizations and cultural periods.",
@@ -141,7 +138,6 @@ export const studentQuizMocks = [
     ],
   },
   {
-    id: "eng-vocab-004",
     title: "English Vocabulary Boost",
     slug: "english-vocabulary-boost",
     description: "Lightweight vocabulary and spelling practice for daily review.",

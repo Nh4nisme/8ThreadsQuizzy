@@ -1,6 +1,7 @@
 "use client";
 
-import { useState, useRef, useEffect } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
+import { useRouter } from "next/navigation";
 import {
   BookOpen,
   Clock,
@@ -13,78 +14,81 @@ import {
   Trash2,
   ChevronDown,
 } from "lucide-react";
+import {
+  deleteQuizRequest,
+  duplicateQuizRequest,
+  fetchTeacherQuizzes,
+} from "../../lib/quiz-client.js";
 
-const quizzes = [
-  {
-    QuizID: 1,
-    QuizTitle: "Introduction to Biology",
-    QuestionCount: 15,
-    QuizDescription: "Basic concepts of biology for beginners",
-    QuizStatus: "Published",
-    QuizTime: 20,
-    QuizCompletion: 32,
-  },
-  {
-    QuizID: 2,
-    QuizTitle: "Advanced Mathematics",
-    QuestionCount: 15,
-    QuizDescription: "Basic concepts of biology for beginners",
-    QuizStatus: "Published",
-    QuizTime: 20,
-    QuizCompletion: 32,
-  },
-  {
-    QuizID: 3,
-    QuizTitle: "Chemistry Fundamentals",
-    QuestionCount: 15,
-    QuizDescription: "Basic concepts of biology for beginners",
-    QuizStatus: "Draft",
-    QuizTime: 20,
-    QuizCompletion: 32,
-  },
-];
-
-{
-  /* Default option does NOT allow styling, resorting to ts*/
-}
-({
-  /* Functions does not work for now*/
-});
-function QuizMenu() {
+function QuizMenu({ quizId, onEdit, onDuplicated, onDeleted }) {
   const [open, setOpen] = useState(false);
   const ref = useRef(null);
 
   useEffect(() => {
-    function handleClickOutside(e) {
-      if (ref.current && !ref.current.contains(e.target)) setOpen(false);
+    function handleClickOutside(event) {
+      if (ref.current && !ref.current.contains(event.target)) {
+        setOpen(false);
+      }
     }
+
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
+  const handleDuplicate = async () => {
+    const data = await duplicateQuizRequest(quizId);
+    onDuplicated(data.quiz);
+    setOpen(false);
+  };
+
+  const handleDelete = async () => {
+    await deleteQuizRequest(quizId);
+    onDeleted(quizId);
+    setOpen(false);
+  };
+
   return (
     <div className="relative" ref={ref}>
       <button
-        onClick={() => setOpen(!open)}
-        className="px-3 py-3 border border-gray-700 rounded-lg text-white hover:bg-purple-600 transition"
+        type="button"
+        onClick={() => setOpen((current) => !current)}
+        className="rounded-lg border border-gray-700 px-3 py-3 text-white transition hover:bg-purple-600"
       >
-        <EllipsisVertical className="w-4 h-4" />
+        <EllipsisVertical className="h-4 w-4" />
       </button>
 
       {open && (
-        <div className="absolute right-0 mt-1 w-44 bg-[#101010] rounded-xl shadow-xl z-50 overflow-hidden">
-          <button className="flex items-center gap-3 w-full px-4 py-3 text-white text-sm hover:bg-purple-600 transition">
-            <SquarePen className="h-5" /> Edit
+        <div className="absolute right-0 z-50 mt-1 w-44 overflow-hidden rounded-xl bg-[#101010] shadow-xl">
+          <button
+            type="button"
+            onClick={() => {
+              onEdit(quizId);
+              setOpen(false);
+            }}
+            className="flex w-full items-center gap-3 px-4 py-3 text-sm text-white transition hover:bg-purple-600"
+          >
+            <SquarePen className="h-5" />
+            Edit
           </button>
 
-          <button className="flex items-center gap-3 w-full px-4 py-3 text-white text-sm hover:bg-purple-600 transition">
-            <Copy className="h-5" /> Duplicate
+          <button
+            type="button"
+            onClick={handleDuplicate}
+            className="flex w-full items-center gap-3 px-4 py-3 text-sm text-white transition hover:bg-purple-600"
+          >
+            <Copy className="h-5" />
+            Duplicate
           </button>
 
           <hr className="text-gray-800" />
 
-          <button className="flex items-center gap-3 w-full px-4 py-3 text-red-500 text-sm hover:bg-red-500 hover:text-white transition">
-            <Trash2 className="h-5" /> Delete
+          <button
+            type="button"
+            onClick={handleDelete}
+            className="flex w-full items-center gap-3 px-4 py-3 text-sm text-red-500 transition hover:bg-red-500 hover:text-white"
+          >
+            <Trash2 className="h-5" />
+            Delete
           </button>
         </div>
       )}
@@ -92,37 +96,38 @@ function QuizMenu() {
   );
 }
 
-({
-  /* Same thing with above but for category, delete if not needed */
-});
-function CategoryDropdown() {
+function CategoryDropdown({ categories, category, onChange }) {
   const [open, setOpen] = useState(false);
-  const [category, setCategory] = useState("All Categories");
-  const categories = ["All Categories", "Biology", "Math", "Chemistry"];
 
   return (
     <div className="relative">
       <button
-        onClick={() => setOpen(!open)}
-        className="p-2.5 flex items-center gap-2 bg-[#18181a] border border-[#27272a] rounded-lg text-white text-sm">
+        type="button"
+        onClick={() => setOpen((current) => !current)}
+        className="flex items-center gap-2 rounded-lg border border-[#27272a] bg-[#18181a] p-2.5 text-sm text-white"
+      >
         <Filter className="w-4 text-gray-400" />
         {category}
-        <ChevronDown className="w-4 h-4 text-gray-400" />
+        <ChevronDown className="h-4 w-4 text-gray-400" />
       </button>
 
       {open && (
-        <div className="absolute right-0 mt-1 w-44 bg-[#1a1a1f] border border-gray-800 rounded-xl shadow-xl z-50">
-          {categories.map((c) => (
+        <div className="absolute right-0 z-50 mt-1 w-44 rounded-xl border border-gray-800 bg-[#1a1a1f] shadow-xl">
+          {categories.map((item) => (
             <button
-              key={c}
+              key={item}
+              type="button"
               onClick={() => {
-                setCategory(c);
+                onChange(item);
                 setOpen(false);
               }}
-              className={`w-full text-left px-3 py-2.5 text-sm transition 
-                ${category === c ? "bg-gray-200" : "text-gray-400 hover:bg-gray-800"}`}
+              className={`w-full px-3 py-2.5 text-left text-sm transition ${
+                category === item
+                  ? "bg-gray-200 text-black"
+                  : "text-gray-400 hover:bg-gray-800"
+              }`}
             >
-              {c}
+              {item}
             </button>
           ))}
         </div>
@@ -131,129 +136,219 @@ function CategoryDropdown() {
   );
 }
 
-{/*Without QuizID it still gonna works, but let put it here for now*/}
-function QuizCard({ QuizStatus, QuizTitle, QuestionCount, QuizDescription, QuizTime, QuizCompletion }){
- return (
-    <div className="mt-5 flex items-center gap-4 border-2 bg-[#19191b] border-gray-800 hover:border-purple-600 rounded-lg p-5 transition">
-      {/* Icon */}
-      <div className="bg-purple-900/40 rounded-full p-4">
-        <BookOpen className="text-[#7c3aed]"></BookOpen>
+function QuizCard({ quiz, isSelected, onView, onEdit, onDuplicated, onDeleted }) {
+  const quizStatusLabel = quiz.status === "published" ? "Published" : "Draft";
+
+  return (
+    <div
+      className={`mt-5 flex items-center gap-4 rounded-lg border-2 bg-[#19191b] p-5 transition ${
+        isSelected ? "border-purple-600" : "border-gray-800 hover:border-purple-600"
+      }`}
+    >
+      <div className="rounded-full bg-purple-900/40 p-4">
+        <BookOpen className="text-[#7c3aed]" />
       </div>
 
-      {/* Content */}
       <div className="flex-1">
-        {/* Title + status */}
-        <div className="flex items-center gap-2 mb-1">
-          <h1 className="text-white font-bold">{QuizTitle}</h1>
+        <div className="mb-1 flex items-center gap-2">
+          <h1 className="font-bold text-white">{quiz.title}</h1>
           <span
-            className={`text-xs px-3 py-0.75 rounded-full font-bold
-            ${
-              QuizStatus === "Published"
+            className={`rounded-full px-3 py-0.75 text-xs font-bold ${
+              quiz.status === "published"
                 ? "bg-green-500 text-white"
-                : "border border-amber-500 text-orange-500 bg-amber-950"
+                : "border border-amber-500 bg-amber-950 text-orange-500"
             }`}
           >
-            {QuizStatus}
+            {quizStatusLabel}
           </span>
         </div>
 
-        {/* Description */}
-        <p className="text-gray-300 text-sm mb-2">{QuizDescription}</p>
+        <p className="mb-2 text-sm text-gray-300">{quiz.description}</p>
 
-        {/* Quiz info */}
-        <div className="flex gap-4 text-white text-xs">
+        <div className="flex gap-4 text-xs text-white">
           <span className="flex items-center gap-1">
-            <BookOpen className="w-3.5 h-3.5" /> {QuestionCount} questions
+            <BookOpen className="h-3.5 w-3.5" /> {quiz.questions.length} questions
           </span>
           <span className="flex items-center gap-1">
-            <Clock className="w-3.5 h-3.5" /> {QuizTime} min
+            <Clock className="h-3.5 w-3.5" /> {quiz.durationMinutes} min
           </span>
           <span className="flex items-center gap-1">
-            <Users className="w-3.5 h-3.5" /> {QuizCompletion} completions
+            <Users className="h-3.5 w-3.5" /> {quiz.estimatedPlayers || 0} completions
           </span>
-          <span>Created just now</span>{" "}
-          {/* Probably need change if planning to connect to a database */}
+          <span>{quiz.category}</span>
         </div>
       </div>
 
-      {/* Buttons */}
       <div className="flex items-center gap-3">
-        <button className="px-4 py-2 bg-[#101010] text-white border border-gray-800 rounded-lg hover:bg-purple-600 transition">
-            View
+        <button
+          type="button"
+          onClick={() => onView(quiz._id)}
+          className="rounded-lg border border-gray-800 bg-[#101010] px-4 py-2 text-white transition hover:bg-purple-600"
+        >
+          View
         </button>
 
-        <QuizMenu />
+        <QuizMenu
+          quizId={quiz._id}
+          onEdit={onEdit}
+          onDuplicated={onDuplicated}
+          onDeleted={onDeleted}
+        />
       </div>
     </div>
   );
 }
 
-function QuizComponent() {
+export default function QuizLibrary({ selectedQuizId, onSelectQuiz }) {
+  const router = useRouter();
   const [active, setActive] = useState("All Quizzes");
   const [search, setSearch] = useState("");
+  const [category, setCategory] = useState("All Categories");
+  const [quizzes, setQuizzes] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState("");
   const tabs = ["All Quizzes", "Published", "Draft"];
-  const filtered = quizzes
-    .filter((q) => active === "All Quizzes" || q.QuizStatus === active)
-    .filter((q) => q.QuizTitle.toLowerCase().includes(search.toLowerCase()));
+
+  useEffect(() => {
+    const loadQuizzes = async () => {
+      try {
+        const data = await fetchTeacherQuizzes();
+        setQuizzes(data.quizzes || []);
+      } catch (loadError) {
+        setError(loadError instanceof Error ? loadError.message : "Unable to load quizzes.");
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    loadQuizzes();
+  }, []);
+
+  const categories = useMemo(
+    () => ["All Categories", ...new Set(quizzes.map((quiz) => quiz.category))],
+    [quizzes],
+  );
+
+  const filteredQuizzes = useMemo(() => {
+    return quizzes
+      .filter((quiz) =>
+        active === "All Quizzes"
+          ? true
+          : active === "Published"
+            ? quiz.status === "published"
+            : quiz.status === "draft",
+      )
+      .filter((quiz) => category === "All Categories" || quiz.category === category)
+      .filter((quiz) =>
+        `${quiz.title} ${quiz.description} ${quiz.category}`
+          .toLowerCase()
+          .includes(search.toLowerCase()),
+      );
+  }, [active, category, quizzes, search]);
+
+  const handleEdit = (quizId) => {
+    router.push(`/quizzes/create?quizId=${quizId}`);
+  };
+
+  const handleDuplicated = (quiz) => {
+    setQuizzes((current) => [quiz, ...current]);
+  };
+
+  const handleDeleted = (quizId) => {
+    setQuizzes((current) => current.filter((quiz) => quiz._id !== quizId));
+
+    if (selectedQuizId === quizId) {
+      onSelectQuiz(null);
+    }
+  };
 
   return (
     <>
-      {/* Quiz Title and Description */}
-      <div className="flex justify-between w-full items-start mb-5">
+      <div className="mb-5 flex justify-between w-full items-start">
         <div>
           <div className="flex rounded-lg">
             <div>
-              <h3 className="text-white font-bold text-3xl">Quizzes</h3>
-              <p className="text-gray-400 text-sm mt-3">Create, manage and analyze your quizzes</p>
+              <h3 className="text-3xl font-bold text-white">Quizzes</h3>
+              <p className="mt-3 text-sm text-gray-400">Create, manage and analyze your quizzes</p>
             </div>
           </div>
         </div>
       </div>
 
-      <div className="bg-[#151518] rounded-lg px-6 py-8">
-        {/* Title */}
-        <h1 className="text-white text-2xl font-bold tracking-tight">Quiz Library</h1>
-        <h2 className="text-gray-400 text-base pt-1 mb-6">Browse and manage all your quizzes</h2>
+      <div className="rounded-lg bg-[#151518] px-6 py-8">
+        <h1 className="text-2xl font-bold tracking-tight text-white">Quiz Library</h1>
+        <h2 className="mb-6 pt-1 text-base text-gray-400">Browse and manage all your quizzes</h2>
 
-        {/* Tabs + Search */}
         <div className="flex items-center justify-between">
-
-          {/* Tabs */}
-          <div className="p-1 border border-gray-800 inline-flex rounded-lg">
+          <div className="inline-flex rounded-lg border border-gray-800 p-1">
             {tabs.map((tab) => (
-              <button key={tab} onClick={() => setActive(tab)}
-                className={`px-4 py-2 rounded-lg text-sm font-medium transition
-                  ${active === tab ? "bg-[#101010] text-white" : "text-gray-400 hover:text-white"}`}>
+              <button
+                key={tab}
+                type="button"
+                onClick={() => setActive(tab)}
+                className={`rounded-lg px-4 py-2 text-sm font-medium transition ${
+                  active === tab ? "bg-[#101010] text-white" : "text-gray-400 hover:text-white"
+                }`}
+              >
                 {tab}
               </button>
             ))}
           </div>
 
-          {/* Searchbar */}
           <div className="flex gap-3">
-            <div className="flex items-center p-0 gap-2 bg-[#18181a] border border-[#27272a] pl-3 rounded-lg focus-within:border-purple-600">
-              <Search className="w-4 h-4 text-gray-400" />
+            <div className="flex items-center gap-2 rounded-lg border border-[#27272a] bg-[#18181a] pl-3 focus-within:border-purple-600">
+              <Search className="h-4 w-4 text-gray-400" />
               <input
                 type="text"
                 placeholder="Search quizzes..."
                 value={search}
-                onChange={(e) => setSearch(e.target.value)}
-                className="mt-0 text-white text-sm outline-none border-none placeholder-gray-500 w-full bg-transparent"/>
+                onChange={(event) => setSearch(event.target.value)}
+                className="mt-0 w-full border-none bg-transparent text-sm text-white outline-none placeholder-gray-500"
+              />
             </div>
 
-            <CategoryDropdown></CategoryDropdown>
+            <CategoryDropdown
+              categories={categories}
+              category={category}
+              onChange={setCategory}
+            />
           </div>
         </div>
 
-        {/* Quiz cards */}
-        <div className="mt-7">
-          {filtered.map((quiz) => (
-            <QuizCard key={quiz.QuizID} {...quiz} />
-          ))}
-        </div>
+        {isLoading ? (
+          <div className="mt-7 rounded-lg border border-white/10 bg-black/10 px-6 py-10 text-center text-zinc-400">
+            Loading quizzes...
+          </div>
+        ) : null}
+
+        {error ? (
+          <div className="mt-7 rounded-lg border border-red-500/30 bg-red-500/10 px-6 py-6 text-center text-red-200">
+            {error}
+          </div>
+        ) : null}
+
+        {!isLoading && !error ? (
+          <div className="mt-7">
+            {filteredQuizzes.map((quiz) => (
+              <QuizCard
+                key={quiz._id}
+                quiz={quiz}
+                isSelected={selectedQuizId === quiz._id}
+                onView={onSelectQuiz}
+                onEdit={handleEdit}
+                onDuplicated={handleDuplicated}
+                onDeleted={handleDeleted}
+              />
+            ))}
+          </div>
+        ) : null}
+
+        {!isLoading && !error && filteredQuizzes.length === 0 ? (
+          <div className="mt-7 rounded-lg border border-dashed border-white/10 bg-black/10 px-6 py-10 text-center text-zinc-400">
+            No quizzes matched the current search and filters.
+          </div>
+        ) : null}
       </div>
     </>
-  )
+  );
 }
-
-export default QuizComponent;
