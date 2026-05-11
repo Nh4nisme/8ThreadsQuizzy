@@ -2,8 +2,19 @@ const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const User = require('../models/User');
 
+const buildAuthPayload = (user) => ({
+    token: jwt.sign({ id: user.id }, process.env.JWT_SECRET, { expiresIn: '1h' }),
+    user: {
+        id: user.id,
+        fullName: user.fullName,
+        username: user.username,
+        email: user.email,
+        role: user.role,
+    },
+});
+
 exports.register = async (req, res) => {
-    const { username, email, password, role } = req.body || {};
+    const { fullName, username, email, password, role } = req.body || {};
 
     // Validate input
     if (!username || !email || !password) {
@@ -19,10 +30,13 @@ exports.register = async (req, res) => {
         const salt = await bcrypt.genSalt(10);
         const hashedPassword = await bcrypt.hash(password, salt);
 
-        user = new User({ username, email, password: hashedPassword, role });
+        user = new User({ fullName, username, email, password: hashedPassword, role });
         await user.save();
 
-        res.status(201).json({ message: 'User registered successfully' });
+        res.status(201).json({
+            message: 'User registered successfully',
+            ...buildAuthPayload(user),
+        });
     } catch (error) {
         console.error(error);
         res.status(500).json({ message: error.message });
@@ -48,12 +62,17 @@ exports.login = async (req, res) => {
             return res.status(400).json({ message: 'Invalid credentials' });
         }
 
-        const payload = { id: user.id };
-        const token = jwt.sign(payload, process.env.JWT_SECRET, { expiresIn: '1h' });
-
-        res.json({ token, user: { id: user.id, username: user.username, email: user.email, role: user.role } });
+        res.json(buildAuthPayload(user));
     } catch (error) {
         console.error(error);
         res.status(500).json({ message: error.message });
     }
+};
+
+exports.getCurrentUser = async (req, res) => {
+    if (!req.user) {
+        return res.status(401).json({ message: 'Unauthorized' });
+    }
+
+    res.json({ user: req.user });
 };
