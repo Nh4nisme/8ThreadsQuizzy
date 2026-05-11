@@ -35,10 +35,10 @@ const buildQuizPayload = (body = {}, user) => {
       explanation: question.explanation?.trim() || "",
       choices: Array.isArray(question.choices)
         ? question.choices.map((choice) => ({
-            id: choice.id?.trim(),
-            label: choice.label?.trim(),
-            text: choice.text?.trim(),
-          }))
+          id: choice.id?.trim(),
+          label: choice.label?.trim(),
+          text: choice.text?.trim(),
+        }))
         : [],
       correctChoiceId: question.correctChoiceId?.trim(),
     })),
@@ -57,7 +57,7 @@ const buildQuizDetail = async (quiz) => {
     : 0;
   const averageTimeSeconds = completedAttempts.length
     ? completedAttempts.reduce((sum, attempt) => sum + (attempt.timeSpentSeconds || 0), 0) /
-      completedAttempts.length
+    completedAttempts.length
     : 0;
   const topScore = completedAttempts.length
     ? Math.max(...completedAttempts.map((attempt) => attempt.score || 0))
@@ -68,12 +68,12 @@ const buildQuizDetail = async (quiz) => {
     question: question.prompt,
     progress: completedAttempts.length
       ? Math.max(
-          0,
-          Math.min(
-            100,
-            Math.round(55 + ((question.order % 3) * 11) + completedAttempts.length * 1.5),
-          ),
-        )
+        0,
+        Math.min(
+          100,
+          Math.round(55 + ((question.order % 3) * 11) + completedAttempts.length * 1.5),
+        ),
+      )
       : 0,
   }));
 
@@ -143,7 +143,17 @@ exports.getTeacherQuizzes = async (req, res) => {
       .sort({ createdAt: -1 })
       .lean();
 
-    res.json({ quizzes });
+    const quizzesWithStats = await Promise.all(
+      quizzes.map(async (quiz) => {
+        const completions = await QuizAttempt.countDocuments({
+          quizId: quiz._id,
+          status: "completed",
+        });
+        return { ...quiz, completions };
+      }),
+    );
+
+    res.json({ quizzes: quizzesWithStats });
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: error.message });
