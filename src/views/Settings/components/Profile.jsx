@@ -76,7 +76,6 @@ export default function Profile({ user }) {
               className="profile-file-input"
               onChange={handleFileChange}
             />
-            Change Photo
           </label>
         </div>
 

@@ -1,9 +1,9 @@
 import { useState } from "react";
 import "../styles/setting.css"
 
-function SettingRow({title, desc, active, onToggle}){
+function SettingRow({ title, desc, active, onToggle }) {
 
-  return(
+  return (
 
     <div className="setting-row">
 
@@ -19,7 +19,7 @@ function SettingRow({title, desc, active, onToggle}){
 
       </div>
 
-      <div className={`toggle ${active ? "active":""}`} onClick={onToggle}></div>
+      <div className={`toggle ${active ? "active" : ""}`} onClick={onToggle}></div>
 
     </div>
 
@@ -27,7 +27,7 @@ function SettingRow({title, desc, active, onToggle}){
 
 }
 
-export default function Notifications(){
+export default function Notifications() {
   const [emailNotifications, setEmailNotifications] = useState({
     "Quiz Completions": true,
     "Event Reminders": true,
@@ -55,7 +55,7 @@ export default function Notifications(){
     alert("Notification preferences saved!");
   };
 
-  return(
+  return (
 
     <div className="privacy-card">
 
@@ -105,7 +105,7 @@ export default function Notifications(){
       </div>
 
 
-      <hr/>
+      <hr />
 
 
       {/* In App Notifications */}
@@ -138,7 +138,7 @@ export default function Notifications(){
       </div>
 
 
-      <hr/>
+      <hr />
 
 
       {/* Frequency */}
@@ -150,9 +150,9 @@ export default function Notifications(){
         <div className="radio-group">
 
           <label>
-            <input 
-              type="radio" 
-              name="freq" 
+            <input
+              type="radio"
+              name="freq"
               checked={frequency === "Immediately"}
               onChange={() => setFrequency("Immediately")}
             />
@@ -160,9 +160,9 @@ export default function Notifications(){
           </label>
 
           <label>
-            <input 
-              type="radio" 
-              name="freq" 
+            <input
+              type="radio"
+              name="freq"
               checked={frequency === "Daily Digest"}
               onChange={() => setFrequency("Daily Digest")}
             />
@@ -170,9 +170,9 @@ export default function Notifications(){
           </label>
 
           <label>
-            <input 
-              type="radio" 
-              name="freq" 
+            <input
+              type="radio"
+              name="freq"
               checked={frequency === "Weekly Digest"}
               onChange={() => setFrequency("Weekly Digest")}
             />

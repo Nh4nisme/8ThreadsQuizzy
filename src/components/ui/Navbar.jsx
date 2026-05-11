@@ -16,18 +16,18 @@ const Navbar = () => {
   };
 
   return (
-    <nav className="bg-[#101010] shadow-md p-4 flex justify-between items-center">
+    <nav className="bg-bg-main border-b border-border-main shadow-sm p-4 flex justify-between items-center sticky top-0 z-50">
       <div className="flex items-center space-x-2">
       </div>
       <div className="flex items-center gap-3">
         <div className="hidden text-right md:block">
-          <p className="text-sm font-medium text-white">{user?.fullName || user?.username || "User"}</p>
-          <p className="text-xs text-zinc-400">{user?.email}</p>
+          <p className="text-sm font-medium text-text-main">{user?.fullName || user?.username || "User"}</p>
+          <p className="text-xs text-text-muted">{user?.email}</p>
         </div>
         <button
           type="button"
           onClick={() => router.push("/quizzes/create")}
-          className="border border-[#FFFFFF]/20 text-white px-4 py-2 rounded-[10px] flex items-center space-x-2 hover:bg-[#7C3AED] h-10"
+          className="bg-accent-gradient text-text-on-accent px-4 py-2 rounded-[10px] flex items-center space-x-2 hover:opacity-90 transition-opacity h-10 font-medium"
         >
           <svg
             className="w-5 h-5"
@@ -48,7 +48,7 @@ const Navbar = () => {
         <button
           type="button"
           onClick={handleLogout}
-          className="h-10 rounded-[10px] border border-white/20 px-4 py-2 text-white transition hover:bg-white/10"
+          className="h-10 rounded-[10px] border border-border-main px-4 py-2 text-text-main transition hover:bg-bg-secondary"
         >
           Logout
         </button>
