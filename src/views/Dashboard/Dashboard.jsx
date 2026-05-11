@@ -1,5 +1,6 @@
 "use client";
 
+import { useRouter } from "next/navigation";
 import { useAuth } from "../../context/AuthContext.jsx";
 import StatsCard from "./components/StatsCard.jsx";
 import EventItem from "./components/EventItem.jsx";
@@ -7,6 +8,7 @@ import StudentItem from "./components/StudentItem.jsx";
 import QuizCard from "./components/QuizCard.jsx";
 
 export default function Dashboard() {
+  const router = useRouter();
   const { user } = useAuth();
 
   return (
@@ -20,7 +22,11 @@ export default function Dashboard() {
           </p>
         </div>
 
-        <button className="bg-purple-600 px-4 py-2 rounded-lg hover:bg-purple-500">
+        <button
+          type="button"
+          onClick={() => router.push("/quizzes/create")}
+          className="bg-purple-600 px-4 py-2 rounded-lg hover:bg-purple-500"
+        >
           + Create New Quiz
         </button>
       </div>
@@ -158,7 +164,13 @@ export default function Dashboard() {
           />
 
           <div className="border border-dashed border-gray-600 rounded-xl flex items-center justify-center">
-            <button className="text-purple-400 text-lg">+ Create Quiz</button>
+            <button
+              type="button"
+              onClick={() => router.push("/quizzes/create")}
+              className="text-purple-400 text-lg"
+            >
+              + Create Quiz
+            </button>
           </div>
         </div>
       </div>

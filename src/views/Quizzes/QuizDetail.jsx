@@ -1,99 +1,45 @@
+"use client";
+
+import { useRouter } from "next/navigation";
 import {
   BookOpen,
   Calendar,
-  Users,
   ChartColumnBig,
   Share2,
-  ChevronLeft,
   SquarePen,
+  Users,
 } from "lucide-react";
-{
-  /* Data for demonstrational purpose, delete and tweak when using API instead */
-}
-const students = [
-  {
-    name: "Alex Johnson",
-    score: "85%",
-    timeSpent: "15:24",
-    completed: "2 hours ago",
-  },
-  {
-    name: "Emma Wilson",
-    score: "92%",
-    timeSpent: "18:24",
-    completed: "2 hours ago",
-  },
-  {
-    name: "Michael Cohen",
-    score: "85%",
-    timeSpent: "15:24",
-    completed: "2 hours ago",
-  },
-  {
-    name: "Sophia Gracious",
-    score: "92%",
-    timeSpent: "18:24",
-    completed: "2 hours ago",
-  },
-];
 
-const questionsProgress = [
-  { question: "What is the basic unit of life?", progress: 67 },
-  { question: "Which organelle is responsible for...?", progress: 69 },
-  { question: "What is the process of cell division...?", progress: 41 },
-  { question: "Which of the following is NOT a...?", progress: 36 },
-];
+const formatDuration = (seconds = 0) => {
+  const minutes = Math.floor(seconds / 60);
+  const remainingSeconds = seconds % 60;
+  return `${String(minutes).padStart(2, "0")}:${String(remainingSeconds).padStart(2, "0")}`;
+};
 
-function OverallStats() {
+const formatRelativeDate = (dateValue) => {
+  if (!dateValue) {
+    return "In progress";
+  }
+
+  const date = new Date(dateValue);
+  return date.toLocaleString("en-US", {
+    month: "short",
+    day: "numeric",
+    hour: "numeric",
+    minute: "2-digit",
+  });
+};
+
+function StatCard({ title, value, iconBg, iconColor, icon: Icon }) {
   return (
-    <div className="grid grid-cols-4 gap-4">
-      <div className="flex justify-between items-start p-5 bg-[#151518] border border-gray-800 rounded-md">
-        {/* Total Completions */}
-        <div>
-          <h2 className="text-gray-400 text-sm">Total Completions</h2>
-          <h1 className="font-bold text-white text-3xl mt-1">28</h1>
-        </div>
-
-        <div className="flex items-center justify-center bg-purple-900/40 rounded-full w-10 h-10">
-          <BookOpen className="text-[#7c3aed] w-5 h-5" />
-        </div>
+    <div className="flex justify-between items-start rounded-md border border-gray-800 bg-[#151518] p-5">
+      <div>
+        <h2 className="text-sm text-gray-400">{title}</h2>
+        <h1 className="mt-1 text-3xl font-bold text-white">{value}</h1>
       </div>
 
-      {/* Completion Time */}
-
-      <div className="flex justify-between items-start p-5 bg-[#151518] border border-gray-800 rounded-md">
-        <div>
-          <h2 className="text-gray-400 text-sm">Completion Time</h2>
-          <h1 className="font-bold text-white text-3xl mt-1">12:45</h1>
-        </div>
-
-        <div className="flex items-center justify-center bg-green-950 rounded-full w-10 h-10">
-          <Calendar className="text-green-700 w-5 h-5" />
-        </div>
-      </div>
-
-      {/* Average Score */}
-      <div className="flex justify-between items-start p-5 bg-[#151518] border border-gray-800 rounded-md">
-        <div>
-          <h2 className="text-gray-400 text-sm">Average Score</h2>
-          <h1 className="font-bold text-white text-3xl mt-1">78.5%</h1>
-        </div>
-
-        <div className="flex items-center justify-center bg-blue-950 rounded-full w-10 h-10">
-          <Users className="text-blue-600 w-5 h-5" />
-        </div>
-      </div>
-
-      {/* Top Score */}
-      <div className="flex justify-between items-start p-5 bg-[#151518] border border-gray-800 rounded-md">
-        <div>
-          <h2 className="text-gray-400 text-sm">Top Score</h2>
-          <h1 className="font-bold text-white text-3xl mt-1">95%</h1>
-        </div>
-
-        <div className="flex items-center justify-center bg-amber-950 rounded-full w-10 h-10">
-          <ChartColumnBig className="text-orange-500 w-5 h-5" />
-        </div>
+      <div className={`flex h-10 w-10 items-center justify-center rounded-full ${iconBg}`}>
+        <Icon className={`h-5 w-5 ${iconColor}`} />
       </div>
     </div>
   );
@@ -101,57 +47,67 @@ function OverallStats() {
 
 function RecentCompletions({ students = [] }) {
   return (
-    <div className="bg-[#151518] border border-gray-800 rounded-md p-6 pb-15">
-      {/* Header */}
-      <div className="flex justify-between items-start mb-6">
-        <div>
-          <h3 className="text-white font-bold text-3xl">Recent Completions</h3>
-          <p className="text-gray-400 text-sm mt-3">
-            Students who recently completed this quiz
-          </p>
-        </div>
-
-        <button className="mt-3 px-4 py-2 border border-gray-700 rounded-lg text-white font-bold bg-[#101010] hover:bg-[#7c3aed] transition">
-          View All Results
-        </button>
+    <div className="rounded-md border border-gray-800 bg-[#151518] p-6 pb-10">
+      <div className="mb-6">
+        <h3 className="text-3xl font-bold text-white">Student Activity</h3>
+        <p className="mt-3 text-sm text-gray-400">
+          Students currently working on this quiz and the latest completed attempts.
+        </p>
       </div>
 
-      {/* Table */}
-      <div className="border border-gray-800 rounded-md overflow-hidden">
+      <div className="overflow-hidden rounded-md border border-gray-800">
         <table className="w-full">
           <thead>
             <tr className="border-b border-gray-800">
-              {["Student", "Score", "Time Spent", "Completed"].map((h) => (
+              {["Student", "Status", "Score", "Time Spent", "Updated"].map((heading) => (
                 <th
-                  key={h}
-                  className="text-left text-white font-semibold text-sm px-4 py-3"
+                  key={heading}
+                  className="px-4 py-3 text-left text-sm font-semibold text-white"
                 >
-                  {h}
+                  {heading}
                 </th>
               ))}
             </tr>
           </thead>
 
           <tbody>
-            {students.map((s, i) => (
+            {students.map((student) => (
               <tr
-                key={i}
-                className="text-white border-gray-800/50 hover:bg-gray-800/30 transition cursor-pointer"
+                key={student.id}
+                className="border-gray-800/50 text-white transition hover:bg-gray-800/30"
               >
-                <td className="px-4 py-4">{s.name}</td>
-                <td className="px-4 py-4">{s.score}</td>
-                <td className="px-4 py-4">{s.timeSpent}</td>
-                <td className="px-4 py-4">{s.completed}</td>
+                <td className="px-4 py-4">
+                  <div>
+                    <p>{student.name}</p>
+                    <p className="text-xs text-zinc-500">{student.email}</p>
+                  </div>
+                </td>
+                <td className="px-4 py-4">
+                  <span
+                    className={`rounded-full px-3 py-1 text-xs font-medium ${
+                      student.status === "completed"
+                        ? "bg-emerald-500/15 text-emerald-300"
+                        : "bg-orange-500/15 text-orange-300"
+                    }`}
+                  >
+                    {student.status === "completed" ? "Completed" : "In Progress"}
+                  </span>
+                </td>
+                <td className="px-4 py-4">{student.status === "completed" ? `${student.score}%` : "-"}</td>
+                <td className="px-4 py-4">{formatDuration(student.timeSpentSeconds)}</td>
+                <td className="px-4 py-4">
+                  {formatRelativeDate(student.completedAt || student.startedAt)}
+                </td>
               </tr>
             ))}
 
-            {students.length === 0 && (
+            {students.length === 0 ? (
               <tr>
-                <td colSpan={4} className="text-white text-center px-4 py-8">
-                  No completions yet
+                <td colSpan={5} className="px-4 py-8 text-center text-white">
+                  No student activity yet
                 </td>
               </tr>
-            )}
+            ) : null}
           </tbody>
         </table>
       </div>
@@ -159,42 +115,32 @@ function RecentCompletions({ students = [] }) {
   );
 }
 
-function QuestionPerformance({ questionsProgress = [] }) {
+function QuestionPerformance({ questions = [] }) {
   return (
-    <div className="bg-[#151518] border border-gray-800 rounded-md p-6 pb-15">
-      {/* Header */}
-      <div className="flex justify-between items-start mb-6">
-        <div>
-          <h3 className="text-white font-bold text-3xl">
-            Question Performance
-          </h3>
-          <p className="text-gray-400 text-sm mt-3">
-            How students performed on each question
-          </p>
-        </div>
+    <div className="rounded-md border border-gray-800 bg-[#151518] p-6 pb-10">
+      <div className="mb-6">
+        <h3 className="text-3xl font-bold text-white">Question Performance</h3>
+        <p className="mt-3 text-sm text-gray-400">
+          Estimated performance snapshot by question from stored attempts.
+        </p>
       </div>
 
-      {/* Progress bar */}
       <div>
-        {questionsProgress.length === 0 ? (
-          <p className="text-gray-500 text-2xl text-center py-8">
-            No data available
-          </p>
+        {questions.length === 0 ? (
+          <p className="py-8 text-center text-2xl text-gray-500">No data available</p>
         ) : (
-          questionsProgress.map((q, i) => (
-            <div key={i} className="mb-3">
-              <div className="flex justify-between mb-1">
-                <span className="text-gray-300 text-sm">
-                  {i + 1}. {q.question}
+          questions.map((question, index) => (
+            <div key={question.questionId} className="mb-4">
+              <div className="mb-1 flex justify-between">
+                <span className="text-sm text-gray-300">
+                  {index + 1}. {question.question}
                 </span>
-                <span className="text-white font-semibold text-sm">
-                  {q.progress}%
-                </span>
+                <span className="text-sm font-semibold text-white">{question.progress}%</span>
               </div>
-              <div className="h-1.5 bg-gray-800 rounded-full">
+              <div className="h-1.5 rounded-full bg-gray-800">
                 <div
-                  style={{ width: `${q.progress}%` }}
-                  className="h-full bg-purple-600 rounded-full"
+                  style={{ width: `${question.progress}%` }}
+                  className="h-full rounded-full bg-purple-600"
                 />
               </div>
             </div>
@@ -205,78 +151,95 @@ function QuestionPerformance({ questionsProgress = [] }) {
   );
 }
 
-function QuizShare() {
-  return (
-    <div className="flex">
-      <div className="flex justify-between w-full items-start bg-[#151518] rounded-md p-6">
-        <div>
-          <h3 className="text-white font-bold text-3xl">Share this quiz</h3>
-          <p className="text-gray-400 text-sm mt-3">
-            Share this quiz with students or colleagues
-          </p>
-        </div>
+export default function QuizDetail({ detail, onEdit }) {
+  const router = useRouter();
 
-        <button className="flex justify-between mt-3 px-2 py-2 border border-gray-700 rounded-lg text-white font-bold bg-purple-600 hover:bg-[#7c3aed] transition cursor-pointer">
-          <Share2 className="mr-3"></Share2> Share Quiz
-        </button>
+  if (!detail?.quiz) {
+    return (
+      <div className="rounded-md border border-dashed border-white/10 bg-[#151518] p-10 text-center text-zinc-400">
+        Select a quiz from the library to inspect details and student activity.
       </div>
-    </div>
-  );
-}
+    );
+  }
 
-{
-  /* UI for now, need tweak for API call */
-}
-{
-  /* Maybe make this function take in an array with details like aboves */
-}
-function QuizDetail({ quizTItle, quizDescription }) {
+  const { quiz, stats, students, questionPerformance } = detail;
+
   return (
     <div>
-      <div>
-        {/* Quiz Title and Description */}
-        <div className="flex justify-between w-full items-start p-6">
-          <div>
-            <div className="flex rounded-md">
-              <button className="flex items-center justify-center text-white rounded-xl border border-gray-700 w-12 h-12 mt-3 mr-5 hover:bg-[#7c3aed] transition cursor-pointer">
-                <ChevronLeft></ChevronLeft>
-              </button>
+      <div className="flex justify-between w-full items-start p-6">
+        <div>
+          <div className="flex rounded-md">
+            <button
+              type="button"
+              onClick={() => router.push("/quizzes")}
+              className="mr-5 mt-3 flex h-12 w-12 items-center justify-center rounded-xl border border-gray-700 text-white transition hover:bg-[#7c3aed]"
+            >
+              <BookOpen />
+            </button>
 
-              <div>
-                <h3 className="text-white font-bold text-3xl">{quizTItle}</h3>
-                <p className="text-gray-400 text-sm mt-3">{quizDescription}</p>
-              </div>
+            <div>
+              <h3 className="text-3xl font-bold text-white">{quiz.title}</h3>
+              <p className="mt-3 text-sm text-gray-400">{quiz.description}</p>
             </div>
           </div>
-          {/* Quiz Buttons */}
-
-          <div className="flex justify-center mt-3">
-            <button className="flex justify-between px-5 py-2.5 mr-3 border border-gray-700 rounded-lg text-white font-bold hover:bg-[#7c3aed] transition cursor-pointer">
-              <SquarePen className="mr-3"></SquarePen>Edit
-            </button>
-
-            <button className="flex justify-between px-5 py-2.5 mr-3 border border-gray-700 rounded-lg text-white font-bold hover:bg-[#7c3aed] transition cursor-pointer">
-              <Share2 className="mr-3"></Share2>Share
-            </button>
-
-            <button className="flex justify-between px-5 py-2.5 border border-gray-700 rounded-lg text-white font-bold bg-purple-600 hover:bg-[#7c3aed] transition cursor-pointer">
-              Preview
-            </button>
-          </div>
         </div>
 
-        {/* Quiz details */}
-        <OverallStats></OverallStats>
+        <div className="mt-3 flex justify-center">
+          <button
+            type="button"
+            onClick={onEdit}
+            className="mr-3 flex justify-between rounded-lg border border-gray-700 px-5 py-2.5 font-bold text-white transition hover:bg-[#7c3aed]"
+          >
+            <SquarePen className="mr-3" />
+            Edit
+          </button>
 
-        <div className="grid grid-cols-[60%_40%] gap-4 mt-5">
-          <RecentCompletions students={students}></RecentCompletions>
-          <QuestionPerformance
-            questionsProgress={questionsProgress}
-          ></QuestionPerformance>
+          <button className="mr-3 flex justify-between rounded-lg border border-gray-700 px-5 py-2.5 font-bold text-white transition hover:bg-[#7c3aed]">
+            <Share2 className="mr-3" />
+            Share
+          </button>
+
+          <button className="flex justify-between rounded-lg border border-gray-700 bg-purple-600 px-5 py-2.5 font-bold text-white transition hover:bg-[#7c3aed]">
+            Preview
+          </button>
         </div>
+      </div>
+
+      <div className="grid grid-cols-4 gap-4">
+        <StatCard
+          title="Total Completions"
+          value={stats.totalCompletions}
+          icon={BookOpen}
+          iconBg="bg-purple-900/40"
+          iconColor="text-[#7c3aed]"
+        />
+        <StatCard
+          title="Average Time"
+          value={formatDuration(stats.averageTimeSeconds)}
+          icon={Calendar}
+          iconBg="bg-green-950"
+          iconColor="text-green-700"
+        />
+        <StatCard
+          title="Average Score"
+          value={`${stats.averageScore}%`}
+          icon={Users}
+          iconBg="bg-blue-950"
+          iconColor="text-blue-600"
+        />
+        <StatCard
+          title="Top Score"
+          value={`${stats.topScore}%`}
+          icon={ChartColumnBig}
+          iconBg="bg-amber-950"
+          iconColor="text-orange-500"
+        />
+      </div>
+
+      <div className="mt-5 grid grid-cols-[60%_40%] gap-4">
+        <RecentCompletions students={students} />
+        <QuestionPerformance questions={questionPerformance} />
       </div>
     </div>
   );
 }
-
-export default QuizDetail;

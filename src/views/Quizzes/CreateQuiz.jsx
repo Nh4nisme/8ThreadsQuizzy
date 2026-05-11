@@ -1,311 +1,574 @@
-import { useState } from "react";
-import { ChevronLeft, ChevronRight, Clock, CircleCheck, Trash2, ChevronDown, Plus} from "lucide-react"
-{/* Please note that all the fields in this jsx is customized using the same styling in index.css for consistency */}
+"use client";
 
-function Toggle({ value, onChange }) {
+import { useEffect, useMemo, useState } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
+import { ChevronLeft, Plus, Trash2 } from "lucide-react";
+import {
+  createQuizRequest,
+  fetchQuizDetail,
+  updateQuizRequest,
+} from "../../lib/quiz-client.js";
+
+const categoryOptions = ["Science", "Mathematics", "History", "Language", "Technology"];
+const difficultyOptions = ["Easy", "Medium", "Hard"];
+
+const createChoice = (questionIndex, choiceIndex) => ({
+  id: `q${questionIndex + 1}-choice-${choiceIndex + 1}`,
+  label: String.fromCharCode(65 + choiceIndex),
+  text: "",
+});
+
+const createQuestion = (questionIndex) => ({
+  id: `question-${questionIndex + 1}`,
+  order: questionIndex + 1,
+  prompt: "",
+  points: 100,
+  type: "multiple_choice",
+  explanation: "",
+  choices: Array.from({ length: 4 }, (_, choiceIndex) => createChoice(questionIndex, choiceIndex)),
+  correctChoiceId: "",
+});
+
+const createSlug = (value) =>
+  value
+    .toLowerCase()
+    .trim()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "");
+
+export default function CreateQuiz() {
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const quizId = searchParams.get("quizId");
+  const [form, setForm] = useState({
+    title: "",
+    slug: "",
+    description: "",
+    category: "Science",
+    difficulty: "Easy",
+    durationMinutes: 15,
+    estimatedPlayers: 0,
+    visibility: "student",
+    tags: "",
+    settings: {
+      passingScore: 70,
+      randomizeQuestions: false,
+      immediateResults: false,
+    },
+    questions: [createQuestion(0)],
+  });
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isLoadingQuiz, setIsLoadingQuiz] = useState(Boolean(quizId));
+  const [error, setError] = useState("");
+  const [successMessage, setSuccessMessage] = useState("");
+
+  const totalQuestions = form.questions.length;
+
+  useEffect(() => {
+    if (!quizId) {
+      setIsLoadingQuiz(false);
+      return;
+    }
+
+    const loadQuiz = async () => {
+      try {
+        const data = await fetchQuizDetail(quizId);
+        const quiz = data.quiz;
+        setForm({
+          title: quiz.title,
+          slug: quiz.slug,
+          description: quiz.description,
+          category: quiz.category,
+          difficulty: quiz.difficulty,
+          durationMinutes: quiz.durationMinutes,
+          estimatedPlayers: quiz.estimatedPlayers || 0,
+          visibility: quiz.visibility || "student",
+          tags: Array.isArray(quiz.tags) ? quiz.tags.join(", ") : "",
+          settings: {
+            passingScore: quiz.settings?.passingScore ?? 70,
+            randomizeQuestions: Boolean(quiz.settings?.randomizeQuestions),
+            immediateResults: Boolean(quiz.settings?.immediateResults),
+          },
+          questions: quiz.questions.map((question) => ({
+            ...question,
+            choices: question.choices.map((choice) => ({
+              id: choice.id,
+              label: choice.label,
+              text: choice.text,
+            })),
+          })),
+        });
+      } catch (loadError) {
+        setError(loadError instanceof Error ? loadError.message : "Unable to load quiz.");
+      } finally {
+        setIsLoadingQuiz(false);
+      }
+    };
+
+    loadQuiz();
+  }, [quizId]);
+
+  const canSubmit = useMemo(() => {
+    if (!form.title.trim() || !form.slug.trim() || !form.description.trim()) {
+      return false;
+    }
+
+    return form.questions.every((question) => {
+      const hasPrompt = question.prompt.trim();
+      const hasCorrectChoice = question.correctChoiceId;
+      const allChoicesFilled = question.choices.every((choice) => choice.text.trim());
+      return hasPrompt && hasCorrectChoice && allChoicesFilled;
+    });
+  }, [form]);
+
+  const updateField = (field, value) => {
+    setForm((current) => ({ ...current, [field]: value }));
+  };
+
+  const updateSettings = (field, value) => {
+    setForm((current) => ({
+      ...current,
+      settings: {
+        ...current.settings,
+        [field]: value,
+      },
+    }));
+  };
+
+  const updateQuestion = (questionIndex, field, value) => {
+    setForm((current) => ({
+      ...current,
+      questions: current.questions.map((question, index) =>
+        index === questionIndex ? { ...question, [field]: value } : question,
+      ),
+    }));
+  };
+
+  const updateChoice = (questionIndex, choiceIndex, value) => {
+    setForm((current) => ({
+      ...current,
+      questions: current.questions.map((question, index) => {
+        if (index !== questionIndex) {
+          return question;
+        }
+
+        return {
+          ...question,
+          choices: question.choices.map((choice, innerIndex) =>
+            innerIndex === choiceIndex ? { ...choice, text: value } : choice,
+          ),
+        };
+      }),
+    }));
+  };
+
+  const addQuestion = () => {
+    setForm((current) => ({
+      ...current,
+      questions: [...current.questions, createQuestion(current.questions.length)],
+    }));
+  };
+
+  const removeQuestion = (questionIndex) => {
+    setForm((current) => {
+      const nextQuestions = current.questions
+        .filter((_, index) => index !== questionIndex)
+        .map((question, index) => ({
+          ...question,
+          id: `question-${index + 1}`,
+          order: index + 1,
+        }));
+
+      return {
+        ...current,
+        questions: nextQuestions.length > 0 ? nextQuestions : [createQuestion(0)],
+      };
+    });
+  };
+
+  const handleSubmit = async (status) => {
+    if (!canSubmit) {
+      setError("Please complete the quiz details, questions, and correct answers before saving.");
+      return;
+    }
+
+    setIsSubmitting(true);
+    setError("");
+    setSuccessMessage("");
+
+    try {
+      const payload = {
+        ...form,
+        slug: form.slug.trim(),
+        title: form.title.trim(),
+        description: form.description.trim(),
+        status,
+        tags: form.tags
+          .split(",")
+          .map((tag) => tag.trim())
+          .filter(Boolean),
+      };
+
+      const data = quizId
+        ? await updateQuizRequest(quizId, payload)
+        : await createQuizRequest(payload);
+      setSuccessMessage(
+        quizId
+          ? "Quiz updated successfully."
+          : status === "published"
+            ? "Quiz published successfully."
+            : "Quiz saved as draft.",
+      );
+      router.push("/quizzes");
+      router.refresh();
+      return data;
+    } catch (submitError) {
+      setError(
+        submitError instanceof Error
+          ? submitError.message
+          : "Unable to save quiz.",
+      );
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
   return (
-    <button
-      onClick={() => onChange(!value)}
-      className={`relative w-12 h-6 rounded-full transition-colors duration-300 cursor-pointer ${
-        value ? "bg-purple-600" : "bg-gray-700"
-      }`}
-    >
-      <div className={`absolute top-0.5 w-5 h-5 bg-[#151518] rounded-full shadow transition-transform duration-300 ${
-        value ? "translate-x-6" : "translate-x-0.5"
-      }`} />
-    </button>
-  );
-}
-
-{/* QuizDetail Card */}
-function DetailCard(){
-  const [category, setCategory] = useState("Science");
-  const [difficulty, setDifficulty] = useState("Easy");
-
-  return(
-    <div className="w-full bg-[#151518] p-8 rounded-md border border-[#484848]">
-      {/* Header */}
-      <div>
-        <h1 className="text-3xl font-bold text-white">Quiz Detail</h1>
-        <p className="text-gray-400">Basic information about your quiz</p>
-      </div>
-        
-
-      {/* Input fields */}
-      <div className="mt-5 text-white font-semibold ">
-        {/* Quiz Title */}
-        <div className="mb-5">
-          <p>Quiz Title</p>
-          <input type="text" placeholder="Enter quiz title..."/>
-        </div>
-
-        {/* Quiz Description */}
-        <div className="mb-5">
-          <p>Quiz Title</p>
-          <input type="text" className="pb-20" placeholder="Enter quiz description..."/>
-        </div>
-
-        {/* Category and Difficulty select */}
-        <div className="flex gap-5">
-          <div className="w-full">
-            <p>Category</p>
-            <select value={category} onChange={(e) => setCategory(e.target.value)}>
-              <option value="Science">Science</option>
-              <option value="Mathmetics">Mathmetics</option>
-              <option value="Biology">Biology</option>
-            </select>
-          </div>
-
-          <div className="w-full">
-            <p>Difficulty Level</p>
-            <select value={difficulty} onChange={(e) => setDifficulty(e.target.value)}>
-              <option value="Easy">Easy</option>
-              <option value="Medium">Medium</option>
-              <option value="Hard">Hard</option>
-            </select>
-          </div>
-        </div>
-      </div>
-    </div>
-  )
-}
-
-{/* QuizSettings Card */}
-function SettingsCard(){
-  const [RandomizeUnenabled, RandomizeEnabled] = useState(false);
-  const [ResultUnenabled, ResultEnabled] = useState(false);
-
-  return(
-    <div className="bg-[#151518] p-8 pb-5 rounded-md border border-[#484848]">
-      {/* Header */}
-      <div>
-        <h1 className="text-3xl font-bold text-white">Quiz Settings</h1>
-        <p className="text-gray-400">Configure how your quiz workss</p>
-      </div>
-
-      {/* Time */}
-      <div className="mt-5 text-white font-semibold ">
-        {/* Quiz Title */}
-        <div>
-          <p>Time Limit</p>
-          <div className="mt-2 flex items-center border border-[#484848] bg-[#1f1f20] rounded-md px-3">
-            <Clock className="w-5 h-5 text-gray-400 mr-2" />
-            <input type="number" 
-                  onChange={(e) => { if (e.target.value < 1) e.target.value = 1 }}
-                  className="-mt-px bg-transparent border-none text-white"/>
-            <p className="text-[#767676]">minutes</p>
-          </div>
-        </div>
-
-        {/* Fields */}
-        <div className="mt-7">
-          <p>Passing Score</p>
-          <div className="mt-2 flex items-center border border-[#484848] bg-[#1f1f20] rounded-md px-3">
-            <CircleCheck className="w-5 h-5 text-gray-400 mr-2" />
-            <input type="number" 
-                  onChange={(e) => { if (e.target.value < 0) e.target.value = 0
-                    else if (e.target.value > 100) e.target.value = 100
-                   }}
-                  className="-mt-px bg-transparent border-none text-white"/>
-            <p className="text-[#767676]">%</p>
-          </div>
-        </div>
-
-        {/* Toggles */}      
-        <div className="mt-6 flex">
-          <div className="w-full">
-            <h1 className="text-lg font-bold text-white">Randomize Questions</h1>
-            <p className="text-gray-400 mt-2">Show questions in random order</p>
-          </div>
-          <div className="mt-3">
-            <Toggle value={RandomizeUnenabled} onChange={RandomizeEnabled}/>
-          </div>
-        </div>
-
-        <div className="mt-6 flex">
-          <div className="w-full">
-            <h1 className="text-lg font-bold text-white">Immediate Results</h1>
-            <p className="text-gray-400 mt-2">Show results for each question</p>
-          </div>
-          <div className="mt-3">
-            <Toggle value={ResultUnenabled} onChange={ResultEnabled} />
-          </div>
-        </div>
-      </div>
-    </div>
-  )
-}
-
-{/* Step 1 */}
-function BasicInfo(){
-  return (
-    <div className="grid grid-cols-5 gap-5 items-start">
-      <div className="col-span-3">
-        <DetailCard></DetailCard>
-      </div>
-      
-      <div className="col-span-2">
-        <SettingsCard></SettingsCard>
-      </div>
-    </div>
-  )
-}
-
-{/* Answer Boxes AKA step 2 */}
-function AnswerOption({ label, selected, onSelect }) {
-  return (
-    <div
-      onClick={onSelect}
-      className={`flex items-center gap-3 p-4 rounded-lg border cursor-pointer transition bg-[#1f1f20]
-        ${selected ? "border-purple-600" : "border-[#484848] hover:border-gray-400"}`}
-    >
-      <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center
-        ${selected ? "border-purple-600" : "border-gray-600"}`}>
-        {selected && <div className="w-2.5 h-2.5 rounded-full bg-purple-600" />}
-      </div>
-      <span className="text-white font-semibold">{label}</span>
-    </div>
-  );
-}
-
-function QuizQuestion(){
-  const [questionType, setQuestionType] = useState("Multiple_Choice");
-  
-  const [selected, setSelected] = useState(null);
-  const options = ["Solar Power", "Wind Power", "Natural Gas", "Hydroelectric Power"];
-  
-  return(
-    <div className="bg-[#151518] p-8 pb-5 rounded-md border border-[#484848]">
-      {/* Header */}
-      <div className="mb-5">
-        <h1 className="text-3xl font-bold text-white">Quiz Questions</h1>
-        <p className="text-gray-400">Create and manage your quiz questions</p>
-      </div>
-      
-      {/* Question Box */}
-      <div className="text-white bg-[#19191b] border border-[#484848] rounded-md mb-3">
-       {/* Question Box Header */}
-       <div className="flex justify-between items-center m-5">
-         <div>
-           <h1 className="font-bold text-lg">Question {1}</h1>
-         </div>
-        
-         <div className="flex">
-           <div className="flex items-center mr-5">
-             <h1 className="font-bold mr-3">Points: </h1>
-             <div className="w-20 h-10 flex items-center justify-start pl-3 border border-[#484848] rounded-lg">10</div>
-           </div>
-        
-           <div className="relative w-50 mr-5 -mt-1">
-            <select
-              value={questionType}
-              onChange={(e) => setQuestionType(e.target.value)}
-              className="w-full h-10 rounded-lg appearance-none cursor-pointer pt-1.5 font-semibold">
-              
-              <option value="Multiple_Choice">Multiple Choice</option>
-              <option value="Written">Written</option>
-              <option value="Fill_blank">Fill in the blank</option>
-            </select>
-            <ChevronDown className="absolute right-2 top-6 -translate-y-3/7 h-10 text-gray-400 pointer-events-none" />
-          </div>
-
-          <button className="flex items-center cursor-pointer" >
-            <Trash2 className="text-red-600"></Trash2>
+    <div className="rounded-2xl border border-white/10 bg-[#101010] p-6 text-white">
+      <div className="flex flex-col gap-6 border-b border-white/10 pb-6 lg:flex-row lg:items-start lg:justify-between">
+        <div className="flex items-start gap-4">
+          <button
+            type="button"
+            onClick={() => router.push("/quizzes")}
+            className="mt-1 flex h-11 w-11 items-center justify-center rounded-xl border border-white/10 transition hover:bg-white/5"
+          >
+            <ChevronLeft size={18} />
           </button>
-         </div>
-       </div>
-
-       {/* Question Text Box */}
-       <div>
-        <div className="m-5 -mt-2">
-          <h1 className="font-semibold">Question Text</h1>
-          <div className="border border-[#484848] bg-[#1f1f20] rounded-md mt-2">
-            <p className="m-3 font-medium h-20">Which of the folling is NOT a renewable energy source?</p>
+          <div>
+            <h1 className="text-3xl font-bold">{quizId ? "Edit Quiz" : "Create New Quiz"}</h1>
+            <p className="mt-2 text-sm text-zinc-400">
+              Add quiz details, define settings, and build question sets that map cleanly to the database schema.
+            </p>
           </div>
         </div>
 
-        {/* Answer boxes */}
-        <div className="flex flex-col gap-3 m-5">
-          <p className="text-white font-semibold">Answer Options</p>
-          {options.map((opt, i) => (
-            <AnswerOption
-              key={i}
-              label={opt}
-              selected={selected === i}
-              onSelect={() => setSelected(i)}
-            />
-          ))}
+        <div className="flex flex-wrap gap-3">
+          <button
+            type="button"
+            disabled={isSubmitting}
+            onClick={() => handleSubmit("draft")}
+            className="rounded-xl border border-white/10 px-5 py-3 font-medium transition hover:bg-white/5 disabled:opacity-50"
+          >
+            Save draft
+          </button>
+          <button
+            type="button"
+            disabled={isSubmitting}
+            onClick={() => handleSubmit("published")}
+            className="rounded-xl bg-gradient-to-r from-purple-500 to-orange-500 px-5 py-3 font-medium text-white disabled:opacity-50"
+          >
+            Publish quiz
+          </button>
         </div>
-       </div>
       </div>
 
-      {/* Add question */}
-      <div className="flex border border-dashed border-[#4c4c4e] text-white justify-center rounded-md p-2 hover:bg-purple-600 transition cursor-pointer">
-        <Plus className="mr-3"></Plus>
-        <h1 className="font-bold">Add Question</h1>
-      </div>
-    </div>
-  )
-}
+      {error ? (
+        <div className="mt-6 rounded-xl border border-red-500/30 bg-red-500/10 px-4 py-3 text-sm text-red-200">
+          {error}
+        </div>
+      ) : null}
 
-{/* Final Component */}
-function CreateQuiz(){
-  const [step, setStep] = useState(1);
+      {successMessage ? (
+        <div className="mt-6 rounded-xl border border-emerald-500/30 bg-emerald-500/10 px-4 py-3 text-sm text-emerald-200">
+          {successMessage}
+        </div>
+      ) : null}
 
-  return (
-    <div className="border bg-[#101010] p-5 pb-10">
-      <div className="flex justify-between w-full items-start pb-10">
-        <div>
-          <div className="flex rounded-md">
-            <button className="flex items-center justify-center text-white rounded-xl border border-[#484848] w-12 h-12 mt-2 mr-5 hover:bg-[#7c3aed] transition cursor-pointer">
-              <ChevronLeft></ChevronLeft>
-            </button>
+      {isLoadingQuiz ? (
+        <div className="mt-6 rounded-xl border border-white/10 bg-[#151518] px-4 py-10 text-center text-zinc-400">
+          Loading quiz data...
+        </div>
+      ) : null}
 
-            <div>
-              <h3 className="text-white font-bold text-3xl">Create New Quiz</h3>
-              <p className="text-gray-400 ">Add questions, set answers and configure quiz settings</p>
+      {!isLoadingQuiz ? (
+      <div className="mt-6 grid gap-6 xl:grid-cols-[minmax(0,1fr)_360px]">
+        <div className="space-y-6">
+          <section className="rounded-2xl border border-white/10 bg-[#151518] p-6">
+            <h2 className="text-2xl font-semibold">Quiz Details</h2>
+            <p className="mt-2 text-sm text-zinc-400">Basic metadata stored with the quiz document.</p>
+
+            <div className="mt-6 grid gap-5 md:grid-cols-2">
+              <div className="md:col-span-2">
+                <label className="text-sm font-medium text-zinc-300">Title</label>
+                <input
+                  type="text"
+                  value={form.title}
+                  onChange={(event) => {
+                    const nextTitle = event.target.value;
+                    updateField("title", nextTitle);
+                    updateField("slug", createSlug(nextTitle));
+                  }}
+                  placeholder="Enter quiz title"
+                />
+              </div>
+
+              <div className="md:col-span-2">
+                <label className="text-sm font-medium text-zinc-300">Slug</label>
+                <input
+                  type="text"
+                  value={form.slug}
+                  onChange={(event) => updateField("slug", createSlug(event.target.value))}
+                  placeholder="quiz-slug"
+                />
+              </div>
+
+              <div className="md:col-span-2">
+                <label className="text-sm font-medium text-zinc-300">Description</label>
+                <textarea
+                  rows="4"
+                  value={form.description}
+                  onChange={(event) => updateField("description", event.target.value)}
+                  placeholder="Short summary for students"
+                />
+              </div>
+
+              <div>
+                <label className="text-sm font-medium text-zinc-300">Category</label>
+                <select
+                  value={form.category}
+                  onChange={(event) => updateField("category", event.target.value)}
+                >
+                  {categoryOptions.map((option) => (
+                    <option key={option} value={option}>
+                      {option}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              <div>
+                <label className="text-sm font-medium text-zinc-300">Difficulty</label>
+                <select
+                  value={form.difficulty}
+                  onChange={(event) => updateField("difficulty", event.target.value)}
+                >
+                  {difficultyOptions.map((option) => (
+                    <option key={option} value={option}>
+                      {option}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              <div>
+                <label className="text-sm font-medium text-zinc-300">Duration (minutes)</label>
+                <input
+                  type="number"
+                  min="1"
+                  value={form.durationMinutes}
+                  onChange={(event) => updateField("durationMinutes", Number(event.target.value))}
+                />
+              </div>
+
+              <div>
+                <label className="text-sm font-medium text-zinc-300">Estimated players</label>
+                <input
+                  type="number"
+                  min="0"
+                  value={form.estimatedPlayers}
+                  onChange={(event) => updateField("estimatedPlayers", Number(event.target.value))}
+                />
+              </div>
+
+              <div className="md:col-span-2">
+                <label className="text-sm font-medium text-zinc-300">Tags</label>
+                <input
+                  type="text"
+                  value={form.tags}
+                  onChange={(event) => updateField("tags", event.target.value)}
+                  placeholder="biology, revision, basics"
+                />
+              </div>
             </div>
-          </div>
+          </section>
+
+          <section className="rounded-2xl border border-white/10 bg-[#151518] p-6">
+            <div className="flex items-center justify-between">
+              <div>
+                <h2 className="text-2xl font-semibold">Questions</h2>
+                <p className="mt-2 text-sm text-zinc-400">Each question needs filled choices and a correct answer.</p>
+              </div>
+              <button
+                type="button"
+                onClick={addQuestion}
+                className="inline-flex items-center gap-2 rounded-xl border border-white/10 px-4 py-2 text-sm font-medium transition hover:bg-white/5"
+              >
+                <Plus size={16} />
+                Add question
+              </button>
+            </div>
+
+            <div className="mt-6 space-y-5">
+              {form.questions.map((question, questionIndex) => (
+                <article
+                  key={question.id}
+                  className="rounded-2xl border border-white/10 bg-black/20 p-5"
+                >
+                  <div className="flex items-center justify-between gap-4">
+                    <div>
+                      <h3 className="text-lg font-semibold">Question {questionIndex + 1}</h3>
+                      <p className="mt-1 text-sm text-zinc-400">Multiple choice only for the current stored schema.</p>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => removeQuestion(questionIndex)}
+                      className="rounded-xl border border-red-500/20 p-2 text-red-300 transition hover:bg-red-500/10"
+                    >
+                      <Trash2 size={16} />
+                    </button>
+                  </div>
+
+                  <div className="mt-5 grid gap-4 md:grid-cols-4">
+                    <div className="md:col-span-3">
+                      <label className="text-sm font-medium text-zinc-300">Prompt</label>
+                      <textarea
+                        rows="3"
+                        value={question.prompt}
+                        onChange={(event) => updateQuestion(questionIndex, "prompt", event.target.value)}
+                        placeholder="Enter the question prompt"
+                      />
+                    </div>
+                    <div>
+                      <label className="text-sm font-medium text-zinc-300">Points</label>
+                      <input
+                        type="number"
+                        min="0"
+                        value={question.points}
+                        onChange={(event) => updateQuestion(questionIndex, "points", Number(event.target.value))}
+                      />
+                    </div>
+
+                    <div className="md:col-span-4">
+                      <label className="text-sm font-medium text-zinc-300">Explanation</label>
+                      <textarea
+                        rows="2"
+                        value={question.explanation}
+                        onChange={(event) => updateQuestion(questionIndex, "explanation", event.target.value)}
+                        placeholder="Optional explanation shown after completion"
+                      />
+                    </div>
+                  </div>
+
+                  <div className="mt-5 grid gap-4 md:grid-cols-2">
+                    {question.choices.map((choice, choiceIndex) => (
+                      <div
+                        key={choice.id}
+                        className={`rounded-xl border p-4 transition ${
+                          question.correctChoiceId === choice.id
+                            ? "border-purple-400 bg-purple-500/10"
+                            : "border-white/10 bg-[#17171a]"
+                        }`}
+                      >
+                        <div className="flex items-center justify-between gap-3">
+                          <span className="text-sm font-semibold text-zinc-300">{choice.label}</span>
+                          <button
+                            type="button"
+                            onClick={() => updateQuestion(questionIndex, "correctChoiceId", choice.id)}
+                            className={`rounded-full px-3 py-1 text-xs font-medium transition ${
+                              question.correctChoiceId === choice.id
+                                ? "bg-purple-500 text-white"
+                                : "border border-white/10 text-zinc-400 hover:bg-white/5"
+                            }`}
+                          >
+                            {question.correctChoiceId === choice.id ? "Correct" : "Mark correct"}
+                          </button>
+                        </div>
+                        <input
+                          type="text"
+                          value={choice.text}
+                          onChange={(event) => updateChoice(questionIndex, choiceIndex, event.target.value)}
+                          placeholder={`Answer option ${choice.label}`}
+                        />
+                      </div>
+                    ))}
+                  </div>
+                </article>
+              ))}
+            </div>
+          </section>
         </div>
 
-        <div className="flex">
-          <div className="flex justify-center mt-3">
-            <button className="flex justify-between rounded-xl px-5 py-2.5 mr-3 border border-[#484848] text-white font-bold hover:bg-[#7c3aed] transition cursor-pointer">
-              <p>Save draft</p>
-            </button>
-            
-            <button className="flex justify-between rounded-xl px-5 py-2.5 border border-[#484848] text-white font-bold bg-[#7c3aed] hover:bg-purple-500 transition cursor-pointer">
-              <p>Preview</p>
-            </button>
-          </div>
-        </div>
+        <aside className="space-y-6">
+          <section className="rounded-2xl border border-white/10 bg-[#151518] p-6">
+            <h2 className="text-2xl font-semibold">Quiz Settings</h2>
+            <p className="mt-2 text-sm text-zinc-400">Stored in the `settings` object on the quiz document.</p>
+
+            <div className="mt-6 space-y-5">
+              <div>
+                <label className="text-sm font-medium text-zinc-300">Passing score</label>
+                <input
+                  type="number"
+                  min="0"
+                  max="100"
+                  value={form.settings.passingScore}
+                  onChange={(event) => updateSettings("passingScore", Number(event.target.value))}
+                />
+              </div>
+
+              <label className="flex items-center justify-between rounded-xl border border-white/10 bg-black/20 px-4 py-4">
+                <div>
+                  <p className="font-medium text-white">Randomize questions</p>
+                  <p className="mt-1 text-sm text-zinc-400">Shuffle question order when students start the quiz.</p>
+                </div>
+                <input
+                  type="checkbox"
+                  checked={form.settings.randomizeQuestions}
+                  onChange={(event) => updateSettings("randomizeQuestions", event.target.checked)}
+                  className="h-4 w-4 accent-purple-500"
+                />
+              </label>
+
+              <label className="flex items-center justify-between rounded-xl border border-white/10 bg-black/20 px-4 py-4">
+                <div>
+                  <p className="font-medium text-white">Immediate results</p>
+                  <p className="mt-1 text-sm text-zinc-400">Allow per-question feedback during play.</p>
+                </div>
+                <input
+                  type="checkbox"
+                  checked={form.settings.immediateResults}
+                  onChange={(event) => updateSettings("immediateResults", event.target.checked)}
+                  className="h-4 w-4 accent-purple-500"
+                />
+              </label>
+            </div>
+          </section>
+
+          <section className="rounded-2xl border border-white/10 bg-[#151518] p-6">
+            <h2 className="text-2xl font-semibold">Schema Preview</h2>
+            <p className="mt-2 text-sm text-zinc-400">Quick sanity check before writing to Mongo.</p>
+
+            <div className="mt-6 space-y-4 text-sm text-zinc-300">
+              <div className="rounded-xl border border-white/10 bg-black/20 p-4">
+                <p className="text-zinc-400">Slug</p>
+                <p className="mt-2 break-all font-medium text-white">{form.slug || "quiz-slug"}</p>
+              </div>
+              <div className="rounded-xl border border-white/10 bg-black/20 p-4">
+                <p className="text-zinc-400">Questions</p>
+                <p className="mt-2 font-medium text-white">{totalQuestions}</p>
+              </div>
+              <div className="rounded-xl border border-white/10 bg-black/20 p-4">
+                <p className="text-zinc-400">Visibility</p>
+                <p className="mt-2 font-medium text-white">{form.visibility}</p>
+              </div>
+              <div className="rounded-xl border border-white/10 bg-black/20 p-4">
+                <p className="text-zinc-400">Status on submit</p>
+                <p className="mt-2 font-medium text-white">Draft or Published</p>
+              </div>
+            </div>
+          </section>
+        </aside>
       </div>
-
-      {step === 1 && <BasicInfo/>}
-      {step === 2 && <QuizQuestion />}
-
-      <div className="flex justify-end gap-3 mt-5">
-        <di>
-          <button onClick={() => setStep(step - 1)} className="flex justify-between rounded-xl px-5 py-2.5 mr-3 border border-[#484848] text-white font-bold hover:bg-[#7c3aed] transition cursor-pointer">
-            <ChevronLeft /> Prev
-          </button>
-        </di>
-
-        {step === 1 && (
-          <button onClick={() => setStep(2)} className="flex justify-between rounded-xl px-5 py-2.5 border border-[#484848] text-white font-bold bg-[#7c3aed] hover:bg-purple-500 transition cursor-pointer">
-            Next <ChevronRight />
-          </button>
-        )}
-
-        {step === 2 && (
-          <button /*onClick={}*/ className="flex justify-between rounded-xl px-5 py-2.5 border border-[#484848] text-white font-bold bg-[#7c3aed] hover:bg-purple-500 transition cursor-pointer">
-            Preview & Publish
-          </button>
-        )}
-      </div>
+      ) : null}
     </div>
-  )
+  );
 }
-
-
-export default CreateQuiz

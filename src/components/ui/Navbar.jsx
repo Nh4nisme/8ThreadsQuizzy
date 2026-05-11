@@ -25,7 +25,11 @@ const Navbar = () => {
           <p className="text-sm font-medium text-white">{user?.fullName || user?.username || "User"}</p>
           <p className="text-xs text-zinc-400">{user?.email}</p>
         </div>
-        <button className="border border-[#FFFFFF]/20 text-white px-4 py-2 rounded-[10px] flex items-center space-x-2 hover:bg-[#7C3AED] h-10">
+        <button
+          type="button"
+          onClick={() => router.push("/quizzes/create")}
+          className="border border-[#FFFFFF]/20 text-white px-4 py-2 rounded-[10px] flex items-center space-x-2 hover:bg-[#7C3AED] h-10"
+        >
           <svg
             className="w-5 h-5"
             fill="none"
