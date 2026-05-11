@@ -16,6 +16,15 @@ const QuizAttemptSchema = new mongoose.Schema(
     },
     studentName: { type: String, required: true, trim: true },
     studentEmail: { type: String, default: "", trim: true },
+    responses: {
+      type: [
+        {
+          questionId: { type: String, required: true },
+          choiceId: { type: String, default: "" },
+        },
+      ],
+      default: [],
+    },
     status: {
       type: String,
       enum: ["in_progress", "completed"],

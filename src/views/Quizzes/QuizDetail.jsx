@@ -151,7 +151,7 @@ function QuestionPerformance({ questions = [] }) {
   );
 }
 
-export default function QuizDetail({ detail, onEdit }) {
+export default function QuizDetail({ detail, onEdit, onPreview, onShare }) {
   const router = useRouter();
 
   if (!detail?.quiz) {
@@ -194,12 +194,20 @@ export default function QuizDetail({ detail, onEdit }) {
             Edit
           </button>
 
-          <button className="mr-3 flex justify-between rounded-lg border border-gray-700 px-5 py-2.5 font-bold text-white transition hover:bg-[#7c3aed]">
+          <button
+            type="button"
+            onClick={onShare}
+            className="mr-3 flex justify-between rounded-lg border border-gray-700 px-5 py-2.5 font-bold text-white transition hover:bg-[#7c3aed]"
+          >
             <Share2 className="mr-3" />
             Share
           </button>
 
-          <button className="flex justify-between rounded-lg border border-gray-700 bg-purple-600 px-5 py-2.5 font-bold text-white transition hover:bg-[#7c3aed]">
+          <button 
+            type="button"
+            onClick={onPreview}
+            className="flex justify-between rounded-lg border border-gray-700 bg-purple-600 px-5 py-2.5 font-bold text-white transition hover:bg-[#7c3aed]"
+          >
             Preview
           </button>
         </div>

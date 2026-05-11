@@ -32,6 +32,14 @@ export const fetchStudentQuizzes = async () => {
   return getJson(response);
 };
 
+export const fetchStudentQuizBySlug = async (slug) => {
+  const response = await fetch(`${QUIZ_API_BASE}/student/slug/${slug}`, {
+    cache: "no-store",
+  });
+
+  return getJson(response);
+};
+
 export const fetchTeacherQuizzes = async () => {
   const response = await fetch(`${QUIZ_API_BASE}`, {
     headers: {
@@ -97,6 +105,30 @@ export const deleteQuizRequest = async (quizId) => {
     headers: {
       ...getAuthHeaders(),
     },
+  });
+
+  return getJson(response);
+};
+
+export const createQuizAttemptRequest = async (quizId) => {
+  const response = await fetch(`${QUIZ_API_BASE}/${quizId}/attempts`, {
+    method: "POST",
+    headers: {
+      ...getAuthHeaders(),
+    },
+  });
+
+  return getJson(response);
+};
+
+export const submitQuizAttemptRequest = async (quizId, attemptId, responses) => {
+  const response = await fetch(`${QUIZ_API_BASE}/${quizId}/attempts/${attemptId}/submit`, {
+    method: "PATCH",
+    headers: {
+      "Content-Type": "application/json",
+      ...getAuthHeaders(),
+    },
+    body: JSON.stringify({ responses }),
   });
 
   return getJson(response);
