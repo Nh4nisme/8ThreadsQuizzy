@@ -219,9 +219,9 @@ export default function StudentQuizPortal() {
   }, [initialQuizId, quizzes]);
 
   useEffect(() => {
-    const loadData = async () => {
+    const loadData = async (isSilent = false) => {
       try {
-        setIsLoading(true);
+        if (!isSilent) setIsLoading(true);
         const [quizzesData, eventsData] = await Promise.all([
           fetchStudentQuizzes(),
           fetchStudentEvents()
@@ -229,13 +229,20 @@ export default function StudentQuizPortal() {
         setQuizzes(quizzesData.quizzes || []);
         setEvents(eventsData.events || []);
       } catch (loadError) {
-        setError(loadError instanceof Error ? loadError.message : "Unable to load data.");
+        if (!isSilent) setError(loadError instanceof Error ? loadError.message : "Unable to load data.");
       } finally {
-        setIsLoading(false);
+        if (!isSilent) setIsLoading(false);
       }
     };
 
     loadData();
+
+    // Set up polling for real-time updates (new events or status changes)
+    const pollInterval = setInterval(() => {
+      loadData(true); // Silent update
+    }, 10000); // Every 10 seconds
+
+    return () => clearInterval(pollInterval);
   }, []);
 
   const categoryOptions = useMemo(

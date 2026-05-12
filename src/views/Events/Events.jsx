@@ -14,20 +14,27 @@ export default function Events() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingEvent, setEditingEvent] = useState(null);
 
-  const loadEvents = async () => {
-    setIsLoading(true);
+  const loadEvents = async (isSilent = false) => {
+    if (!isSilent) setIsLoading(true);
     try {
       const data = await fetchTeacherEvents();
       setEvents(data.events || []);
     } catch (error) {
       console.error("Failed to load events:", error);
     } finally {
-      setIsLoading(false);
+      if (!isSilent) setIsLoading(false);
     }
   };
 
   useEffect(() => {
     loadEvents();
+    
+    // Set up polling for real-time updates (e.g., live participants)
+    const pollInterval = setInterval(() => {
+      loadEvents(true); // Silent update
+    }, 5000); // Every 5 seconds
+
+    return () => clearInterval(pollInterval);
   }, []);
 
   const filteredEvents = useMemo(() => {
