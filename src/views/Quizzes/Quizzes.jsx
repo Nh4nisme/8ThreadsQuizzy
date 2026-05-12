@@ -82,6 +82,7 @@ export default function Quizzes() {
         onPreview={() => setIsPreviewing(true)}
         onShare={() => setIsSharing(true)}
       />
+      <br />
       <QuizLibrary selectedQuizId={selectedQuizId} onSelectQuiz={handleSelectQuiz} />
 
       <div style={{ marginTop: "20px", float: 'right' }}>

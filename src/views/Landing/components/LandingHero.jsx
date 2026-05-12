@@ -22,22 +22,24 @@ export default function LandingHero({ onExplore, onGetStarted }) {
   return (
     <div
       ref={heroRef}
-      className="relative flex min-h-[calc(100vh-72px)] w-full flex-col items-center justify-center overflow-hidden bg-black"
+      className="relative flex min-h-[calc(100vh-72px)] w-full flex-col items-center justify-center overflow-hidden bg-bg-main"
     >
       {/* Interactive spotlight overlay */}
-      <div style={spotlightStyle} />
+      <div style={spotlightStyle} className="pointer-events-none absolute inset-0 z-0 opacity-50" />
+      
       {/* Animated grid background */}
       <HeroBackground
         gridImage="/assets/PatternUp.png"
         parallax={parallax}
         floatAnim={floatAnim}
       />
-      <div className="relative z-10 flex flex-col items-center mt-24">
+
+      <div className="relative z-10 flex flex-col items-center mt-24 px-6">
         <motion.div 
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
-          className="mb-6"
+          className="mb-10"
         >
           <HeroBadge />
         </motion.div>
@@ -46,11 +48,11 @@ export default function LandingHero({ onExplore, onGetStarted }) {
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 1, delay: 0.2, ease: [0.16, 1, 0.3, 1] }}
-          className="text-5xl md:text-7xl font-bold text-center text-white tracking-tight"
+          className="text-6xl md:text-8xl font-black text-center text-white tracking-tighter leading-[0.9] max-w-5xl"
         >
-          Learn, Quiz,{" "}
-          <span className="bg-gradient-to-r from-purple-500 to-orange-500 text-transparent bg-clip-text">
-            Earn Rewards
+          Learn. Quiz.{" "}
+          <span className="text-gradient">
+            Ascend.
           </span>
         </motion.h1>
 
@@ -58,16 +60,17 @@ export default function LandingHero({ onExplore, onGetStarted }) {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 1, delay: 0.4, ease: [0.16, 1, 0.3, 1] }}
-          className="mt-8 text-xl text-center text-zinc-400 max-w-2xl leading-relaxed"
+          className="mt-12 text-xl md:text-2xl text-center text-text-secondary max-w-3xl leading-relaxed font-medium"
         >
-          Join thousands of students and teachers on the ultimate quiz platform.
-          Test your knowledge, compete with peers, and win exciting rewards.
+          Join the elite ecosystem of knowledge seekers. 
+          Build your legacy through interactive challenges and secure your place on the leaderboard.
         </motion.p>
 
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 1, delay: 0.6, ease: [0.16, 1, 0.3, 1] }}
+          className="mt-16"
         >
           <HeroActions 
             onExplore={onExplore} 
