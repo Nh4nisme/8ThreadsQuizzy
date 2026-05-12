@@ -60,7 +60,10 @@ export default function Landing() {
         onSignIn={() => setAuthMode("signin")}
         onSignUp={() => setAuthMode("signup")}
       />
-      <LandingHero onExplore={() => handleSectionNavigation("quiz")} />
+      <LandingHero 
+        onExplore={() => handleSectionNavigation("quiz")} 
+        onGetStarted={() => setAuthMode("signup")}
+      />
       <LandingSections ref={exploreSectionRef} />
 
       {authMode && (
