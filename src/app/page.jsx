@@ -1,5 +1,10 @@
 import Landing from "../views/Landing/Landing.jsx";
+import LayoutTransition from "../components/ui/LayoutTransition.jsx";
 
 export default function HomePage() {
-  return <Landing />;
+  return (
+    <LayoutTransition>
+      <Landing />
+    </LayoutTransition>
+  );
 }

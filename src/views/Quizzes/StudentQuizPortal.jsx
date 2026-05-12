@@ -15,13 +15,15 @@ import {
   Calendar,
 } from "lucide-react";
 import { useAuth } from "../../context/AuthContext.jsx";
-import { 
-  fetchStudentQuizzes, 
+import {
+  fetchStudentQuizzes,
   fetchStudentEvents,
-  createQuizAttemptRequest, 
-  submitQuizAttemptRequest 
+  createQuizAttemptRequest,
+  submitQuizAttemptRequest
 } from "../../lib/quiz-client.js";
 import { toast } from "../../components/ui/Toast.jsx";
+import { motion, AnimatePresence } from "framer-motion";
+import { FadeIn, StaggerContainer, StaggerItem, HoverScale, ScaleIn } from "../../components/ui/Motion.jsx";
 
 const difficultyOptions = ["All Levels", "Easy", "Medium", "Hard"];
 
@@ -29,7 +31,6 @@ export function StudentQuizPlayer({ quiz, attemptId, onExit, onComplete, isPrevi
   const [questionIndex, setQuestionIndex] = useState(0);
   const [selectedAnswers, setSelectedAnswers] = useState({});
   const [showResults, setShowResults] = useState(false);
-
   const [timeLeft, setTimeLeft] = useState((quiz.durationMinutes || 10) * 60);
 
   const question = quiz.questions[questionIndex];
@@ -55,16 +56,13 @@ export function StudentQuizPlayer({ quiz, attemptId, onExit, onComplete, isPrevi
 
   useEffect(() => {
     if (showResults) return;
-    
     if (timeLeft <= 0) {
       handleSubmit();
       return;
     }
-
     const timer = setInterval(() => {
       setTimeLeft((prev) => prev - 1);
     }, 1000);
-
     return () => clearInterval(timer);
   }, [timeLeft, showResults]);
 
@@ -79,132 +77,172 @@ export function StudentQuizPlayer({ quiz, attemptId, onExit, onComplete, isPrevi
       await handleSubmit();
       return;
     }
-
     setQuestionIndex((current) => current + 1);
   };
 
   if (showResults) {
     return (
-      <div className="min-h-screen bg-bg-main px-6 py-10 text-text-main md:px-10">
-        <div className="mx-auto flex max-w-4xl flex-col gap-6 rounded-2xl border border-border-main bg-bg-card p-8">
-          <div className="flex items-center justify-between">
+      <div className="min-h-screen bg-bg-main px-6 py-10 text-text-main md:px-10 overflow-hidden">
+        <StaggerContainer className="mx-auto flex max-w-4xl flex-col gap-6">
+          <StaggerItem className="flex items-center justify-between">
             <button
               type="button"
               onClick={onExit}
-              className="flex items-center gap-2 rounded-xl border border-border-main px-4 py-2 text-sm hover:bg-bg-secondary"
+              className="flex items-center gap-2 rounded-xl border border-border-main px-4 py-2 text-sm hover:bg-bg-secondary transition-colors"
             >
               <ArrowLeft size={16} />
               Back to quizzes
             </button>
-            <span className="rounded-full bg-accent/15 px-4 py-2 text-sm text-accent">
+            <span className="rounded-full bg-green-500/20 px-4 py-2 text-sm text-green-400 font-bold">
               Completed
             </span>
-          </div>
+          </StaggerItem>
 
-          <div className="rounded-2xl border border-border-main bg-accent-gradient/10 p-8">
-            <p className="text-sm uppercase tracking-[0.18em] text-accent">Quiz Summary</p>
-            <h1 className="mt-4 text-3xl font-semibold">{quiz.title}</h1>
-            <p className="mt-3 text-text-secondary">
-              You answered {score} out of {quiz.questions.length} questions correctly.
-            </p>
-          </div>
-        </div>
+          <StaggerItem className="rounded-3xl border border-border-main bg-accent-gradient/10 p-12 text-center relative overflow-hidden">
+            <div className="absolute top-0 left-0 w-full h-1 bg-accent-gradient" />
+            <ScaleIn delay={0.3}>
+              <Trophy className="w-16 h-16 text-accent mx-auto mb-6" />
+            </ScaleIn>
+            <FadeIn delay={0.5}>
+              <p className="text-sm uppercase tracking-[0.2em] text-accent font-bold">Quiz Summary</p>
+              <h1 className="mt-4 text-4xl font-bold">{quiz.title}</h1>
+              <p className="mt-6 text-xl text-text-secondary leading-relaxed">
+                Excellent work! You answered <span className="text-white font-bold">{score}</span> out of <span className="text-white font-bold">{quiz.questions.length}</span> questions correctly.
+              </p>
+            </FadeIn>
+          </StaggerItem>
+
+          <StaggerItem className="grid grid-cols-2 md:grid-cols-4 gap-4">
+            {[
+              { label: "Accuracy", value: `${Math.round((score / quiz.questions.length) * 100)}%` },
+              { label: "Questions", value: quiz.questions.length },
+              { label: "Correct", value: score },
+              { label: "Points", value: score * 100 }
+            ].map((stat, i) => (
+              <div key={i} className="bg-bg-card border border-border-main p-6 rounded-2xl text-center">
+                <p className="text-xs text-text-muted uppercase tracking-widest mb-2">{stat.label}</p>
+                <p className="text-2xl font-bold text-white">{stat.value}</p>
+              </div>
+            ))}
+          </StaggerItem>
+        </StaggerContainer>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-bg-main px-6 py-10 text-text-main md:px-10">
-      <div className="mx-auto flex max-w-6xl flex-col gap-6">
-        <div className="flex items-center justify-between">
+    <div className="min-h-screen bg-bg-main px-6 py-10 text-text-main md:px-10 overflow-hidden">
+      <StaggerContainer className="mx-auto flex max-w-6xl flex-col gap-6">
+        <StaggerItem className="flex items-center justify-between">
           <button
             type="button"
             onClick={onExit}
-            className="flex items-center gap-2 rounded-xl border border-border-main px-4 py-2 text-sm hover:bg-bg-secondary"
+            className="flex items-center gap-2 rounded-xl border border-border-main px-4 py-2 text-sm hover:bg-bg-secondary transition-colors"
           >
             <ArrowLeft size={16} />
             Leave quiz
           </button>
-          <div className="rounded-full border border-border-main bg-bg-secondary px-4 py-2 text-sm text-text-secondary">
-            Question {questionIndex + 1} of {quiz.questions.length}
+          <div className="rounded-full border border-border-main bg-bg-secondary px-6 py-2 text-sm text-text-secondary font-medium">
+            Question <span className="text-white">{questionIndex + 1}</span> of <span className="text-white">{quiz.questions.length}</span>
           </div>
-        </div>
+        </StaggerItem>
 
         <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_320px]">
-          <div className="rounded-2xl border border-border-main bg-bg-card p-8 shadow-sm">
-            <div className="flex items-start justify-between gap-4">
-              <div>
-                <p className="text-sm uppercase tracking-[0.18em] text-accent">{quiz.category}</p>
-                <h1 className="mt-3 text-3xl font-semibold">{quiz.title}</h1>
+          <StaggerItem className="rounded-3xl border border-border-main bg-bg-card p-1 shadow-2xl relative overflow-hidden">
+            <div className="absolute top-0 left-0 h-1 bg-accent-gradient transition-all duration-500" style={{ width: `${((questionIndex + 1) / quiz.questions.length) * 100}%` }} />
+            <div className="p-10">
+              <div className="flex items-start justify-between gap-4 mb-10">
+                <div>
+                  <p className="text-xs font-bold uppercase tracking-[0.2em] text-accent mb-2">{quiz.category}</p>
+                  <h1 className="text-3xl font-bold tracking-tight">{quiz.title}</h1>
+                </div>
+                <span className="rounded-xl bg-accent-secondary/10 px-4 py-2 text-xs font-bold text-accent-secondary border border-accent-secondary/20">
+                  {quiz.difficulty}
+                </span>
               </div>
-              <span className="rounded-full bg-accent-secondary/15 px-4 py-2 text-sm text-accent-secondary">
-                {quiz.difficulty}
-              </span>
-            </div>
 
-            <div className="mt-8 rounded-2xl border border-border-main bg-bg-input p-6">
-              <p className="text-sm text-text-muted">Prompt</p>
-              <h2 className="mt-3 text-2xl font-medium leading-9">{question.prompt}</h2>
-            </div>
+              <AnimatePresence mode="wait">
+                <motion.div
+                  key={question.id}
+                  initial={{ opacity: 0, x: 20, filter: "blur(10px)" }}
+                  animate={{ opacity: 1, x: 0, filter: "blur(0px)" }}
+                  exit={{ opacity: 0, x: -20, filter: "blur(10px)" }}
+                  transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
+                >
+                  <div className="rounded-2xl border border-border-main bg-bg-input p-8 mb-8">
+                    <p className="text-xs font-bold text-text-muted uppercase tracking-widest mb-4">Question Prompt</p>
+                    <h2 className="text-2xl font-semibold leading-relaxed tracking-tight">{question.prompt}</h2>
+                  </div>
 
-            <div className="mt-6 grid gap-4 md:grid-cols-2">
-              {question.choices.map((choice) => {
-                const isSelected = selectedAnswers[question.id] === choice.id;
+                  <div className="grid gap-4 md:grid-cols-2">
+                    {question.choices.map((choice) => {
+                      const isSelected = selectedAnswers[question.id] === choice.id;
+                      return (
+                        <button
+                          key={choice.id}
+                          type="button"
+                          onClick={() =>
+                            setSelectedAnswers((current) => ({
+                              ...current,
+                              [question.id]: choice.id,
+                            }))
+                          }
+                          className={`rounded-2xl border-2 p-6 text-left transition-all duration-300 group relative overflow-hidden ${isSelected
+                              ? "border-accent bg-accent/10 shadow-[0_0_30px_rgba(124,58,237,0.1)]"
+                              : "border-border-main bg-bg-secondary hover:border-accent/40 hover:bg-bg-tertiary"
+                            }`}
+                        >
+                          {isSelected && <motion.div layoutId="choice-bg" className="absolute inset-0 bg-accent-gradient opacity-[0.03]" />}
+                          <span className={`block text-[10px] font-bold uppercase tracking-[0.3em] transition-colors ${isSelected ? "text-accent" : "text-text-muted"}`}>
+                            {choice.label}
+                          </span>
+                          <span className={`mt-3 block text-lg font-semibold transition-colors ${isSelected ? "text-white" : "text-text-secondary"}`}>{choice.text}</span>
+                        </button>
+                      );
+                    })}
+                  </div>
+                </motion.div>
+              </AnimatePresence>
 
-                return (
+              <div className="mt-12 flex justify-end">
+                <HoverScale>
                   <button
-                    key={choice.id}
                     type="button"
-                    onClick={() =>
-                      setSelectedAnswers((current) => ({
-                        ...current,
-                        [question.id]: choice.id,
-                      }))
-                    }
-                    className={`rounded-2xl border p-5 text-left transition duration-200 ${
-                      isSelected
-                        ? "border-accent bg-accent/10 text-text-main shadow-[0_0_15px_var(--accent-glow)]"
-                        : "border-border-main bg-bg-secondary text-text-secondary hover:border-accent/50 hover:bg-bg-tertiary"
-                    }`}
+                    onClick={handleNext}
+                    disabled={!selectedAnswers[question.id]}
+                    className="rounded-2xl bg-accent-gradient px-12 py-4 font-bold text-white shadow-xl shadow-accent/20 disabled:cursor-not-allowed disabled:opacity-50 transition-all hover:shadow-accent/40"
                   >
-                    <span className="block text-xs uppercase tracking-[0.2em] text-text-muted">
-                      {choice.label}
-                    </span>
-                    <span className="mt-2 block text-base font-medium">{choice.text}</span>
+                    {questionIndex === quiz.questions.length - 1 ? "Finish Quiz" : "Next Question"}
                   </button>
-                );
-              })}
-            </div>
-
-            <div className="mt-8 flex justify-end">
-              <button
-                type="button"
-                onClick={handleNext}
-                disabled={!selectedAnswers[question.id]}
-                className="rounded-xl bg-accent-gradient px-8 py-3 font-semibold text-text-on-accent transition-all hover:opacity-90 shadow-lg shadow-accent/20 disabled:cursor-not-allowed disabled:opacity-50"
-              >
-                {questionIndex === quiz.questions.length - 1 ? "Finish Quiz" : "Next Question"}
-              </button>
-            </div>
-          </div>
-
-          <div className="rounded-2xl border border-border-main bg-bg-card p-6 shadow-sm">
-            <h3 className="text-lg font-semibold">Session Summary</h3>
-            <div className="mt-5 space-y-4">
-              <div className="rounded-xl border border-border-main bg-bg-input p-4">
-                <p className="text-sm text-text-muted">Answered</p>
-                <p className="mt-2 text-2xl font-semibold">{answeredCount}</p>
-              </div>
-              <div className="rounded-xl border border-border-main bg-bg-input p-4">
-                <p className="text-sm text-text-muted">Time Remaining</p>
-                <p className={`mt-2 text-2xl font-semibold ${timeLeft < 60 ? "text-red-500 animate-pulse" : "text-accent"}`}>
-                  {formatTime(timeLeft)}
-                </p>
+                </HoverScale>
               </div>
             </div>
-          </div>
+          </StaggerItem>
+
+          <StaggerItem className="space-y-6">
+            <div className="rounded-3xl border border-border-main bg-bg-card p-8 shadow-sm">
+              <h3 className="text-lg font-bold mb-6">Session Status</h3>
+              <div className="space-y-4">
+                <div className="rounded-2xl border border-border-main bg-bg-input p-5">
+                  <p className="text-xs text-text-muted uppercase tracking-widest font-bold mb-2">Answered</p>
+                  <p className="text-3xl font-bold text-white">{answeredCount} <span className="text-lg text-zinc-600 font-normal">/ {quiz.questions.length}</span></p>
+                </div>
+                <div className="rounded-2xl border border-border-main bg-bg-input p-5">
+                  <p className="text-xs text-text-muted uppercase tracking-widest font-bold mb-2">Time Left</p>
+                  <p className={`text-3xl font-bold ${timeLeft < 60 ? "text-red-500 animate-pulse" : "text-accent"}`}>
+                    {formatTime(timeLeft)}
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            <FadeIn delay={0.5} className="rounded-3xl border border-border-main bg-accent-gradient/5 p-8 text-center border-dashed">
+              <Sparkles className="w-8 h-8 text-accent mx-auto mb-4" />
+              <p className="text-sm text-text-secondary">Keep going! You're doing great on this {quiz.category} quiz.</p>
+            </FadeIn>
+          </StaggerItem>
         </div>
-      </div>
+      </StaggerContainer>
     </div>
   );
 }
@@ -306,13 +344,13 @@ export default function StudentQuizPortal() {
 
   if (activeQuiz) {
     return (
-      <StudentQuizPlayer 
-        quiz={activeQuiz} 
+      <StudentQuizPlayer
+        quiz={activeQuiz}
         attemptId={activeAttemptId}
         onExit={() => {
           setActiveQuiz(null);
           setActiveAttemptId(null);
-        }} 
+        }}
       />
     );
   }
@@ -363,21 +401,19 @@ export default function StudentQuizPortal() {
               <div className="flex items-center gap-1 mt-4 p-1 bg-bg-input rounded-xl border border-border-main w-fit">
                 <button
                   onClick={() => setViewType("quizzes")}
-                  className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${
-                    viewType === "quizzes"
+                  className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${viewType === "quizzes"
                       ? "bg-accent text-text-on-accent shadow-md shadow-accent/20"
                       : "text-text-secondary hover:text-text-main hover:bg-bg-tertiary"
-                  }`}
+                    }`}
                 >
                   Standard Quizzes
                 </button>
                 <button
                   onClick={() => setViewType("events")}
-                  className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${
-                    viewType === "events"
+                  className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${viewType === "events"
                       ? "bg-accent text-text-on-accent shadow-md shadow-accent/20"
                       : "text-text-secondary hover:text-text-main hover:bg-bg-tertiary"
-                  }`}
+                    }`}
                 >
                   Events & Exams
                 </button>
@@ -455,9 +491,8 @@ export default function StudentQuizPortal() {
                 return (
                   <article
                     key={item._id || item.slug}
-                    className={`rounded-2xl border border-border-main bg-bg-secondary p-6 transition-all duration-300 group ${
-                      isDisabled ? "opacity-60" : "hover:border-accent hover:bg-bg-tertiary hover:shadow-lg hover:shadow-accent/5"
-                    }`}
+                    className={`rounded-2xl border border-border-main bg-bg-secondary p-6 transition-all duration-300 group ${isDisabled ? "opacity-60" : "hover:border-accent hover:bg-bg-tertiary hover:shadow-lg hover:shadow-accent/5"
+                      }`}
                   >
                     <div className="flex items-start justify-between gap-4">
                       <div>
@@ -469,10 +504,9 @@ export default function StudentQuizPortal() {
                             <div className="flex items-center gap-2">
                               <p className="text-sm text-text-muted">{quiz?.category || "Event"}</p>
                               {isEvent && (
-                                <span className={`text-[10px] uppercase font-bold px-2 py-0.5 rounded-full ${
-                                  status === 'active' ? 'bg-green-500/20 text-green-400' : 
-                                  status === 'upcoming' ? 'bg-blue-500/20 text-blue-400' : 'bg-gray-500/20 text-gray-400'
-                                }`}>
+                                <span className={`text-[10px] uppercase font-bold px-2 py-0.5 rounded-full ${status === 'active' ? 'bg-green-500/20 text-green-400' :
+                                    status === 'upcoming' ? 'bg-blue-500/20 text-blue-400' : 'bg-gray-500/20 text-gray-400'
+                                  }`}>
                                   {status}
                                 </span>
                               )}
@@ -492,7 +526,7 @@ export default function StudentQuizPortal() {
                                 <Clock3 size={14} />
                                 {isMounted ? (
                                   <>
-                                    {new Date(item.startTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })} - 
+                                    {new Date(item.startTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })} -
                                     {new Date(item.endTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                                   </>
                                 ) : "Loading time..."}
@@ -519,11 +553,10 @@ export default function StudentQuizPortal() {
                         type="button"
                         onClick={() => !isDisabled && handleJoinQuiz(quiz, isEvent ? item._id : null)}
                         disabled={isDisabled}
-                        className={`rounded-xl px-6 py-2.5 text-sm font-semibold transition-all whitespace-nowrap ${
-                          isDisabled 
-                            ? "bg-bg-tertiary text-text-muted cursor-not-allowed border border-border-main" 
+                        className={`rounded-xl px-6 py-2.5 text-sm font-semibold transition-all whitespace-nowrap ${isDisabled
+                            ? "bg-bg-tertiary text-text-muted cursor-not-allowed border border-border-main"
                             : "bg-accent-gradient text-text-on-accent shadow-lg shadow-accent/20 hover:opacity-90"
-                        }`}
+                          }`}
                       >
                         {isEvent ? (status === 'active' ? "Start now" : status === 'upcoming' ? "Wait..." : "Ended") : "Join now"}
                       </button>

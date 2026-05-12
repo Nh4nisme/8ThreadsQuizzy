@@ -39,9 +39,7 @@ export default function RootLayout({ children }) {
         <ThemeProvider>
           <AuthProvider>
             <AppLoader />
-            <LayoutTransition>
-              <main>{children}</main>
-            </LayoutTransition>
+            <main>{children}</main>
             <ToastContainer />
           </AuthProvider>
         </ThemeProvider>

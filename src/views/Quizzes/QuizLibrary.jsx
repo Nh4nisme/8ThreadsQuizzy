@@ -1,5 +1,3 @@
-"use client";
-
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import {
@@ -19,6 +17,7 @@ import {
   duplicateQuizRequest,
   fetchTeacherQuizzes,
 } from "../../lib/quiz-client.js";
+import { FadeIn, StaggerContainer, StaggerItem, HoverScale } from "../../components/ui/Motion.jsx";
 
 function QuizMenu({ quizId, onEdit, onDuplicated, onDeleted }) {
   const [open, setOpen] = useState(false);
@@ -139,64 +138,69 @@ function QuizCard({ quiz, isSelected, onView, onEdit, onDuplicated, onDeleted })
   const quizStatusLabel = quiz.status === "published" ? "Published" : "Draft";
 
   return (
-    <div
-      className={`mt-5 flex items-center gap-4 rounded-lg border-2 bg-[#19191b] p-5 transition ${isSelected ? "border-purple-600" : "border-gray-800 hover:border-purple-600"
-        }`}
-    >
-      <div className="rounded-full bg-purple-900/40 p-4">
-        <BookOpen className="text-[#7c3aed]" />
-      </div>
-
-      <div className="flex-1">
-        <div className="mb-1 flex items-center gap-2">
-          <h1 className="font-bold text-white">{quiz.title}</h1>
-          <span
-            className={`rounded-full px-3 py-0.75 text-xs font-bold ${quiz.status === "published"
-              ? "bg-green-500 text-white"
-              : "border border-amber-500 bg-amber-950 text-orange-500"
-              }`}
-          >
-            {quizStatusLabel}
-          </span>
+    <StaggerItem>
+      <div
+        className={`mt-5 flex items-center gap-4 rounded-lg border-2 bg-[#19191b] p-5 transition ${isSelected ? "border-purple-600" : "border-gray-800 hover:border-purple-600 shadow-lg hover:shadow-purple-500/10"
+          }`}
+      >
+        <div className="rounded-full bg-purple-900/40 p-4">
+          <BookOpen className="text-[#7c3aed]" />
         </div>
 
-        <p className="mb-2 text-sm text-gray-300">{quiz.description}</p>
+        <div className="flex-1">
+          <div className="mb-1 flex items-center gap-2">
+            <h1 className="font-bold text-white">{quiz.title}</h1>
+            <span
+              className={`rounded-full px-3 py-0.75 text-xs font-bold ${quiz.status === "published"
+                ? "bg-green-500 text-white"
+                : "border border-amber-500 bg-amber-950 text-orange-500"
+                }`}
+            >
+              {quizStatusLabel}
+            </span>
+          </div>
 
-        <div className="flex gap-4 text-xs text-white">
-          <span className="flex items-center gap-1">
-            <BookOpen className="h-3.5 w-3.5" /> {quiz.questions.length} questions
-          </span>
-          <span className="flex items-center gap-1">
-            <Clock className="h-3.5 w-3.5" /> {quiz.durationMinutes} min
-          </span>
-          <span className="flex items-center gap-1">
-            <Users className="h-3.5 w-3.5" /> {quiz.completions || 0} completions
-          </span>
-          <span>{quiz.category}</span>
+          <p className="mb-2 text-sm text-gray-300">{quiz.description}</p>
+
+          <div className="flex gap-4 text-xs text-white">
+            <span className="flex items-center gap-1">
+              <BookOpen className="h-3.5 w-3.5" /> {quiz.questions.length} questions
+            </span>
+            <span className="flex items-center gap-1">
+              <Clock className="h-3.5 w-3.5" /> {quiz.durationMinutes} min
+            </span>
+            <span className="flex items-center gap-1">
+              <Users className="h-3.5 w-3.5" /> {quiz.completions || 0} completions
+            </span>
+            <span>{quiz.category}</span>
+          </div>
+        </div>
+
+        <div className="flex items-center gap-3">
+          <HoverScale>
+            <button
+              type="button"
+              onClick={() => onView(quiz._id)}
+              className="rounded-lg border border-gray-800 bg-[#101010] px-4 py-2 text-white transition hover:bg-purple-600"
+            >
+              View
+            </button>
+          </HoverScale>
+
+          <QuizMenu
+            quizId={quiz._id}
+            onEdit={onEdit}
+            onDuplicated={onDuplicated}
+            onDeleted={onDeleted}
+          />
         </div>
       </div>
-
-      <div className="flex items-center gap-3">
-        <button
-          type="button"
-          onClick={() => onView(quiz._id)}
-          className="rounded-lg border border-gray-800 bg-[#101010] px-4 py-2 text-white transition hover:bg-purple-600"
-        >
-          View
-        </button>
-
-        <QuizMenu
-          quizId={quiz._id}
-          onEdit={onEdit}
-          onDuplicated={onDuplicated}
-          onDeleted={onDeleted}
-        />
-      </div>
-    </div>
+    </StaggerItem>
   );
 }
 
 export default function QuizLibrary({ selectedQuizId, onSelectQuiz }) {
+  // ... (existing state/effects remain same)
   const router = useRouter();
   const [active, setActive] = useState("All Quizzes");
   const [search, setSearch] = useState("");
@@ -260,8 +264,8 @@ export default function QuizLibrary({ selectedQuizId, onSelectQuiz }) {
   };
 
   return (
-    <>
-      <div className="mb-5 flex justify-between w-full items-start">
+    <StaggerContainer>
+      <FadeIn className="mb-5 flex justify-between w-full items-start">
         <div>
           <div className="flex rounded-lg">
             <div>
@@ -270,20 +274,22 @@ export default function QuizLibrary({ selectedQuizId, onSelectQuiz }) {
             </div>
           </div>
         </div>
-      </div>
+      </FadeIn>
 
-      <div className="rounded-lg bg-[#151518] px-6 py-8">
-        <h1 className="text-2xl font-bold tracking-tight text-white">Quiz Library</h1>
-        <h2 className="mb-6 pt-1 text-base text-gray-400">Browse and manage all your quizzes</h2>
+      <div className="rounded-lg bg-[#151518] px-6 py-8 border border-white/5">
+        <FadeIn>
+          <h1 className="text-2xl font-bold tracking-tight text-white">Quiz Library</h1>
+          <h2 className="mb-6 pt-1 text-base text-gray-400">Browse and manage all your quizzes</h2>
+        </FadeIn>
 
-        <div className="flex items-center justify-between">
-          <div className="inline-flex rounded-lg border border-gray-800 p-1">
+        <FadeIn delay={0.2} className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+          <div className="inline-flex rounded-lg border border-gray-800 p-1 bg-black/20">
             {tabs.map((tab) => (
               <button
                 key={tab}
                 type="button"
                 onClick={() => setActive(tab)}
-                className={`rounded-lg px-4 py-2 text-sm font-medium transition ${active === tab ? "bg-[#101010] text-white" : "text-gray-400 hover:text-white"
+                className={`rounded-lg px-4 py-2 text-sm font-medium transition ${active === tab ? "bg-[#101010] text-white shadow-lg" : "text-gray-400 hover:text-white"
                   }`}
               >
                 {tab}
@@ -292,14 +298,14 @@ export default function QuizLibrary({ selectedQuizId, onSelectQuiz }) {
           </div>
 
           <div className="flex gap-3">
-            <div className="flex items-center gap-2 rounded-lg border border-[#27272a] bg-[#18181a] pl-3 focus-within:border-purple-600">
+            <div className="flex items-center gap-2 rounded-lg border border-[#27272a] bg-[#18181a] pl-3 focus-within:border-purple-600 transition-colors">
               <Search className="h-4 w-4 text-gray-400" />
               <input
                 type="text"
                 placeholder="Search quizzes..."
                 value={search}
                 onChange={(event) => setSearch(event.target.value)}
-                className="mt-0 w-full border-none bg-transparent text-sm text-white outline-none placeholder-gray-500"
+                className="mt-0 w-full border-none bg-transparent text-sm text-white outline-none placeholder-gray-500 py-2.5"
               />
             </div>
 
@@ -309,18 +315,18 @@ export default function QuizLibrary({ selectedQuizId, onSelectQuiz }) {
               onChange={setCategory}
             />
           </div>
-        </div>
+        </FadeIn>
 
         {isLoading ? (
-          <div className="mt-7 rounded-lg border border-white/10 bg-black/10 px-6 py-10 text-center text-zinc-400">
+          <FadeIn className="mt-7 rounded-lg border border-white/10 bg-black/10 px-6 py-10 text-center text-zinc-400">
             Loading quizzes...
-          </div>
+          </FadeIn>
         ) : null}
 
         {error ? (
-          <div className="mt-7 rounded-lg border border-red-500/30 bg-red-500/10 px-6 py-6 text-center text-red-200">
+          <FadeIn className="mt-7 rounded-lg border border-red-500/30 bg-red-500/10 px-6 py-6 text-center text-red-200">
             {error}
-          </div>
+          </FadeIn>
         ) : null}
 
         {!isLoading && !error ? (
@@ -340,11 +346,11 @@ export default function QuizLibrary({ selectedQuizId, onSelectQuiz }) {
         ) : null}
 
         {!isLoading && !error && filteredQuizzes.length === 0 ? (
-          <div className="mt-7 rounded-lg border border-dashed border-white/10 bg-black/10 px-6 py-10 text-center text-zinc-400">
+          <FadeIn className="mt-7 rounded-lg border border-dashed border-white/10 bg-black/10 px-6 py-10 text-center text-zinc-400">
             No quizzes matched the current search and filters.
-          </div>
+          </FadeIn>
         ) : null}
       </div>
-    </>
+    </StaggerContainer>
   );
 }

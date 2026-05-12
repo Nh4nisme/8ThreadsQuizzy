@@ -1,5 +1,6 @@
 import SideBar from "../components/ui/SideBar.jsx";
 import Navbar from "../components/ui/Navbar.jsx";
+import LayoutTransition from "../components/ui/LayoutTransition.jsx";
 
 const MainLayout = ({ children }) => {
   return (
