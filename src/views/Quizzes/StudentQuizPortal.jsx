@@ -149,29 +149,30 @@ export function StudentQuizPlayer({ quiz, attemptId, onExit, onComplete, isPrevi
   // --- RESULTS VIEW ---
   if (showResults) {
     return (
-      <div className="relative min-h-screen overflow-hidden bg-[#050505] px-6 py-12 text-white md:px-10">
+      <div className="relative min-h-screen overflow-hidden bg-[#050505] px-4 md:px-10 py-6 md:py-12 text-white">
         <GlowOrb className="-top-24 -left-24 h-[500px] w-[500px]" color="purple" />
         <GlowOrb className="bottom-0 -right-24 h-[600px] w-[600px]" color="emerald" />
         <GlowOrb className="top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 h-[800px] w-[800px]" color="blue" />
 
-        <div className="relative z-10 mx-auto flex max-w-4xl flex-col gap-8">
-          <StaggerContainer className="flex flex-col gap-8">
+        <div className="relative z-10 mx-auto flex max-w-4xl flex-col gap-6 md:gap-8">
+          <StaggerContainer className="flex flex-col gap-6 md:gap-8">
             <StaggerItem className="flex items-center justify-between">
               <button
                 type="button"
                 onClick={onExit}
-                className="group flex items-center gap-2 rounded-2xl border border-white/10 bg-white/5 px-5 py-2.5 text-sm font-medium backdrop-blur-md transition-all hover:bg-white/10 hover:border-white/20"
+                className="group flex items-center gap-2 rounded-2xl border border-white/10 bg-white/5 px-4 md:px-5 py-2.5 text-xs md:text-sm font-medium backdrop-blur-md transition-all hover:bg-white/10 hover:border-white/20"
               >
                 <ArrowLeft size={18} className="transition-transform group-hover:-translate-x-1" />
-                Return to Dashboard
+                <span className="hidden sm:inline">Return to Dashboard</span>
+                <span className="sm:hidden">Exit</span>
               </button>
-              <div className="flex items-center gap-2 rounded-full bg-emerald-500/10 px-4 py-1.5 border border-emerald-500/20">
+              <div className="flex items-center gap-2 rounded-full bg-emerald-500/10 px-3 md:px-4 py-1.5 border border-emerald-500/20">
                 <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-                <span className="text-xs font-bold text-emerald-400 uppercase tracking-widest">Assessment Finalized</span>
+                <span className="text-[9px] md:text-xs font-bold text-emerald-400 uppercase tracking-widest">Finalized</span>
               </div>
             </StaggerItem>
 
-            <StaggerItem className="relative overflow-hidden rounded-[40px] border border-white/10 bg-[#111115]/60 p-12 text-center backdrop-blur-xl shadow-2xl">
+            <StaggerItem className="relative overflow-hidden rounded-3xl md:rounded-[40px] border border-white/10 bg-[#111115]/60 p-6 md:p-12 text-center backdrop-blur-xl shadow-2xl">
               {/* Confetti Spawner */}
               <div className="absolute inset-0 pointer-events-none flex items-center justify-center">
                 {Array.from({ length: 50 }).map((_, i) => (
@@ -181,39 +182,38 @@ export function StudentQuizPlayer({ quiz, attemptId, onExit, onComplete, isPrevi
 
               <div className="relative z-10">
                 <ScaleIn delay={0.2}>
-                  <div className="relative mx-auto mb-8 w-24 h-24">
+                  <div className="relative mx-auto mb-6 md:mb-8 w-16 h-16 md:w-24 md:h-24">
                     <div className="absolute inset-0 bg-accent-gradient blur-2xl opacity-40 rounded-full animate-pulse" />
-                    <div className="relative flex items-center justify-center w-full h-full rounded-3xl bg-accent-gradient shadow-lg">
-                      <Trophy className="w-12 h-12 text-white" />
+                    <div className="relative flex items-center justify-center w-full h-full rounded-2xl md:rounded-3xl bg-accent-gradient shadow-lg">
+                      <Trophy className="w-8 h-8 md:w-12 md:h-12 text-white" />
                     </div>
                   </div>
                 </ScaleIn>
 
                 <FadeIn delay={0.4}>
-                  <p className="text-sm uppercase tracking-[0.4em] text-accent font-bold mb-4">Quiz Achievement</p>
-                  <h1 className="text-5xl md:text-6xl font-black tracking-tight mb-6">
+                  <p className="text-[10px] md:text-sm uppercase tracking-[0.4em] text-accent font-black mb-3 md:mb-4">Quiz Achievement</p>
+                  <h1 className="text-3xl md:text-6xl font-black tracking-tight mb-4 md:mb-6 leading-tight">
                     {Math.round((score / totalQuestions) * 100) >= 80 ? "Legendary!" : "Great Job!"}
                   </h1>
 
-                  <div className="inline-flex items-center gap-4 px-8 py-4 rounded-3xl bg-white/5 border border-white/10 backdrop-blur-md mb-8">
+                  <div className="inline-flex items-center gap-3 md:gap-4 px-6 md:px-8 py-3 md:py-4 rounded-2xl md:rounded-3xl bg-white/5 border border-white/10 backdrop-blur-md mb-6 md:mb-8">
                     <div className="text-left">
-                      <p className="text-[10px] text-text-muted uppercase tracking-[0.2em] font-bold">Total Score</p>
-                      <p className="text-4xl font-black bg-accent-gradient bg-clip-text text-transparent">
-                        {score * 100}<span className="text-xl text-white/50 ml-1">pts</span>
+                      <p className="text-[9px] md:text-[10px] text-text-muted uppercase tracking-[0.2em] font-black">Score</p>
+                      <p className="text-2xl md:text-4xl font-black bg-accent-gradient bg-clip-text text-transparent">
+                        {score * 100}<span className="text-xs md:text-xl text-white/50 ml-1">pts</span>
                       </p>
                     </div>
-                    <div className="w-[1px] h-10 bg-white/10" />
+                    <div className="w-[1px] h-8 md:h-10 bg-white/10" />
                     <div className="text-left">
-                      <p className="text-[10px] text-text-muted uppercase tracking-[0.2em] font-bold">Accuracy</p>
-                      <p className="text-4xl font-black text-white">
+                      <p className="text-[9px] md:text-[10px] text-text-muted uppercase tracking-[0.2em] font-black">Accuracy</p>
+                      <p className="text-2xl md:text-4xl font-black text-white">
                         {Math.round((score / totalQuestions) * 100)}%
                       </p>
                     </div>
                   </div>
 
-                  <p className="max-w-xl mx-auto text-lg text-text-secondary leading-relaxed">
+                  <p className="max-w-xl mx-auto text-sm md:text-lg text-text-secondary leading-relaxed font-medium">
                     You've successfully completed <span className="text-white font-bold">{quiz.title}</span>.
-                    Your performance indicates a strong grasp of <span className="text-white font-bold">{quiz.category}</span> fundamentals.
                   </p>
                 </FadeIn>
               </div>
@@ -319,11 +319,10 @@ export function StudentQuizPlayer({ quiz, attemptId, onExit, onComplete, isPrevi
                         <span className="rounded-xl bg-accent/10 px-4 py-2 text-[10px] font-black text-accent uppercase tracking-[0.2em] border border-accent/20">
                           {quiz.category}
                         </span>
-                        <span className={`rounded-xl px-4 py-2 text-[10px] font-black uppercase tracking-[0.2em] border ${
-                          quiz.difficulty === "Hard" ? "bg-red-500/10 text-red-400 border-red-500/20" :
+                        <span className={`rounded-xl px-4 py-2 text-[10px] font-black uppercase tracking-[0.2em] border ${quiz.difficulty === "Hard" ? "bg-red-500/10 text-red-400 border-red-500/20" :
                           quiz.difficulty === "Medium" ? "bg-amber-500/10 text-amber-400 border-amber-500/20" :
-                          "bg-emerald-500/10 text-emerald-400 border-emerald-500/20"
-                        }`}>
+                            "bg-emerald-500/10 text-emerald-400 border-emerald-500/20"
+                          }`}>
                           {quiz.difficulty} Sector
                         </span>
                       </div>
@@ -346,16 +345,14 @@ export function StudentQuizPlayer({ quiz, attemptId, onExit, onComplete, isPrevi
                                 [question.id]: choice.id,
                               }))
                             }
-                            className={`group relative flex flex-col items-start rounded-[32px] border-2 p-8 text-left transition-all duration-500 ${
-                              isSelected
-                                ? "border-accent bg-accent/10 shadow-[0_0_60px_rgba(139,92,246,0.2)] ring-8 ring-accent/5"
-                                : "border-white/5 bg-white/5 hover:border-white/20 hover:bg-white/[0.08]"
-                            }`}
+                            className={`group relative flex flex-col items-start rounded-[32px] border-2 p-8 text-left transition-all duration-500 ${isSelected
+                              ? "border-accent bg-accent/10 shadow-[0_0_60px_rgba(139,92,246,0.2)] ring-8 ring-accent/5"
+                              : "border-white/5 bg-white/5 hover:border-white/20 hover:bg-white/[0.08]"
+                              }`}
                           >
                             <div className="flex w-full items-center justify-between mb-6">
-                              <span className={`flex items-center justify-center w-11 h-11 rounded-2xl text-xs font-black border-2 transition-all duration-500 ${
-                                isSelected ? "bg-accent border-accent text-white shadow-lg" : "bg-white/5 border-white/10 text-text-muted group-hover:border-white/30"
-                              }`}>
+                              <span className={`flex items-center justify-center w-11 h-11 rounded-2xl text-xs font-black border-2 transition-all duration-500 ${isSelected ? "bg-accent border-accent text-white shadow-lg" : "bg-white/5 border-white/10 text-text-muted group-hover:border-white/30"
+                                }`}>
                                 {choice.label}
                               </span>
                               {isSelected && (
@@ -447,13 +444,12 @@ export function StudentQuizPlayer({ quiz, attemptId, onExit, onComplete, isPrevi
                     <button
                       key={q.id}
                       onClick={() => setQuestionIndex(idx)}
-                      className={`relative group h-12 w-12 rounded-[14px] flex items-center justify-center text-xs font-black transition-all ${
-                        isCurrent
-                          ? "bg-white text-black shadow-2xl scale-110 z-10"
-                          : isAnswered
+                      className={`relative group h-12 w-12 rounded-[14px] flex items-center justify-center text-xs font-black transition-all ${isCurrent
+                        ? "bg-white text-black shadow-2xl scale-110 z-10"
+                        : isAnswered
                           ? "bg-accent/20 text-accent border border-accent/20 hover:bg-accent/30"
                           : "bg-white/5 text-text-muted border border-white/5 hover:border-white/10 hover:bg-white/10"
-                      }`}
+                        }`}
                     >
                       {idx + 1}
                       {isAnswered && !isCurrent && (
@@ -606,19 +602,11 @@ export default function StudentQuizPortal() {
               <ArrowLeft size={18} className="transition-transform group-hover:-translate-x-1" />
               Back to Home
             </Link>
-            <div className="mt-8">
-              <motion.div
-                initial={{ opacity: 0, scale: 0.8 }}
-                animate={{ opacity: 1, scale: 1 }}
-                className="inline-flex items-center gap-2 rounded-full bg-accent/10 px-4 py-1.5 border border-accent/20 mb-6"
-              >
-                <Sparkles size={14} className="text-accent" />
-                <span className="text-[10px] font-black text-accent uppercase tracking-[0.2em]">Learning Environment</span>
-              </motion.div>
-              <h1 className="text-5xl md:text-6xl font-black tracking-tight leading-[1.1] mb-6">
+            <div className="mt-4 md:mt-8">
+              <h1 className="text-3xl md:text-6xl font-black tracking-tight leading-[1.1] mb-4 md:mb-6">
                 Ready to excel, <span className="bg-accent-gradient bg-clip-text text-transparent">{user?.fullName?.split(' ')[0] || user?.username || "Learner"}?</span>
               </h1>
-              <p className="max-w-xl text-lg text-text-secondary leading-relaxed">
+              <p className="max-w-xl text-base md:text-lg text-text-secondary leading-relaxed font-medium">
                 Dive into our interactive quiz catalog. Sharpen your skills, compete in live events, and track your progress in real-time.
               </p>
             </div>
@@ -657,7 +645,7 @@ export default function StudentQuizPortal() {
 
         {/* Browser & Filters Section */}
         <section className="flex flex-col gap-8">
-          <div className="flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between p-8 rounded-[40px] border border-white/5 bg-[#111115]/40 backdrop-blur-xl">
+          <div className="flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between p-6 md:p-8 rounded-3xl md:rounded-[40px] border border-white/5 bg-[#111115]/40 backdrop-blur-xl">
             <div className="flex items-center gap-2 p-1.5 bg-white/5 rounded-2xl border border-white/10 w-fit">
               <button
                 onClick={() => setViewType("quizzes")}

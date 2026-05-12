@@ -54,17 +54,17 @@ export default function Dashboard() {
 
   return (
     <StaggerContainer className="space-y-10">
-      <FadeIn className="flex flex-col md:flex-row md:items-center justify-between gap-6">
+      <FadeIn className="flex flex-col lg:flex-row lg:items-center justify-between gap-6">
         <div>
-          <h1 className="text-4xl font-black tracking-tight text-white">
+          <h1 className="text-3xl md:text-4xl font-black tracking-tight text-white leading-tight">
             Welcome back, <span className="text-gradient">{user?.fullName?.split(' ')[0] || user?.username}</span>
           </h1>
-          <p className="text-text-secondary font-medium mt-1">Here is a summary of your academic ecosystem today.</p>
+          <p className="text-text-secondary font-medium mt-1 text-sm md:text-base">Here is a summary of your academic ecosystem today.</p>
         </div>
 
         <button
           onClick={() => router.push("/quizzes/create")}
-          className="flex items-center gap-2 px-6 py-3 rounded-2xl bg-accent-gradient font-black text-sm shadow-xl shadow-accent/20 transition-all hover:shadow-accent/40 hover:-translate-y-0.5 active:translate-y-0"
+          className="flex items-center justify-center gap-2 px-6 py-3.5 rounded-2xl bg-accent-gradient font-black text-sm shadow-xl shadow-accent/20 transition-all hover:shadow-accent/40 hover:-translate-y-0.5 active:translate-y-0 w-full lg:w-auto"
         >
           <Plus size={18} />
           Create New Quiz
@@ -186,15 +186,15 @@ export default function Dashboard() {
         </div>
       </StaggerItem>
 
-      <FadeIn delay={0.4} className="rounded-[40px] border border-accent/20 bg-accent-gradient/5 p-12 text-center overflow-hidden relative group">
+      <FadeIn delay={0.4} className="rounded-3xl md:rounded-[40px] border border-accent/20 bg-accent-gradient/5 p-6 md:p-12 text-center overflow-hidden relative group">
         <Sparkles size={40} className="text-accent mx-auto mb-6 opacity-40 group-hover:opacity-100 group-hover:scale-110 transition-all duration-700" />
-        <h2 className="text-3xl font-black text-white mb-4">Elevate your Teaching Experience</h2>
-        <p className="text-text-secondary max-w-2xl mx-auto font-medium">
+        <h2 className="text-xl md:text-3xl font-black text-white mb-4">Elevate your Teaching Experience</h2>
+        <p className="text-text-secondary max-w-2xl mx-auto font-medium text-sm md:text-base">
           Discover new ways to engage with your students. Use the "Events" portal to host live competitions and foster a collaborative learning spirit.
         </p>
         <button
           onClick={() => router.push("/events")}
-          className="mt-10 px-10 py-4 rounded-2xl bg-white text-black font-black text-sm shadow-2xl transition-all hover:bg-zinc-200 active:scale-95"
+          className="mt-8 md:mt-10 px-8 md:px-10 py-3 md:py-4 rounded-xl md:rounded-2xl bg-white text-black font-black text-sm shadow-2xl transition-all hover:bg-zinc-200 active:scale-95 w-full sm:w-auto"
         >
           Explore Events Portal
         </button>
