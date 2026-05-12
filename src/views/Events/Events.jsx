@@ -5,6 +5,7 @@ import EventItem from "./components/EventItem.jsx";
 import ScheduleEventModal from "./components/ScheduleEventModal.jsx";
 import { fetchTeacherEvents, createEventRequest, updateEventRequest, updateEventStatusRequest, deleteEventRequest } from "../../lib/quiz-client.js";
 import { Search, Plus, Calendar, Filter } from "lucide-react";
+import { toast } from "../../components/ui/Toast.jsx";
 
 export default function Events() {
   const [events, setEvents] = useState([]);
@@ -58,11 +59,12 @@ export default function Events() {
       } else {
         await createEventRequest(formData);
       }
+      toast.success(editingEvent ? "Event updated!" : "Event scheduled!");
       setIsModalOpen(false);
       setEditingEvent(null);
       loadEvents();
     } catch (error) {
-      alert("Failed to save event: " + error.message);
+      toast.error("Failed to save event: " + error.message);
     }
   };
 
@@ -71,12 +73,13 @@ export default function Events() {
     setIsModalOpen(true);
   };
 
-  const handleStatusUpdate = async (eventId, newStatus) => {
+  const handleStatusUpdate = async (eventId, status) => {
     try {
-      await updateEventStatusRequest(eventId, newStatus);
+      await updateEventStatusRequest(eventId, status);
+      toast.success(`Event is now ${status}`);
       loadEvents();
     } catch (error) {
-      alert("Failed to update status: " + error.message);
+      toast.error("Failed to update status: " + error.message);
     }
   };
 

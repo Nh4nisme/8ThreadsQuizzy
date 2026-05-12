@@ -21,6 +21,7 @@ import {
   createQuizAttemptRequest, 
   submitQuizAttemptRequest 
 } from "../../lib/quiz-client.js";
+import { toast } from "../../components/ui/Toast.jsx";
 
 const difficultyOptions = ["All Levels", "Easy", "Medium", "Hard"];
 
@@ -29,26 +30,53 @@ export function StudentQuizPlayer({ quiz, attemptId, onExit, onComplete, isPrevi
   const [selectedAnswers, setSelectedAnswers] = useState({});
   const [showResults, setShowResults] = useState(false);
 
+  const [timeLeft, setTimeLeft] = useState((quiz.durationMinutes || 10) * 60);
+
   const question = quiz.questions[questionIndex];
   const answeredCount = Object.keys(selectedAnswers).length;
   const score = quiz.questions.reduce((total, currentQuestion) => {
     return total + (selectedAnswers[currentQuestion.id] === currentQuestion.correctChoiceId ? 1 : 0);
   }, 0);
 
+  const handleSubmit = async () => {
+    if (!isPreview && attemptId) {
+      const responses = Object.entries(selectedAnswers).map(([questionId, choiceId]) => ({
+        questionId,
+        choiceId,
+      }));
+      try {
+        await submitQuizAttemptRequest(quiz._id || quiz.id, attemptId, responses);
+      } catch (error) {
+        console.error("Failed to submit attempt:", error);
+      }
+    }
+    setShowResults(true);
+  };
+
+  useEffect(() => {
+    if (showResults) return;
+    
+    if (timeLeft <= 0) {
+      handleSubmit();
+      return;
+    }
+
+    const timer = setInterval(() => {
+      setTimeLeft((prev) => prev - 1);
+    }, 1000);
+
+    return () => clearInterval(timer);
+  }, [timeLeft, showResults]);
+
+  const formatTime = (seconds) => {
+    const mins = Math.floor(seconds / 60);
+    const secs = seconds % 60;
+    return `${mins}:${secs.toString().padStart(2, "0")}`;
+  };
+
   const handleNext = async () => {
     if (questionIndex === quiz.questions.length - 1) {
-      if (!isPreview && attemptId) {
-        const responses = Object.entries(selectedAnswers).map(([questionId, choiceId]) => ({
-          questionId,
-          choiceId,
-        }));
-        try {
-          await submitQuizAttemptRequest(quiz._id || quiz.id, attemptId, responses);
-        } catch (error) {
-          console.error("Failed to submit attempt:", error);
-        }
-      }
-      setShowResults(true);
+      await handleSubmit();
       return;
     }
 
@@ -168,8 +196,10 @@ export function StudentQuizPlayer({ quiz, attemptId, onExit, onComplete, isPrevi
                 <p className="mt-2 text-2xl font-semibold">{answeredCount}</p>
               </div>
               <div className="rounded-xl border border-border-main bg-bg-input p-4">
-                <p className="text-sm text-text-muted">Estimated time</p>
-                <p className="mt-2 text-2xl font-semibold">{quiz.durationMinutes} min</p>
+                <p className="text-sm text-text-muted">Time Remaining</p>
+                <p className={`mt-2 text-2xl font-semibold ${timeLeft < 60 ? "text-red-500 animate-pulse" : "text-accent"}`}>
+                  {formatTime(timeLeft)}
+                </p>
               </div>
             </div>
           </div>
@@ -205,7 +235,7 @@ export default function StudentQuizPortal() {
       setActiveAttemptId(attempt._id);
       setActiveQuiz(quiz);
     } catch (err) {
-      alert("Failed to join quiz: " + err.message);
+      toast.error("Failed to join quiz: " + err.message);
     }
   };
 

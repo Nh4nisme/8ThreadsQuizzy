@@ -7,6 +7,8 @@ export const metadata = {
   description: "Quiz platform UI migrated to Next.js",
 };
 
+import { ToastContainer } from "../components/ui/Toast.jsx";
+
 export default function RootLayout({ children }) {
   return (
     <html lang="en" suppressHydrationWarning>
@@ -33,7 +35,10 @@ export default function RootLayout({ children }) {
       </head>
       <body>
         <ThemeProvider>
-          <AuthProvider>{children}</AuthProvider>
+          <AuthProvider>
+            {children}
+            <ToastContainer />
+          </AuthProvider>
         </ThemeProvider>
       </body>
     </html>

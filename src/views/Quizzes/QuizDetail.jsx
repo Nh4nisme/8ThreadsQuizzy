@@ -55,61 +55,63 @@ function RecentCompletions({ students = [] }) {
         </p>
       </div>
 
-      <div className="overflow-hidden rounded-md border border-gray-800">
-        <table className="w-full">
-          <thead>
-            <tr className="border-b border-gray-800">
-              {["Student", "Status", "Score", "Time Spent", "Updated"].map((heading) => (
-                <th
-                  key={heading}
-                  className="px-4 py-3 text-left text-sm font-semibold text-white"
-                >
-                  {heading}
-                </th>
-              ))}
-            </tr>
-          </thead>
-
-          <tbody>
-            {students.map((student) => (
-              <tr
-                key={student.id}
-                className="border-gray-800/50 text-white transition hover:bg-gray-800/30"
-              >
-                <td className="px-4 py-4">
-                  <div>
-                    <p>{student.name}</p>
-                    <p className="text-xs text-zinc-500">{student.email}</p>
-                  </div>
-                </td>
-                <td className="px-4 py-4">
-                  <span
-                    className={`rounded-full px-3 py-1 text-xs font-medium ${
-                      student.status === "completed"
-                        ? "bg-emerald-500/15 text-emerald-300"
-                        : "bg-orange-500/15 text-orange-300"
-                    }`}
+      <div className="rounded-md border border-gray-800">
+        <div className="max-h-[460px] overflow-y-auto scrollbar-thin scrollbar-thumb-gray-800 scrollbar-track-transparent">
+          <table className="w-full relative">
+            <thead className="sticky top-0 z-10 bg-[#151518]">
+              <tr className="border-b border-gray-800">
+                {["Student", "Status", "Score", "Time Spent", "Updated"].map((heading) => (
+                  <th
+                    key={heading}
+                    className="px-4 py-3 text-left text-sm font-semibold text-white"
                   >
-                    {student.status === "completed" ? "Completed" : "In Progress"}
-                  </span>
-                </td>
-                <td className="px-4 py-4">{student.status === "completed" ? `${student.score}%` : "-"}</td>
-                <td className="px-4 py-4">{formatDuration(student.timeSpentSeconds)}</td>
-                <td className="px-4 py-4">
-                  {formatRelativeDate(student.completedAt || student.startedAt)}
-                </td>
+                    {heading}
+                  </th>
+                ))}
               </tr>
-            ))}
+            </thead>
 
-            {students.length === 0 ? (
-              <tr>
-                <td colSpan={5} className="px-4 py-8 text-center text-white">
-                  No student activity yet
-                </td>
-              </tr>
-            ) : null}
-          </tbody>
-        </table>
+            <tbody className="divide-y divide-gray-800/50">
+              {students.length > 0 ? (
+                students.map((student) => (
+                  <tr
+                    key={student.id}
+                    className="text-white transition hover:bg-gray-800/30"
+                  >
+                    <td className="px-4 py-4">
+                      <div>
+                        <p className="font-medium">{student.name}</p>
+                        <p className="text-xs text-zinc-500">{student.email}</p>
+                      </div>
+                    </td>
+                    <td className="px-4 py-4">
+                      <span
+                        className={`rounded-full px-3 py-1 text-xs font-medium ${
+                          student.status === "completed"
+                            ? "bg-emerald-500/15 text-emerald-300 border border-emerald-500/20"
+                            : "bg-orange-500/15 text-orange-300 border border-orange-500/20"
+                        }`}
+                      >
+                        {student.status === "completed" ? "Completed" : "In Progress"}
+                      </span>
+                    </td>
+                    <td className="px-4 py-4 font-mono">{student.status === "completed" ? `${student.score}%` : "-"}</td>
+                    <td className="px-4 py-4 text-gray-300">{formatDuration(student.timeSpentSeconds)}</td>
+                    <td className="px-4 py-4 text-gray-400 text-sm">
+                      {formatRelativeDate(student.completedAt || student.startedAt)}
+                    </td>
+                  </tr>
+                ))
+              ) : (
+                <tr>
+                  <td colSpan="5" className="px-4 py-10 text-center text-gray-500 italic">
+                    No student activity found for this quiz.
+                  </td>
+                </tr>
+              )}
+            </tbody>
+          </table>
+        </div>
       </div>
     </div>
   );
