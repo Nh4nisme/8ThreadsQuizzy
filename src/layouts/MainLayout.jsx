@@ -1,16 +1,17 @@
 import SideBar from "../components/ui/SideBar.jsx";
 import Navbar from "../components/ui/Navbar.jsx";
-import LayoutTransition from "../components/ui/LayoutTransition.jsx";
+import { GlowOrb } from "../components/ui/Motion.jsx";
 
 const MainLayout = ({ children }) => {
   return (
-    <div className="flex w-screen h-screen">
+    <div className="flex w-screen h-screen bg-black overflow-hidden">
       <SideBar />
-      <div className="flex flex-col flex-1">
+      <div className="flex flex-col flex-1 relative overflow-hidden">
         <Navbar />
-        <main className="flex-1 p-6 overflow-y-auto overflow-x-hidden bg-black relative">
-          <div className="pointer-events-none absolute -top-40 -left-40 w-[600px] h-[600px] bg-[#AC63E6]/30 blur-[200px] rounded-full"></div>
-          <div className="pointer-events-none absolute -bottom-40 -right-40 w-[600px] h-[600px] bg-[#C45037]/30 blur-[200px] rounded-full"></div>
+        <main className="flex-1 p-6 overflow-y-auto overflow-x-hidden relative z-10">
+          <GlowOrb className="-top-40 -left-40 h-[600px] w-[600px]" color="purple" />
+          <GlowOrb className="top-1/2 -right-40 h-[700px] w-[700px] -translate-y-1/2" color="blue" />
+          <GlowOrb className="-bottom-40 left-1/4 h-[500px] w-[500px]" color="orange" />
 
           {children}
         </main>

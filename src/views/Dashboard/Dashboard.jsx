@@ -61,12 +61,7 @@ export default function Dashboard() {
   const recentQuizzes = quizzes.slice(0, 3);
 
   return (
-    <div className="relative min-h-screen overflow-hidden p-8">
-      {/* Immersive Background Orbs from Landing Page */}
-      <div className="pointer-events-none absolute -top-24 -left-24 h-96 w-96 rounded-full bg-purple-600/20 blur-[120px]" />
-      <div className="pointer-events-none absolute top-1/2 -right-24 h-96 w-96 -translate-y-1/2 rounded-full bg-orange-600/10 blur-[120px]" />
-      <div className="pointer-events-none absolute -bottom-24 left-1/2 h-96 w-96 -translate-x-1/2 rounded-full bg-blue-600/10 blur-[120px]" />
-
+    <div className="min-h-screen p-8">
       <StaggerContainer className="relative z-10 text-white">
         <FadeIn className="flex justify-between items-center mb-8">
           <div>
