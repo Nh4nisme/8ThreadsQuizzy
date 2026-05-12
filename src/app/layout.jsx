@@ -4,6 +4,7 @@ import { ThemeProvider } from "../context/ThemeContext.jsx";
 import { ToastContainer } from "../components/ui/Toast.jsx";
 import AppLoader from "../components/ui/AppLoader.jsx";
 import LayoutTransition from "../components/ui/LayoutTransition.jsx";
+import { GlowOrb } from "../components/ui/Motion.jsx";
 
 export const metadata = {
   title: "8ThreadsQuizzy",
@@ -35,11 +36,18 @@ export default function RootLayout({ children }) {
           }}
         />
       </head>
-      <body>
+      <body className="bg-[#050505] min-h-screen relative overflow-x-hidden">
         <ThemeProvider>
           <AuthProvider>
             <AppLoader />
-            <main>{children}</main>
+            
+            {/* Global Ambient Lighting */}
+            <div className="fixed inset-0 pointer-events-none z-0 overflow-hidden">
+              <GlowOrb className="-top-40 -left-40 h-[600px] w-[600px]" color="purple" />
+              <GlowOrb className="bottom-0 -right-40 h-[700px] w-[700px]" color="blue" />
+            </div>
+
+            <main className="relative z-10">{children}</main>
             <ToastContainer />
           </AuthProvider>
         </ThemeProvider>

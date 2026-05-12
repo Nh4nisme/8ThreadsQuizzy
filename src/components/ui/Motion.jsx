@@ -75,3 +75,28 @@ export const HoverScale = ({ children, scale = 1.02, className = "" }) => (
     {children}
   </motion.div>
 );
+
+export const GlowOrb = ({ className, color = "purple" }) => {
+  const colors = {
+    purple: "bg-purple-600/20",
+    blue: "bg-blue-600/20",
+    orange: "bg-orange-600/15",
+    emerald: "bg-emerald-600/15",
+    amber: "bg-amber-600/15",
+    red: "bg-red-600/20",
+  };
+  return (
+    <motion.div
+      animate={{
+        scale: [1, 1.2, 1],
+        opacity: [0.5, 0.8, 0.5],
+      }}
+      transition={{
+        duration: 8,
+        repeat: Infinity,
+        ease: "easeInOut",
+      }}
+      className={`pointer-events-none absolute rounded-full blur-[120px] ${colors[color] || colors.purple} ${className}`}
+    />
+  );
+};
