@@ -199,9 +199,9 @@ export default function StudentQuizPortal() {
     setIsMounted(true);
   }, []);
 
-  const handleJoinQuiz = async (quiz) => {
+  const handleJoinQuiz = async (quiz, eventId = null) => {
     try {
-      const { attempt } = await createQuizAttemptRequest(quiz._id || quiz.id);
+      const { attempt } = await createQuizAttemptRequest(quiz._id || quiz.id, eventId);
       setActiveAttemptId(attempt._id);
       setActiveQuiz(quiz);
     } catch (err) {
@@ -480,7 +480,7 @@ export default function StudentQuizPortal() {
 
                       <button
                         type="button"
-                        onClick={() => !isDisabled && handleJoinQuiz(quiz)}
+                        onClick={() => !isDisabled && handleJoinQuiz(quiz, isEvent ? item._id : null)}
                         disabled={isDisabled}
                         className={`rounded-xl px-6 py-2.5 text-sm font-semibold transition-all whitespace-nowrap ${
                           isDisabled 

@@ -1,5 +1,6 @@
 const Quiz = require("../models/Quiz");
 const QuizAttempt = require("../models/QuizAttempt");
+const Event = require("../models/Event");
 
 const calculateScore = (quiz, responses = []) => {
   const responseMap = new Map(
@@ -26,9 +27,12 @@ exports.createAttempt = async (req, res) => {
       return res.status(404).json({ message: "Quiz not available" });
     }
 
+    const { eventId } = req.body;
+
     const attempt = await QuizAttempt.create({
       quizId: quiz._id,
       studentId: req.user.id,
+      eventId: eventId || null,
       studentName: req.user.fullName || req.user.username,
       studentEmail: req.user.email || "",
       status: "in_progress",
@@ -38,6 +42,19 @@ exports.createAttempt = async (req, res) => {
       score: 0,
       timeSpentSeconds: 0,
     });
+
+    // If part of an event, add to event participants
+    if (eventId) {
+      await Event.findByIdAndUpdate(eventId, {
+        $addToSet: {
+          participants: {
+            studentId: req.user.id,
+            studentName: req.user.fullName || req.user.username,
+            joinedAt: new Date(),
+          },
+        },
+      });
+    }
 
     res.status(201).json({ attempt });
   } catch (error) {
@@ -77,6 +94,19 @@ exports.submitAttempt = async (req, res) => {
     attempt.completedAt = submittedAt;
 
     await attempt.save();
+
+    // If part of an event, update participant score and completion
+    if (attempt.eventId) {
+      await Event.findOneAndUpdate(
+        { _id: attempt.eventId, "participants.studentId": req.user.id },
+        {
+          $set: {
+            "participants.$.score": attempt.score,
+            "participants.$.completedAt": submittedAt,
+          },
+        }
+      );
+    }
 
     res.json({ attempt });
   } catch (error) {

@@ -110,12 +110,14 @@ export const deleteQuizRequest = async (quizId) => {
   return getJson(response);
 };
 
-export const createQuizAttemptRequest = async (quizId) => {
+export const createQuizAttemptRequest = async (quizId, eventId = null) => {
   const response = await fetch(`${QUIZ_API_BASE}/${quizId}/attempts`, {
     method: "POST",
     headers: {
+      "Content-Type": "application/json",
       ...getAuthHeaders(),
     },
+    body: JSON.stringify({ eventId }),
   });
 
   return getJson(response);
