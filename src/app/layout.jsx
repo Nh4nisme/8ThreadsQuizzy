@@ -1,3 +1,4 @@
+import Script from "next/script";
 import "./globals.css";
 import { AuthProvider } from "../context/AuthContext.jsx";
 import { ThemeProvider } from "../context/ThemeContext.jsx";
@@ -14,9 +15,10 @@ export const metadata = {
 export default function RootLayout({ children }) {
   return (
     <html lang="en" suppressHydrationWarning>
-      <head>
-        {/* ... (script remain the same) */}
-        <script
+      <body className="bg-[#050505] min-h-screen relative overflow-x-hidden">
+        <Script
+          id="theme-init"
+          strategy="beforeInteractive"
           dangerouslySetInnerHTML={{
             __html: `
               (function() {
@@ -35,8 +37,6 @@ export default function RootLayout({ children }) {
             `,
           }}
         />
-      </head>
-      <body className="bg-[#050505] min-h-screen relative overflow-x-hidden">
         <ThemeProvider>
           <AuthProvider>
             <AppLoader />

@@ -4,6 +4,7 @@ import { useEffect, useMemo, useState, useRef } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { 
   ChevronLeft, 
+  ChevronRight,
   Plus, 
   Trash2, 
   CheckCircle2, 
@@ -318,8 +319,8 @@ export default function CreateQuiz() {
               </button>
             </HoverScale>
             <div>
-              <h1 className="text-4xl font-black tracking-tight">{quizId ? "Update Quiz" : "Forge New Quiz"}</h1>
-              <p className="text-text-muted text-sm font-medium mt-1">Refine your challenge and publish to your students.</p>
+              <h1 className="text-2xl md:text-4xl font-black tracking-tight">{quizId ? "Update Quiz" : "Forge New Quiz"}</h1>
+              <p className="text-text-muted text-xs md:text-sm font-medium mt-1">Refine your challenge and publish to your students.</p>
             </div>
           </div>
 
@@ -356,7 +357,7 @@ export default function CreateQuiz() {
                     initial={{ opacity: 0, x: 20 }}
                     animate={{ opacity: 1, x: 0 }}
                     exit={{ opacity: 0, x: -20 }}
-                    className="grid gap-8 bg-[#111115]/60 border border-white/10 rounded-[40px] p-8 md:p-12 backdrop-blur-xl"
+                    className="grid gap-8 bg-[#111115]/60 border border-white/10 rounded-3xl md:rounded-[40px] p-6 md:p-12 backdrop-blur-xl"
                   >
                     <div className="grid gap-6 md:grid-cols-2">
                        <div className="col-span-full">
@@ -435,7 +436,7 @@ export default function CreateQuiz() {
                        </div>
                     </div>
 
-                    <div className="bg-[#111115]/60 border border-white/10 rounded-[40px] p-8 md:p-10 backdrop-blur-xl space-y-8">
+                    <div className="bg-[#111115]/60 border border-white/10 rounded-3xl md:rounded-[40px] p-6 md:p-10 backdrop-blur-xl space-y-8">
                        <div className="space-y-4">
                           <div className="flex items-center justify-between">
                              <label className="text-xs font-black uppercase tracking-[0.3em] text-accent">Question Prompt</label>
@@ -534,7 +535,7 @@ export default function CreateQuiz() {
                     initial={{ opacity: 0, x: 20 }}
                     animate={{ opacity: 1, x: 0 }}
                     exit={{ opacity: 0, x: -20 }}
-                    className="bg-[#111115]/60 border border-white/10 rounded-[40px] p-8 md:p-12 backdrop-blur-xl space-y-12"
+                    className="bg-[#111115]/60 border border-white/10 rounded-3xl md:rounded-[40px] p-6 md:p-12 backdrop-blur-xl space-y-12"
                   >
                     <div>
                        <h2 className="text-2xl font-black mb-2">Quiz Intelligence</h2>
@@ -638,7 +639,7 @@ export default function CreateQuiz() {
                     exit={{ opacity: 0, x: -20 }}
                     className="space-y-8"
                   >
-                     <div className="bg-[#111115]/60 border border-white/10 rounded-[40px] p-8 md:p-12 backdrop-blur-xl">
+                     <div className="bg-[#111115]/60 border border-white/10 rounded-3xl md:rounded-[40px] p-6 md:p-12 backdrop-blur-xl">
                         <div className="flex items-center gap-6 mb-10">
                            <div className="w-20 h-20 rounded-[32px] bg-accent-gradient flex items-center justify-center shadow-2xl">
                               <Target className="w-10 h-10 text-white" />
@@ -807,5 +808,3 @@ export default function CreateQuiz() {
   );
 }
 
-// Minimal icons replacement to avoid missing imports in the snippet
-const ChevronRight = ({ size, className }) => <ChevronDown size={size} className={`-rotate-90 ${className}`} />;

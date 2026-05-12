@@ -73,8 +73,8 @@ export default function Landing() {
         animate={{ opacity: 1 }}
         transition={{ duration: 1.5, delay: 0.5 }}
       >
-        <LandingHero 
-          onExplore={() => handleSectionNavigation("quiz")} 
+        <LandingHero
+          onExplore={() => handleSectionNavigation("quiz")}
           onGetStarted={() => setAuthMode("signup")}
         />
       </motion.div>

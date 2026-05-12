@@ -26,7 +26,7 @@ export default function LandingHero({ onExplore, onGetStarted }) {
     >
       {/* Interactive spotlight overlay */}
       <div style={spotlightStyle} className="pointer-events-none absolute inset-0 z-0 opacity-50" />
-      
+
       {/* Animated grid background */}
       <HeroBackground
         gridImage="/assets/PatternUp.png"
@@ -34,21 +34,21 @@ export default function LandingHero({ onExplore, onGetStarted }) {
         floatAnim={floatAnim}
       />
 
-      <div className="relative z-10 flex flex-col items-center mt-24 px-6">
-        <motion.div 
+      <div className="relative z-10 flex flex-col items-center mt-12 md:mt-24 px-6">
+        <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
-          className="mb-10"
+          className="mb-8 md:mb-10"
         >
           <HeroBadge />
         </motion.div>
-        
-        <motion.h1 
+
+        <motion.h1
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 1, delay: 0.2, ease: [0.16, 1, 0.3, 1] }}
-          className="text-6xl md:text-8xl font-black text-center text-white tracking-tighter leading-[0.9] max-w-5xl"
+          className="text-4xl sm:text-6xl md:text-8xl font-black text-center text-white tracking-tighter leading-[0.9] max-w-5xl"
         >
           Learn. Quiz.{" "}
           <span className="text-gradient">
@@ -56,13 +56,13 @@ export default function LandingHero({ onExplore, onGetStarted }) {
           </span>
         </motion.h1>
 
-        <motion.p 
+        <motion.p
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 1, delay: 0.4, ease: [0.16, 1, 0.3, 1] }}
-          className="mt-12 text-xl md:text-2xl text-center text-text-secondary max-w-3xl leading-relaxed font-medium"
+          className="mt-8 md:mt-12 text-base sm:text-lg md:text-2xl text-center text-text-secondary max-w-3xl leading-relaxed font-medium"
         >
-          Join the elite ecosystem of knowledge seekers. 
+          Join the elite ecosystem of knowledge seekers.
           Build your legacy through interactive challenges and secure your place on the leaderboard.
         </motion.p>
 
@@ -72,8 +72,8 @@ export default function LandingHero({ onExplore, onGetStarted }) {
           transition={{ duration: 1, delay: 0.6, ease: [0.16, 1, 0.3, 1] }}
           className="mt-16"
         >
-          <HeroActions 
-            onExplore={onExplore} 
+          <HeroActions
+            onExplore={onExplore}
             onGetStarted={onGetStarted}
           />
         </motion.div>

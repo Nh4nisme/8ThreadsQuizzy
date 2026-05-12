@@ -30,16 +30,18 @@ export default function Settings() {
       <div className="max-w-6xl mx-auto py-4">
          <StaggerContainer className="space-y-10">
             <FadeIn className="flex flex-col gap-2">
-               <h1 className="text-4xl font-black tracking-tight text-white">System Settings</h1>
-               <p className="text-text-secondary font-medium">Manage your identity, preferences, and security protocols.</p>
+               <h1 className="text-3xl md:text-4xl font-black tracking-tight text-white leading-tight">System Settings</h1>
+               <p className="text-text-secondary font-medium text-sm md:text-base">Manage your identity, preferences, and security protocols.</p>
             </FadeIn>
 
             <StaggerItem>
-               <TabMenu active={activeTab} setActive={setActiveTab} />
+               <div className="overflow-x-auto pb-2 custom-scrollbar">
+                  <TabMenu active={activeTab} setActive={setActiveTab} />
+               </div>
             </StaggerItem>
 
             <FadeIn delay={0.2} key={activeTab}>
-               <div className="bg-[#0f0f12] border border-white/5 rounded-[40px] p-8 md:p-12 shadow-2xl backdrop-blur-xl relative overflow-hidden">
+               <div className="bg-[#0f0f12] border border-white/5 rounded-3xl md:rounded-[40px] p-6 md:p-12 shadow-2xl backdrop-blur-xl relative overflow-hidden">
                   <ActiveTabComponent user={user} />
 
                   {/* Subtle background glow */}
