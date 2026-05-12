@@ -14,6 +14,12 @@ const QuizAttemptSchema = new mongoose.Schema(
       default: null,
       index: true,
     },
+    eventId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Event",
+      default: null,
+      index: true,
+    },
     studentName: { type: String, required: true, trim: true },
     studentEmail: { type: String, default: "", trim: true },
     responses: {
