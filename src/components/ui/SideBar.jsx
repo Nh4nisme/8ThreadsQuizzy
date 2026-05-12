@@ -15,7 +15,7 @@ const SideBar = () => {
     <div className="bg-bg-card h-screen w-[300px] p-6 flex flex-col text-text-main border-r border-border-main sticky top-0">
       <div className="flex items-center mb-8">
         <img src="/assets/Logo.png" alt="Quizzy Logo" className="w-15 h-15" />
-        <span className="bg-accent-gradient bg-clip-text text-transparent text-2xl font-bold ml-2">
+        <span className="bg-accent-gradient bg-clip-text text-transparent text-2xl font-bold">
           8ThreadsQuizzy
         </span>
       </div>
@@ -29,11 +29,10 @@ const SideBar = () => {
           <Link
             key={item.path}
             href={item.path}
-            className={`flex items-center gap-3 rounded-xl px-4 py-2.5 transition-all duration-200 ${
-              isActive(item.path)
-                ? "bg-accent-gradient text-text-on-accent font-medium shadow-md shadow-accent/20"
-                : "text-text-secondary hover:bg-bg-secondary hover:text-text-main"
-            }`}
+            className={`flex items-center gap-3 rounded-xl px-4 py-2.5 transition-all duration-200 ${isActive(item.path)
+              ? "bg-accent-gradient text-text-on-accent font-medium shadow-md shadow-accent/20"
+              : "text-text-secondary hover:bg-bg-secondary hover:text-text-main"
+              }`}
           >
             <item.icon className={isActive(item.path) ? "text-text-on-accent" : "text-text-muted"} />
             {item.label}
@@ -47,11 +46,10 @@ const SideBar = () => {
           <Link
             key={item.path}
             href={item.path}
-            className={`flex items-center gap-3 rounded-xl px-4 py-2.5 transition-all duration-200 ${
-              isActive(item.path)
-                ? "bg-accent-gradient text-text-on-accent font-medium shadow-md shadow-accent/20"
-                : "text-text-secondary hover:bg-bg-secondary hover:text-text-main"
-            }`}
+            className={`flex items-center gap-3 rounded-xl px-4 py-2.5 transition-all duration-200 ${isActive(item.path)
+              ? "bg-accent-gradient text-text-on-accent font-medium shadow-md shadow-accent/20"
+              : "text-text-secondary hover:bg-bg-secondary hover:text-text-main"
+              }`}
           >
             <item.icon className={isActive(item.path) ? "text-text-on-accent" : "text-text-muted"} />
             {item.label}

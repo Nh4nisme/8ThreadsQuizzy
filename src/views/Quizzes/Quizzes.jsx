@@ -69,7 +69,7 @@ export default function Quizzes() {
       </div>
     );
   }
-  
+
   return (
     <>
       <QuizDetail
@@ -83,6 +83,16 @@ export default function Quizzes() {
         onShare={() => setIsSharing(true)}
       />
       <QuizLibrary selectedQuizId={selectedQuizId} onSelectQuiz={handleSelectQuiz} />
+
+      <div style={{ marginTop: "20px", float: 'right' }}>
+        <button
+          type="button"
+          onClick={() => router.push("/quizzes/create")}
+          className="bg-purple-600 px-4 py-2 rounded-lg hover:bg-purple-500"
+        >
+          + Create New Quiz
+        </button>
+      </div>
     </>
   );
 }
