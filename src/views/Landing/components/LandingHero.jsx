@@ -1,6 +1,5 @@
-"use client";
-
 import React from "react";
+import { motion } from "framer-motion";
 import HeroBackground from "../components/hero/HeroBackground.jsx";
 import HeroBadge from "../components/hero/HeroBadge.jsx";
 import HeroActions from "../components/hero/HeroActions.jsx";
@@ -34,23 +33,47 @@ export default function LandingHero({ onExplore, onGetStarted }) {
         floatAnim={floatAnim}
       />
       <div className="relative z-10 flex flex-col items-center mt-24">
-        <div className="mb-6">
+        <motion.div 
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
+          className="mb-6"
+        >
           <HeroBadge />
-        </div>
-        <h1 className="text-5xl md:text-6xl font-bold text-center text-white">
+        </motion.div>
+        
+        <motion.h1 
+          initial={{ opacity: 0, y: 30 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 1, delay: 0.2, ease: [0.16, 1, 0.3, 1] }}
+          className="text-5xl md:text-7xl font-bold text-center text-white tracking-tight"
+        >
           Learn, Quiz,{" "}
           <span className="bg-gradient-to-r from-purple-500 to-orange-500 text-transparent bg-clip-text">
             Earn Rewards
           </span>
-        </h1>
-        <p className="mt-6 text-lg text-center text-white max-w-xl">
+        </motion.h1>
+
+        <motion.p 
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 1, delay: 0.4, ease: [0.16, 1, 0.3, 1] }}
+          className="mt-8 text-xl text-center text-zinc-400 max-w-2xl leading-relaxed"
+        >
           Join thousands of students and teachers on the ultimate quiz platform.
-          Test your knowledge, compete with peers, and win exciting rewards
-        </p>
-        <HeroActions 
-          onExplore={onExplore} 
-          onGetStarted={onGetStarted}
-        />
+          Test your knowledge, compete with peers, and win exciting rewards.
+        </motion.p>
+
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 1, delay: 0.6, ease: [0.16, 1, 0.3, 1] }}
+        >
+          <HeroActions 
+            onExplore={onExplore} 
+            onGetStarted={onGetStarted}
+          />
+        </motion.div>
       </div>
     </div>
   );
