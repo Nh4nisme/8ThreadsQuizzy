@@ -65,6 +65,17 @@ export function AuthProvider({ children }) {
         setUser(data.user);
         return data.user;
       },
+      async refreshUser() {
+        const token = getStoredToken();
+        if (!token) return;
+        try {
+          const { user: currentUser } = await getCurrentUserRequest(token);
+          persistAuthSession({ token, user: currentUser });
+          setUser(currentUser);
+        } catch (error) {
+          console.error("Failed to refresh user:", error);
+        }
+      },
       logout() {
         clearAuthSession();
         setUser(null);

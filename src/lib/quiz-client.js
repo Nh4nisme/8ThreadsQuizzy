@@ -8,7 +8,7 @@ const getJson = async (response) => {
   const data = await response.json().catch(() => ({}));
 
   if (!response.ok) {
-    throw new Error(data.message || "Quiz request failed");
+    throw new Error(data.message || `Request failed with status ${response.status}`);
   }
 
   return data;
@@ -19,8 +19,8 @@ const getAuthHeaders = () => {
 
   return token
     ? {
-        Authorization: `Bearer ${token}`,
-      }
+      Authorization: `Bearer ${token}`,
+    }
     : {};
 };
 
@@ -228,6 +228,55 @@ export const updateEventRequest = async (eventId, payload) => {
 export const deleteEventRequest = async (eventId) => {
   const response = await fetch(`${EVENT_API_BASE}/${eventId}`, {
     method: "DELETE",
+    headers: {
+      ...getAuthHeaders(),
+    },
+  });
+
+  return getJson(response);
+};
+
+// USER & AUTH EXTENSIONS
+export const updateProfileRequest = async (payload) => {
+  const response = await fetch(`${AUTH_API_BASE}/profile`, {
+    method: "PUT",
+    headers: {
+      "Content-Type": "application/json",
+      ...getAuthHeaders(),
+    },
+    body: JSON.stringify(payload),
+  });
+
+  return getJson(response);
+};
+
+export const updatePasswordRequest = async (currentPassword, newPassword) => {
+  const response = await fetch(`${AUTH_API_BASE}/password`, {
+    method: "PUT",
+    headers: {
+      "Content-Type": "application/json",
+      ...getAuthHeaders(),
+    },
+    body: JSON.stringify({ currentPassword, newPassword }),
+  });
+
+  return getJson(response);
+};
+
+export const requestDeletionRequest = async () => {
+  const response = await fetch(`${AUTH_API_BASE}/delete-request`, {
+    method: "POST",
+    headers: {
+      ...getAuthHeaders(),
+    },
+  });
+
+  return getJson(response);
+};
+
+export const cancelDeletionRequest = async () => {
+  const response = await fetch(`${AUTH_API_BASE}/delete-cancel`, {
+    method: "POST",
     headers: {
       ...getAuthHeaders(),
     },

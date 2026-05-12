@@ -1,4 +1,9 @@
+"use client";
+
 import { useEffect, useMemo, useState } from "react";
+import { toast } from "../../../components/ui/Toast.jsx";
+import { updateProfileRequest } from "../../../lib/quiz-client.js";
+import { useAuth } from "../../../context/AuthContext.jsx";
 import "../styles/setting.css";
 
 const getInitialProfileState = (user) => {
@@ -20,8 +25,10 @@ const getInitialProfileState = (user) => {
 };
 
 export default function Profile({ user }) {
+  const { refreshUser } = useAuth();
   const [avatar, setAvatar] = useState(null);
   const [profile, setProfile] = useState(() => getInitialProfileState(user));
+  const [isSaving, setIsSaving] = useState(false);
 
   useEffect(() => {
     setProfile(getInitialProfileState(user));
@@ -48,12 +55,32 @@ export default function Profile({ user }) {
     }
   };
 
+  const handleSaveProfile = async () => {
+    setIsSaving(true);
+    try {
+      const payload = {
+        fullName: `${profile.firstName} ${profile.lastName}`.trim(),
+        username: profile.username,
+        email: profile.email,
+      };
+      await updateProfileRequest(payload);
+      await refreshUser();
+      toast.success("Profile updated successfully!");
+    } catch (error) {
+      toast.error("Failed to update profile: " + error.message);
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
   return (
     <div className="privacy-card">
-      <h2 className="privacy-title">Profile Information</h2>
-      <p className="privacy-sub">
-        Review the account details loaded from your current user session.
-      </p>
+      <div className="mb-6">
+        <h2 className="privacy-title">Profile Information</h2>
+        <p className="privacy-sub">
+          Update your account details and how others see you.
+        </p>
+      </div>
 
       <div className="profile-layout">
         <div className="profile-avatar-block">
@@ -104,11 +131,12 @@ export default function Profile({ user }) {
             />
           </div>
 
-          <div className="form-group">
-            <label>Role</label>
+          <div className="form-group opacity-60">
+            <label>Role (Read-only)</label>
             <input
               value={profile.role}
-              onChange={(event) => handleChange("role", event.target.value)}
+              disabled
+              className="cursor-not-allowed"
             />
           </div>
 
@@ -131,8 +159,22 @@ export default function Profile({ user }) {
         </div>
       </div>
 
-      <div className="support">
-        <span>Loaded from your authenticated user record.</span>
+      <div className="mt-8 flex justify-end">
+        <button
+          onClick={handleSaveProfile}
+          disabled={isSaving}
+          className={`px-8 py-3 rounded-xl font-semibold transition-all ${
+            isSaving
+              ? "bg-gray-800 text-gray-500 cursor-not-allowed"
+              : "bg-accent-gradient text-white shadow-lg shadow-accent/20 hover:scale-[1.02] active:scale-95"
+          }`}
+        >
+          {isSaving ? "Saving..." : "Save Changes"}
+        </button>
+      </div>
+
+      <div className="support mt-4">
+        <span>Updates are synced directly to your account.</span>
       </div>
     </div>
   );
