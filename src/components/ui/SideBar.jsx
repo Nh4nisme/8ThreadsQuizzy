@@ -13,12 +13,12 @@ const SideBar = () => {
 
   return (
     <div className="bg-bg-card h-screen w-[300px] p-6 flex flex-col text-text-main border-r border-border-main sticky top-0">
-      <div className="flex items-center mb-8">
+      <Link href="/" className="flex items-center mb-8 hover:opacity-80 transition-opacity">
         <img src="/assets/Logo.png" alt="Quizzy Logo" className="w-15 h-15" />
         <span className="bg-accent-gradient bg-clip-text text-transparent text-2xl font-bold">
           8ThreadsQuizzy
         </span>
-      </div>
+      </Link>
 
       <div className="mb-6">
         <SearchInput className="bg-bg-input rounded-[10px] border border-border-main focus:border-accent transition-all" />
