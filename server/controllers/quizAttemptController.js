@@ -29,6 +29,25 @@ exports.createAttempt = async (req, res) => {
 
     const { eventId } = req.body;
 
+    // If part of an event, check retake permissions
+    if (eventId) {
+      const event = await Event.findById(eventId).lean();
+      if (!event) return res.status(404).json({ message: "Event not found" });
+
+      const existingAttempt = await QuizAttempt.findOne({
+        eventId,
+        studentId: req.user.id,
+        status: "completed"
+      });
+
+      if (existingAttempt && !event.allowRetakes) {
+        return res.status(400).json({ 
+          success: false, 
+          message: "Retakes are not allowed for this event." 
+        });
+      }
+    }
+
     const attempt = await QuizAttempt.create({
       quizId: quiz._id,
       studentId: req.user.id,
@@ -43,17 +62,19 @@ exports.createAttempt = async (req, res) => {
       timeSpentSeconds: 0,
     });
 
-    // If part of an event, add to event participants
+    // If part of an event, ensure participant exists (don't overwrite if already there)
     if (eventId) {
-      await Event.findByIdAndUpdate(eventId, {
-        $addToSet: {
-          participants: {
-            studentId: req.user.id,
-            studentName: req.user.fullName || req.user.username,
-            joinedAt: new Date(),
-          },
-        },
-      });
+      const event = await Event.findById(eventId);
+      const participantIndex = event.participants.findIndex(p => String(p.studentId) === String(req.user.id));
+      
+      if (participantIndex === -1) {
+        event.participants.push({
+          studentId: req.user.id,
+          studentName: req.user.fullName || req.user.username,
+          joinedAt: new Date(),
+        });
+        await event.save();
+      }
     }
 
     res.status(201).json({ attempt });
@@ -95,17 +116,24 @@ exports.submitAttempt = async (req, res) => {
 
     await attempt.save();
 
-    // If part of an event, update participant score and completion
+    // If part of an event, update participant score only if it's higher
     if (attempt.eventId) {
-      await Event.findOneAndUpdate(
-        { _id: attempt.eventId, "participants.studentId": req.user.id },
-        {
-          $set: {
-            "participants.$.score": attempt.score,
-            "participants.$.completedAt": submittedAt,
-          },
+      const event = await Event.findById(attempt.eventId);
+      if (event) {
+        const participantIndex = event.participants.findIndex(p => String(p.studentId) === String(req.user.id));
+        if (participantIndex !== -1) {
+          const currentScore = event.participants[participantIndex].score || 0;
+          if (attempt.score > currentScore) {
+            event.participants[participantIndex].score = attempt.score;
+            event.participants[participantIndex].completedAt = submittedAt;
+          }
+          // Mark as completed even if score isn't higher if it was previously null
+          if (!event.participants[participantIndex].completedAt) {
+            event.participants[participantIndex].completedAt = submittedAt;
+          }
+          await event.save();
         }
-      );
+      }
     }
 
     res.json({ attempt });
