@@ -4,6 +4,7 @@ import { useEffect, useState, useMemo } from "react";
 import StudentRow from "./components/StudentRow.jsx";
 import { fetchTeacherStudents, assignStudentToClassRequest } from "../../lib/quiz-client.js";
 import { X } from "lucide-react";
+import { toast } from "../../components/ui/Toast.jsx";
 
 function AssignModal({ isOpen, onClose, onConfirm, selectedCount }) {
   const [className, setClassName] = useState("");
@@ -121,11 +122,12 @@ export default function Students() {
   const handleConfirmAssign = async (className) => {
     try {
       await assignStudentToClassRequest(selectedIds, className.trim());
+      toast.success(`Assigned ${selectedIds.length} students to ${className.trim()}`);
       setIsModalOpen(false);
       setSelectedIds([]);
       loadStudents();
     } catch (err) {
-      alert("Failed to assign class: " + err.message);
+      toast.error("Failed to assign class: " + err.message);
     }
   };
 

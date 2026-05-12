@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { toast } from "../../../components/ui/Toast.jsx";
 import "../styles/setting.css"
 
 
@@ -48,25 +49,25 @@ export default function Account(){
 
   const handleUpdatePassword = () => {
     if (passwords.new !== passwords.confirm) {
-      alert("New passwords do not match!");
+      toast.error("New passwords do not match!");
       return;
     }
     if (!passwords.current || !passwords.new) {
-      alert("Please fill all password fields!");
+      toast.error("Please fill all password fields!");
       return;
     }
-    alert("Password updated successfully!");
+    toast.success("Password updated successfully!");
     setPasswords({ current: "", new: "", confirm: "" });
   };
 
   const handleConnect = (account) => {
     setConnectedAccounts(prev => ({ ...prev, [account]: !prev[account] }));
-    alert(`${account} ${connectedAccounts[account] ? 'disconnected' : 'connected'}!`);
+    toast.info(`${account} ${connectedAccounts[account] ? 'disconnected' : 'connected'}!`);
   };
 
   const handleDeleteAccount = () => {
     if (window.confirm("Are you sure you want to delete your account? This action cannot be undone.")) {
-      alert("Account deletion initiated. You will receive a confirmation email.");
+      toast.info("Account deletion initiated. You will receive a confirmation email.");
     }
   };
 
