@@ -10,13 +10,13 @@ const buildAuthPayload = (user) => ({
         username: user.username,
         email: user.email,
         role: user.role,
+        deletionRequestedAt: user.deletionRequestedAt || null,
     },
 });
 
 exports.register = async (req, res) => {
     const { fullName, username, email, password, role } = req.body || {};
 
-    // Validate input
     if (!username || !email || !password) {
         return res.status(400).json({ message: 'Missing required fields' });
     }
@@ -46,7 +46,6 @@ exports.register = async (req, res) => {
 exports.login = async (req, res) => {
     const { email, password } = req.body || {};
 
-    // Validate input
     if (!email || !password) {
         return res.status(400).json({ message: 'Missing credentials' });
     }
@@ -73,6 +72,65 @@ exports.getCurrentUser = async (req, res) => {
     if (!req.user) {
         return res.status(401).json({ message: 'Unauthorized' });
     }
-
     res.json({ user: req.user });
+};
+
+exports.updateProfile = async (req, res) => {
+    try {
+        const { fullName, username, email } = req.body;
+        const user = await User.findById(req.user.id);
+        
+        if (!user) return res.status(404).json({ message: 'User not found' });
+
+        if (username) user.username = username;
+        if (email) user.email = email;
+        if (fullName) user.fullName = fullName;
+
+        await user.save();
+        res.json({ message: 'Profile updated successfully', user });
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+};
+
+exports.updatePassword = async (req, res) => {
+    try {
+        const { currentPassword, newPassword } = req.body;
+        const user = await User.findById(req.user.id);
+        
+        if (!user) return res.status(404).json({ message: 'User not found' });
+
+        const isMatch = await bcrypt.compare(currentPassword, user.password);
+        if (!isMatch) return res.status(400).json({ message: 'Incorrect current password' });
+
+        const salt = await bcrypt.genSalt(10);
+        user.password = await bcrypt.hash(newPassword, salt);
+        
+        await user.save();
+        res.json({ message: 'Password updated successfully' });
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+};
+
+exports.requestAccountDeletion = async (req, res) => {
+    try {
+        const user = await User.findById(req.user.id);
+        user.deletionRequestedAt = new Date();
+        await user.save();
+        res.json({ message: 'Account deletion scheduled', deletionRequestedAt: user.deletionRequestedAt });
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+};
+
+exports.cancelAccountDeletion = async (req, res) => {
+    try {
+        const user = await User.findById(req.user.id);
+        user.deletionRequestedAt = null;
+        await user.save();
+        res.json({ message: 'Account deletion cancelled' });
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
 };
