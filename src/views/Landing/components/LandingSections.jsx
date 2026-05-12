@@ -1,6 +1,5 @@
-"use client";
-
-import { forwardRef, useEffect, useRef } from "react";
+import { forwardRef } from "react";
+import { motion } from "framer-motion";
 import {
   Award,
   BookOpen,
@@ -13,6 +12,7 @@ import {
 } from "lucide-react";
 
 const sections = [
+  // ... (sections data remains the same)
   {
     id: "quiz",
     eyebrow: "Explore More",
@@ -125,37 +125,30 @@ const sections = [
 ];
 
 const LandingSections = forwardRef(function LandingSections(_, ref) {
-  const sectionsWrapperRef = useRef(null);
-
-  useEffect(() => {
-    const root = sectionsWrapperRef.current;
-
-    if (!root) {
-      return undefined;
-    }
-
-    const revealItems = root.querySelectorAll("[data-reveal]");
-    const observer = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          if (entry.isIntersecting) {
-            entry.target.classList.add("reveal-visible");
-            observer.unobserve(entry.target);
-          }
-        });
+  const containerVariants = {
+    hidden: { opacity: 0 },
+    visible: {
+      opacity: 1,
+      transition: {
+        staggerChildren: 0.2,
       },
-      { threshold: 0.2, rootMargin: "0px 0px -10% 0px" },
-    );
+    },
+  };
 
-    revealItems.forEach((item) => observer.observe(item));
-
-    return () => {
-      observer.disconnect();
-    };
-  }, []);
+  const itemVariants = {
+    hidden: { opacity: 0, y: 20 },
+    visible: {
+      opacity: 1,
+      y: 0,
+      transition: {
+        duration: 0.8,
+        ease: [0.16, 1, 0.3, 1],
+      },
+    },
+  };
 
   return (
-    <div ref={sectionsWrapperRef} className="w-full bg-zinc-950 text-white">
+    <div className="w-full bg-zinc-950 text-white overflow-hidden">
       {sections.map((section, index) => (
         <section
           key={section.id}
@@ -163,47 +156,57 @@ const LandingSections = forwardRef(function LandingSections(_, ref) {
           ref={index === 0 ? ref : null}
           className="scroll-mt-24 px-6 py-20 md:px-10"
         >
-          <div className="mx-auto flex w-full max-w-6xl flex-col gap-16">
+          <motion.div 
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, margin: "-10%" }}
+            variants={containerVariants}
+            className="mx-auto flex w-full max-w-6xl flex-col gap-16"
+          >
             <div className="max-w-3xl">
-              <p
-                data-reveal
-                className="reveal-item text-sm font-medium uppercase tracking-[0.2em] text-purple-400"
+              <motion.p
+                variants={itemVariants}
+                className="text-sm font-medium uppercase tracking-[0.2em] text-purple-400"
               >
                 {section.eyebrow}
-              </p>
-              <h2
-                data-reveal
-                className="reveal-item reveal-delay-1 mt-4 text-3xl font-semibold md:text-4xl"
+              </motion.p>
+              <motion.h2
+                variants={itemVariants}
+                className="mt-4 text-3xl font-semibold md:text-4xl"
               >
                 {section.title}
-              </h2>
-              <p
-                data-reveal
-                className="reveal-item reveal-delay-2 mt-5 max-w-2xl text-base leading-7 text-zinc-300"
+              </motion.h2>
+              <motion.p
+                variants={itemVariants}
+                className="mt-5 max-w-2xl text-base leading-7 text-zinc-300"
               >
                 {section.description}
-              </p>
+              </motion.p>
             </div>
 
             <div className="grid gap-6 md:grid-cols-3">
-              {section.cards.map(({ icon: Icon, title, description }, cardIndex) => (
-                <article
+              {section.cards.map(({ icon: Icon, title, description }) => (
+                <motion.article
                   key={title}
-                  data-reveal
-                  className="reveal-item flex min-h-64 flex-col rounded-lg border border-white/10 bg-black/60 p-6"
-                  style={{ transitionDelay: `${cardIndex * 120}ms` }}
+                  variants={itemVariants}
+                  whileHover={{ 
+                    y: -10, 
+                    scale: 1.02,
+                    boxShadow: "0 20px 40px rgba(0,0,0,0.4), 0 0 20px rgba(139, 92, 246, 0.1)"
+                  }}
+                  className="group flex min-h-64 flex-col rounded-2xl border border-white/10 bg-black/40 p-8 transition-colors hover:bg-zinc-900/50 hover:border-purple-500/30"
                 >
-                  <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-gradient-to-r from-purple-500 to-orange-500">
-                    <Icon size={22} />
+                  <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-white/5 group-hover:bg-accent-gradient transition-colors duration-500">
+                    <Icon size={22} className="text-purple-400 group-hover:text-white transition-colors" />
                   </div>
-                  <h3 className="mt-6 text-xl font-semibold">{title}</h3>
-                  <p className="mt-4 text-sm leading-7 text-zinc-300">
+                  <h3 className="mt-8 text-xl font-semibold tracking-tight">{title}</h3>
+                  <p className="mt-4 text-sm leading-7 text-zinc-400 group-hover:text-zinc-300 transition-colors">
                     {description}
                   </p>
-                </article>
+                </motion.article>
               ))}
             </div>
-          </div>
+          </motion.div>
         </section>
       ))}
     </div>

@@ -1,18 +1,20 @@
 import "./globals.css";
 import { AuthProvider } from "../context/AuthContext.jsx";
 import { ThemeProvider } from "../context/ThemeContext.jsx";
+import { ToastContainer } from "../components/ui/Toast.jsx";
+import AppLoader from "../components/ui/AppLoader.jsx";
+import LayoutTransition from "../components/ui/LayoutTransition.jsx";
 
 export const metadata = {
   title: "8ThreadsQuizzy",
   description: "Quiz platform UI migrated to Next.js",
 };
 
-import { ToastContainer } from "../components/ui/Toast.jsx";
-
 export default function RootLayout({ children }) {
   return (
     <html lang="en" suppressHydrationWarning>
       <head>
+        {/* ... (script remain the same) */}
         <script
           dangerouslySetInnerHTML={{
             __html: `
@@ -36,7 +38,10 @@ export default function RootLayout({ children }) {
       <body>
         <ThemeProvider>
           <AuthProvider>
-            {children}
+            <AppLoader />
+            <LayoutTransition>
+              <main>{children}</main>
+            </LayoutTransition>
             <ToastContainer />
           </AuthProvider>
         </ThemeProvider>

@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useEffect, useRef, useState } from "react";
+import { motion } from "framer-motion";
 import Header from "../../components/ui/Header.jsx";
 import LandingHero from "./components/LandingHero.jsx";
 import LandingSections from "./components/LandingSections.jsx";
@@ -55,16 +56,37 @@ export default function Landing() {
 
   return (
     <>
-      <Header
-        onNavigate={handleSectionNavigation}
-        onSignIn={() => setAuthMode("signin")}
-        onSignUp={() => setAuthMode("signup")}
-      />
-      <LandingHero 
-        onExplore={() => handleSectionNavigation("quiz")} 
-        onGetStarted={() => setAuthMode("signup")}
-      />
-      <LandingSections ref={exploreSectionRef} />
+      <motion.div
+        initial={{ opacity: 0, y: 30 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 1, ease: [0.16, 1, 0.3, 1], delay: 1 }}
+      >
+        <Header
+          onNavigate={handleSectionNavigation}
+          onSignIn={() => setAuthMode("signin")}
+          onSignUp={() => setAuthMode("signup")}
+        />
+      </motion.div>
+
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ duration: 1.5, delay: 0.5 }}
+      >
+        <LandingHero 
+          onExplore={() => handleSectionNavigation("quiz")} 
+          onGetStarted={() => setAuthMode("signup")}
+        />
+      </motion.div>
+
+      <motion.div
+        initial={{ opacity: 0, y: 50 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true, margin: "-100px" }}
+        transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
+      >
+        <LandingSections ref={exploreSectionRef} />
+      </motion.div>
 
       {authMode && (
         <AuthModal
