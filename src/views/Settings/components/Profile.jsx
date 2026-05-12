@@ -4,6 +4,7 @@ import { useEffect, useMemo, useState } from "react";
 import { toast } from "../../../components/ui/Toast.jsx";
 import { updateProfileRequest } from "../../../lib/quiz-client.js";
 import { useAuth } from "../../../context/AuthContext.jsx";
+import { Camera } from "lucide-react";
 import "../styles/setting.css";
 
 const getInitialProfileState = (user) => {
@@ -84,26 +85,29 @@ export default function Profile({ user }) {
 
       <div className="profile-layout">
         <div className="profile-avatar-block">
-          <div className="profile-avatar">
-            {avatar ? (
-              <img
-                src={avatar}
-                alt="avatar preview"
-                className="profile-avatar-image"
+          <div className="group relative">
+            <div className="profile-avatar overflow-hidden border-4 border-white/5 shadow-2xl transition-all duration-500 group-hover:border-accent/40 group-hover:scale-105">
+              {avatar ? (
+                <img
+                  src={avatar}
+                  alt="avatar preview"
+                  className="profile-avatar-image h-full w-full object-cover"
+                />
+              ) : (
+                <span className="text-4xl font-black text-white">{initials}</span>
+              )}
+            </div>
+            <label className="absolute bottom-0 right-0 h-10 w-10 rounded-xl bg-accent-gradient flex items-center justify-center cursor-pointer shadow-xl border border-white/20 transition-all hover:scale-110 active:scale-95 group-hover:translate-x-1 group-hover:translate-y-1">
+              <Camera size={18} className="text-white" />
+              <input
+                type="file"
+                accept="image/*"
+                className="hidden"
+                onChange={handleFileChange}
               />
-            ) : (
-              <span>{initials}</span>
-            )}
+            </label>
           </div>
-
-          <label className="btn-outline profile-upload-btn">
-            <input
-              type="file"
-              accept="image/*"
-              className="profile-file-input"
-              onChange={handleFileChange}
-            />
-          </label>
+          <p className="text-[10px] font-black uppercase tracking-[0.2em] text-text-muted mt-4">Avatar</p>
         </div>
 
         <div className="profile-form-grid">
@@ -163,11 +167,10 @@ export default function Profile({ user }) {
         <button
           onClick={handleSaveProfile}
           disabled={isSaving}
-          className={`px-8 py-3 rounded-xl font-semibold transition-all ${
-            isSaving
+          className={`px-8 py-3 rounded-xl font-semibold transition-all ${isSaving
               ? "bg-gray-800 text-gray-500 cursor-not-allowed"
               : "bg-accent-gradient text-white shadow-lg shadow-accent/20 hover:scale-[1.02] active:scale-95"
-          }`}
+            }`}
         >
           {isSaving ? "Saving..." : "Save Changes"}
         </button>

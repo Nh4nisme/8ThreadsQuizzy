@@ -3,38 +3,90 @@
 import { useState } from "react";
 import { SignUp } from "./components/SignUp.tsx";
 import { SignIn } from "./components/SignIn.tsx";
+import { motion, AnimatePresence } from "framer-motion";
+import { X, Sparkles } from "lucide-react";
 
 export default function AuthModal({ mode, onClose }) {
   const [isLogin, setIsLogin] = useState(mode === "signin");
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center">
-      <div
-        className="absolute inset-0 bg-white/2 backdrop-blur-md"
+    <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        exit={{ opacity: 0 }}
         onClick={onClose}
+        className="absolute inset-0 bg-[#050505]/80 backdrop-blur-xl"
       />
 
-      <div className="relative z-10 w-[1100px] max-w-[95vw] min-h-[600px] max-h-[90vh] bg-white rounded-2xl overflow-hidden shadow-2xl flex">
-        <div className="w-1/2 bg-black flex items-center justify-center">
-          <h1 className="text-4xl font-bold bg-gradient-to-r from-[#5813C1] to-[#C45037] bg-clip-text text-transparent">
-            Quizzy
-          </h1>
+      <motion.div
+        initial={{ opacity: 0, scale: 0.9, y: 20 }}
+        animate={{ opacity: 1, scale: 1, y: 0 }}
+        exit={{ opacity: 0, scale: 0.9, y: 20 }}
+        className="relative z-10 w-full max-w-5xl h-[700px] bg-[#0f0f12] border border-white/10 rounded-[40px] shadow-2xl overflow-hidden flex flex-col md:flex-row"
+      >
+        {/* Left Side: Branding/Visuals */}
+        <div className="hidden md:flex w-1/2 bg-black relative overflow-hidden items-center justify-center border-r border-white/5">
+           <div className="absolute inset-0 opacity-30">
+              <div className="absolute top-0 left-0 w-full h-full bg-[radial-gradient(circle_at_center,_var(--accent-primary)_0%,_transparent_70%)] opacity-20 blur-3xl" />
+              <div className="absolute bottom-0 right-0 w-full h-full bg-[radial-gradient(circle_at_center,_#3b82f6_0%,_transparent_70%)] opacity-20 blur-3xl" />
+           </div>
+           
+           <div className="relative z-10 text-center px-12">
+              <motion.div 
+                animate={{ rotate: [0, 5, -5, 0] }}
+                transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" }}
+                className="w-20 h-20 bg-accent-gradient rounded-3xl mx-auto mb-8 flex items-center justify-center shadow-2xl shadow-accent/20"
+              >
+                 <Sparkles size={40} className="text-white" />
+              </motion.div>
+              <h1 className="text-5xl font-black tracking-tighter text-white mb-6">
+                 Forge your <span className="text-gradient">Legacy</span>
+              </h1>
+              <p className="text-text-secondary font-medium text-lg leading-relaxed">
+                 Join the elite circle of learners and creators on the most advanced quiz architecture ever built.
+              </p>
+           </div>
+
+           {/* Grid Pattern */}
+           <div className="absolute inset-0 pointer-events-none opacity-[0.03]" 
+                style={{ backgroundImage: 'radial-gradient(circle, #fff 1px, transparent 1px)', backgroundSize: '30px 30px' }} />
         </div>
 
-        <div className="w-1/2 p-10 overflow-y-auto flex flex-col justify-center">
-          <button onClick={onClose} className="absolute top-3 right-4 text-lg">
-            ×
+        {/* Right Side: Form */}
+        <div className="w-full md:w-1/2 p-8 md:p-12 overflow-y-auto custom-scrollbar relative bg-[#0f0f12]">
+          <button 
+            onClick={onClose} 
+            className="absolute top-8 right-8 h-10 w-10 flex items-center justify-center rounded-xl bg-white/5 text-text-muted hover:text-white transition-all"
+          >
+            <X size={20} />
           </button>
 
-          <div className="w-full max-w-[420px] mx-auto">
-            {isLogin ? (
-              <SignIn onSwitchSignUp={() => setIsLogin(false)} />
-            ) : (
-              <SignUp onSwitchSignIn={() => setIsLogin(true)} />
-            )}
+          <div className="w-full max-w-[400px] mx-auto pt-8">
+            <AnimatePresence mode="wait">
+              {isLogin ? (
+                <motion.div 
+                  key="signin"
+                  initial={{ opacity: 0, x: 20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  exit={{ opacity: 0, x: -20 }}
+                >
+                  <SignIn onSwitchSignUp={() => setIsLogin(false)} />
+                </motion.div>
+              ) : (
+                <motion.div 
+                  key="signup"
+                  initial={{ opacity: 0, x: 20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  exit={{ opacity: 0, x: -20 }}
+                >
+                  <SignUp onSwitchSignIn={() => setIsLogin(true)} />
+                </motion.div>
+              )}
+            </AnimatePresence>
           </div>
         </div>
-      </div>
+      </motion.div>
     </div>
   );
 }

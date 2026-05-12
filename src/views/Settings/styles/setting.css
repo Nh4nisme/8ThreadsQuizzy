@@ -53,13 +53,7 @@ body {
 /* GENERAL CARD STYLES */
 .privacy-card,
 .appearance-card {
-  background: var(--bg-card);
-  border: 1px solid var(--border-main);
-  border-radius: 16px;
-  padding: 30px;
-  max-width: 1000px;
-  margin-top: 25px;
-  box-shadow: var(--shadow-md);
+  width: 100%;
 }
 
 .privacy-title,

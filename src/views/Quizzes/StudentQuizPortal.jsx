@@ -257,100 +257,88 @@ export function StudentQuizPlayer({ quiz, attemptId, onExit, onComplete, isPrevi
 
   // --- ACTIVE PLAYER VIEW ---
   return (
-    <div className="relative min-h-screen overflow-hidden bg-[#050505] text-white">
-      {/* Dynamic Background Reaction to Timer */}
-      <motion.div
-        animate={{
-          opacity: isLowTime ? [0.1, 0.3, 0.1] : 0.1,
-          backgroundColor: isLowTime ? "#ef4444" : "#AC63E6"
-        }}
-        transition={{ duration: isLowTime ? 1 : 4, repeat: Infinity }}
-        className="pointer-events-none absolute inset-0 blur-[150px]"
-      />
+    <div className="relative min-h-screen overflow-hidden bg-bg-main text-white">
+      <GlowOrb className="-top-60 -left-60 h-[800px] w-[800px]" color={isLowTime ? "red" : "purple"} />
+      <GlowOrb className="-bottom-60 -right-60 h-[800px] w-[800px]" color="blue" />
 
-      <GlowOrb className="-top-40 -left-40 h-[600px] w-[600px]" color={isLowTime ? "red" : "purple"} />
-      <GlowOrb className="-bottom-40 -right-40 h-[600px] w-[600px]" color="blue" />
-
-      <div className="relative z-10 flex flex-col h-screen max-w-7xl mx-auto px-6 py-8 md:px-10">
-
+      <div className="relative z-10 flex flex-col h-screen max-w-[1600px] mx-auto px-8 py-10">
         {/* Header Section */}
-        <header className="flex items-center justify-between mb-8">
+        <header className="flex items-center justify-between mb-10">
           <motion.button
-            initial={{ opacity: 0, x: -20 }}
-            animate={{ opacity: 1, x: 0 }}
+            whileHover={{ x: -5 }}
             onClick={onExit}
-            className="group flex items-center gap-2 rounded-2xl border border-white/10 bg-white/5 px-5 py-2.5 text-sm font-medium backdrop-blur-md transition-all hover:bg-white/10"
+            className="group flex items-center gap-3 rounded-2xl border border-white/5 bg-white/5 px-6 py-3 text-sm font-black uppercase tracking-[0.2em] backdrop-blur-xl transition-all hover:bg-white/10 hover:border-white/20"
           >
             <ArrowLeft size={18} className="transition-transform group-hover:-translate-x-1" />
             Quit Session
           </motion.button>
 
-          <div className="flex items-center gap-4">
-            <div className="hidden md:flex flex-col items-end">
-              <p className="text-[10px] text-text-muted uppercase tracking-[0.2em] font-bold">Session Integrity</p>
-              <div className="flex items-center gap-1.5 mt-1">
-                <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.6)]" />
-                <span className="text-xs font-bold text-emerald-400">Secure Live Connection</span>
+          <div className="flex items-center gap-6">
+            <div className="hidden md:flex flex-col items-end leading-none">
+              <p className="text-[10px] text-text-muted uppercase tracking-[0.3em] font-black mb-1.5">Security Protocol</p>
+              <div className="flex items-center gap-2">
+                <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 shadow-[0_0_12px_rgba(16,185,129,0.8)] animate-pulse" />
+                <span className="text-[10px] font-black uppercase tracking-widest text-emerald-400">Live Integrity Valid</span>
               </div>
             </div>
             <div className="h-10 w-[1px] bg-white/10 mx-2 hidden md:block" />
-            <div className="rounded-2xl border border-white/10 bg-white/5 px-6 py-2.5 backdrop-blur-md">
-              <span className="text-xs font-bold text-text-muted uppercase tracking-widest mr-2">Step</span>
-              <span className="text-xl font-black text-white">{questionIndex + 1}</span>
-              <span className="text-sm text-white/40 font-bold"> / {totalQuestions}</span>
+            <div className="rounded-3xl border border-white/5 bg-white/5 px-8 py-4 backdrop-blur-xl shadow-2xl">
+              <span className="text-[10px] font-black text-text-muted uppercase tracking-[0.3em] mr-3">Progress</span>
+              <span className="text-2xl font-black text-white">{questionIndex + 1}</span>
+              <span className="text-sm text-white/40 font-black"> / {totalQuestions}</span>
             </div>
           </div>
         </header>
 
         {/* Main Content Area */}
-        <div className="flex-1 grid gap-8 lg:grid-cols-[1fr_340px] items-start pb-8 overflow-hidden">
-
+        <div className="flex-1 grid gap-10 lg:grid-cols-[1fr_380px] items-start pb-8 overflow-hidden">
           {/* Question Module */}
-          <main className="h-full flex flex-col gap-6">
-            <div className="relative flex-1 rounded-[40px] border border-white/10 bg-[#111115]/40 p-1 shadow-2xl backdrop-blur-2xl overflow-hidden flex flex-col">
-              {/* Animated Progress Bar */}
-              <div className="absolute top-0 left-0 w-full h-[6px] bg-white/5">
+          <main className="h-full flex flex-col gap-8 min-h-0">
+            <div className="relative flex-1 rounded-[48px] border border-white/10 bg-[#0f0f12]/60 shadow-2xl backdrop-blur-3xl overflow-hidden flex flex-col">
+              {/* Progress Line */}
+              <div className="absolute top-0 left-0 w-full h-[4px] bg-white/5">
                 <motion.div
                   initial={{ width: 0 }}
                   animate={{ width: `${progressPercent}%` }}
-                  className="h-full bg-accent-gradient shadow-[0_0_15px_rgba(172,99,230,0.5)] transition-all duration-700"
+                  className="h-full bg-accent-gradient shadow-[0_0_20px_rgba(139,92,246,0.6)] transition-all duration-1000 ease-out"
                 />
               </div>
 
-              <div className="p-8 md:p-12 flex-1 flex flex-col">
+              <div className="p-10 md:p-16 flex-1 flex flex-col overflow-y-auto custom-scrollbar">
                 <AnimatePresence mode="wait">
                   <motion.div
                     key={question.id}
-                    initial={{ opacity: 0, y: 20, filter: "blur(10px)" }}
-                    animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
-                    exit={{ opacity: 0, y: -20, filter: "blur(10px)" }}
+                    initial={{ opacity: 0, y: 30, scale: 0.98 }}
+                    animate={{ opacity: 1, y: 0, scale: 1 }}
+                    exit={{ opacity: 0, y: -30, scale: 0.98 }}
                     transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
                     className="flex flex-col h-full"
                   >
-                    <div className="mb-10">
-                      <div className="flex items-center gap-3 mb-4">
-                        <span className="rounded-lg bg-accent/20 px-3 py-1 text-[10px] font-black text-accent uppercase tracking-[0.2em] border border-accent/20">
+                    <div className="mb-12">
+                      <div className="flex items-center gap-3 mb-6">
+                        <span className="rounded-xl bg-accent/10 px-4 py-2 text-[10px] font-black text-accent uppercase tracking-[0.2em] border border-accent/20">
                           {quiz.category}
                         </span>
-                        <span className={`rounded-lg px-3 py-1 text-[10px] font-black uppercase tracking-[0.2em] border ${quiz.difficulty === "Hard" ? "bg-red-500/10 text-red-400 border-red-500/20" :
+                        <span className={`rounded-xl px-4 py-2 text-[10px] font-black uppercase tracking-[0.2em] border ${
+                          quiz.difficulty === "Hard" ? "bg-red-500/10 text-red-400 border-red-500/20" :
                           quiz.difficulty === "Medium" ? "bg-amber-500/10 text-amber-400 border-amber-500/20" :
-                            "bg-emerald-500/10 text-emerald-400 border-emerald-500/20"
-                          }`}>
-                          {quiz.difficulty} Level
+                          "bg-emerald-500/10 text-emerald-400 border-emerald-500/20"
+                        }`}>
+                          {quiz.difficulty} Sector
                         </span>
                       </div>
-                      <h2 className="text-3xl md:text-4xl font-bold leading-tight tracking-tight text-white/90">
+                      <h2 className="text-4xl md:text-5xl font-black leading-tight tracking-tight text-white">
                         {question.prompt}
                       </h2>
                     </div>
 
-                    <div className="grid gap-4 md:grid-cols-2 mt-auto">
-                      {question.choices.map((choice, i) => {
+                    <div className="grid gap-5 md:grid-cols-2 mt-auto">
+                      {question.choices.map((choice) => {
                         const isSelected = selectedAnswers[question.id] === choice.id;
                         return (
                           <motion.button
                             key={choice.id}
-                            whileHover={{ scale: 1.02, translateY: -2 }}
+                            whileHover={{ scale: 1.01, y: -2 }}
                             whileTap={{ scale: 0.98 }}
                             onClick={() =>
                               setSelectedAnswers((current) => ({
@@ -358,23 +346,25 @@ export function StudentQuizPlayer({ quiz, attemptId, onExit, onComplete, isPrevi
                                 [question.id]: choice.id,
                               }))
                             }
-                            className={`group relative flex flex-col items-start rounded-3xl border-2 p-6 text-left transition-all duration-300 ${isSelected
-                              ? "border-accent bg-accent/10 shadow-[0_0_40px_rgba(172,99,230,0.15)] ring-4 ring-accent/5"
-                              : "border-white/5 bg-white/5 hover:border-white/20 hover:bg-white/[0.08]"
-                              }`}
+                            className={`group relative flex flex-col items-start rounded-[32px] border-2 p-8 text-left transition-all duration-500 ${
+                              isSelected
+                                ? "border-accent bg-accent/10 shadow-[0_0_60px_rgba(139,92,246,0.2)] ring-8 ring-accent/5"
+                                : "border-white/5 bg-white/5 hover:border-white/20 hover:bg-white/[0.08]"
+                            }`}
                           >
-                            <div className="flex w-full items-center justify-between mb-4">
-                              <span className={`flex items-center justify-center w-8 h-8 rounded-xl text-xs font-black border-2 transition-colors ${isSelected ? "bg-accent border-accent text-white" : "bg-white/5 border-white/10 text-text-muted group-hover:border-white/30"
-                                }`}>
+                            <div className="flex w-full items-center justify-between mb-6">
+                              <span className={`flex items-center justify-center w-11 h-11 rounded-2xl text-xs font-black border-2 transition-all duration-500 ${
+                                isSelected ? "bg-accent border-accent text-white shadow-lg" : "bg-white/5 border-white/10 text-text-muted group-hover:border-white/30"
+                              }`}>
                                 {choice.label}
                               </span>
                               {isSelected && (
                                 <motion.div initial={{ scale: 0 }} animate={{ scale: 1 }}>
-                                  <CheckCircle2 className="w-5 h-5 text-accent" />
+                                  <CheckCircle2 className="w-7 h-7 text-accent" />
                                 </motion.div>
                               )}
                             </div>
-                            <span className={`text-lg font-bold transition-colors ${isSelected ? "text-white" : "text-white/70 group-hover:text-white"}`}>
+                            <span className={`text-xl font-bold leading-relaxed transition-colors duration-500 ${isSelected ? "text-white" : "text-white/60 group-hover:text-white"}`}>
                               {choice.text}
                             </span>
                           </motion.button>
@@ -386,19 +376,24 @@ export function StudentQuizPlayer({ quiz, attemptId, onExit, onComplete, isPrevi
               </div>
 
               {/* Action Bar */}
-              <div className="p-8 border-t border-white/5 bg-white/5 flex items-center justify-between">
-                <div className="flex items-center gap-2 text-text-muted">
-                  <AlertCircle size={16} />
-                  <span className="text-xs font-medium">Verify your selection before continuing.</span>
+              <div className="p-10 border-t border-white/5 bg-[#0f0f12]/80 backdrop-blur-xl flex items-center justify-between">
+                <div className="flex items-center gap-4 text-text-muted">
+                  <div className="w-10 h-10 rounded-xl bg-white/5 flex items-center justify-center border border-white/10">
+                    <AlertCircle size={20} className="text-accent" />
+                  </div>
+                  <div>
+                    <p className="text-[10px] font-black uppercase tracking-[0.2em] text-white/80 mb-0.5">Selection Verification</p>
+                    <p className="text-[10px] font-bold text-text-muted uppercase tracking-widest">Protocol validation required before proceeding</p>
+                  </div>
                 </div>
                 <HoverScale>
                   <button
                     onClick={handleNext}
                     disabled={!selectedAnswers[question.id] || isSubmitting}
-                    className="group relative flex items-center gap-3 rounded-2xl bg-accent-gradient px-10 py-4 font-black text-white shadow-2xl shadow-accent/20 disabled:cursor-not-allowed disabled:opacity-50 transition-all hover:shadow-accent/40 hover:-translate-y-0.5 active:translate-y-0"
+                    className="group relative flex items-center gap-4 rounded-[24px] bg-accent-gradient px-14 py-6 font-black text-sm text-white shadow-2xl shadow-accent/20 disabled:cursor-not-allowed disabled:opacity-50 transition-all hover:shadow-accent/40 hover:-translate-y-1"
                   >
-                    <span>{questionIndex === totalQuestions - 1 ? "Complete Challenge" : "Confirm & Next"}</span>
-                    <ChevronRight size={20} className="transition-transform group-hover:translate-x-1" />
+                    <span>{questionIndex === totalQuestions - 1 ? "Complete Challenge" : "Finalize & Continue"}</span>
+                    <ChevronRight size={22} className="transition-transform group-hover:translate-x-1.5" />
                   </button>
                 </HoverScale>
               </div>
@@ -406,41 +401,42 @@ export function StudentQuizPlayer({ quiz, attemptId, onExit, onComplete, isPrevi
           </main>
 
           {/* Sidebar Modules */}
-          <aside className="space-y-6 flex flex-col h-full overflow-y-auto pr-1 custom-scrollbar">
+          <aside className="space-y-8 flex flex-col h-full overflow-y-auto pr-1 custom-scrollbar scrollbar-hide pb-8">
             {/* Status Card */}
-            <div className="rounded-[32px] border border-white/10 bg-[#111115]/60 p-8 shadow-xl backdrop-blur-xl">
-              <h3 className="text-sm font-black uppercase tracking-[0.3em] text-text-muted mb-8">Performance</h3>
-              <div className="grid grid-cols-2 gap-4 mb-8">
-                <div className="space-y-1">
-                  <p className="text-[10px] text-text-muted uppercase font-black tracking-widest">Progress</p>
-                  <p className="text-2xl font-black">{Math.round(answeredPercent)}%</p>
+            <div className="rounded-[40px] border border-white/10 bg-[#0f0f12]/60 p-10 shadow-2xl backdrop-blur-3xl relative overflow-hidden group">
+              <h3 className="text-[10px] font-black uppercase tracking-[0.4em] text-accent mb-10">Real-time Performance</h3>
+              <div className="grid grid-cols-2 gap-8 mb-10">
+                <div className="space-y-2">
+                  <p className="text-[10px] text-text-muted uppercase font-black tracking-widest">Clearance</p>
+                  <p className="text-4xl font-black text-white">{Math.round(answeredPercent)}%</p>
                 </div>
-                <div className="space-y-1">
-                  <p className="text-[10px] text-text-muted uppercase font-black tracking-widest">Time Remaining</p>
-                  <p className={`text-2xl font-black tabular-nums transition-colors ${isLowTime ? "text-red-500" : "text-emerald-400"}`}>
+                <div className="space-y-2 text-right">
+                  <p className="text-[10px] text-text-muted uppercase font-black tracking-widest">Time Buffer</p>
+                  <p className={`text-4xl font-black tabular-nums transition-all duration-500 ${isLowTime ? "text-red-500 scale-105" : "text-emerald-400"}`}>
                     {formatTime(timeLeft)}
                   </p>
                 </div>
               </div>
-              <div className="h-2 w-full bg-white/5 rounded-full overflow-hidden">
+              <div className="h-2 w-full bg-white/5 rounded-full overflow-hidden border border-white/5">
                 <motion.div
                   animate={{ width: `${answeredPercent}%` }}
-                  className="h-full bg-accent-gradient"
+                  className="h-full bg-accent-gradient shadow-[0_0_15px_rgba(139,92,246,0.5)]"
                 />
               </div>
-              <p className="mt-4 text-[10px] text-text-muted font-bold">
-                {answeredCount} of {totalQuestions} questions finalized
+              <p className="mt-6 text-[10px] text-text-muted font-black uppercase tracking-widest">
+                <span className="text-white">{answeredCount}</span> / {totalQuestions} sectors cleared
               </p>
+              <div className="absolute top-0 right-0 w-32 h-32 bg-accent/5 blur-3xl pointer-events-none group-hover:bg-accent/10 transition-all" />
             </div>
 
             {/* Navigation Grid */}
-            <div className="rounded-[32px] border border-white/10 bg-[#111115]/60 p-8 shadow-xl backdrop-blur-xl">
-              <div className="flex items-center justify-between mb-6">
-                <h3 className="text-sm font-black uppercase tracking-[0.3em] text-text-muted">Map</h3>
-                <div className="flex gap-1">
-                  <div className="w-2 h-2 rounded-full bg-accent" title="Current" />
-                  <div className="w-2 h-2 rounded-full bg-white/20" title="Pending" />
-                  <div className="w-2 h-2 rounded-full bg-accent/30" title="Answered" />
+            <div className="rounded-[40px] border border-white/10 bg-[#0f0f12]/60 p-10 shadow-2xl backdrop-blur-3xl">
+              <div className="flex items-center justify-between mb-8">
+                <h3 className="text-[10px] font-black uppercase tracking-[0.4em] text-text-muted">Interactive Map</h3>
+                <div className="flex gap-1.5">
+                  <div className="w-1.5 h-1.5 rounded-full bg-accent shadow-[0_0_8px_rgba(139,92,246,0.6)]" />
+                  <div className="w-1.5 h-1.5 rounded-full bg-white/10" />
+                  <div className="w-1.5 h-1.5 rounded-full bg-accent/30" />
                 </div>
               </div>
               <div className="grid grid-cols-5 gap-3">
@@ -451,16 +447,17 @@ export function StudentQuizPlayer({ quiz, attemptId, onExit, onComplete, isPrevi
                     <button
                       key={q.id}
                       onClick={() => setQuestionIndex(idx)}
-                      className={`relative group h-11 w-11 rounded-xl flex items-center justify-center text-xs font-black transition-all ${isCurrent
-                        ? "bg-accent text-white shadow-lg shadow-accent/40 scale-110 z-10"
-                        : isAnswered
-                          ? "bg-accent/15 text-accent border border-accent/20 hover:bg-accent/30"
-                          : "bg-white/5 text-text-muted border border-white/5 hover:border-white/20 hover:bg-white/10"
-                        }`}
+                      className={`relative group h-12 w-12 rounded-[14px] flex items-center justify-center text-xs font-black transition-all ${
+                        isCurrent
+                          ? "bg-white text-black shadow-2xl scale-110 z-10"
+                          : isAnswered
+                          ? "bg-accent/20 text-accent border border-accent/20 hover:bg-accent/30"
+                          : "bg-white/5 text-text-muted border border-white/5 hover:border-white/10 hover:bg-white/10"
+                      }`}
                     >
                       {idx + 1}
                       {isAnswered && !isCurrent && (
-                        <div className="absolute -top-1 -right-1 w-2.5 h-2.5 bg-accent rounded-full border-2 border-bg-main" />
+                        <div className="absolute -top-1 -right-1 w-2.5 h-2.5 bg-accent rounded-full border-2 border-[#0f0f12]" />
                       )}
                     </button>
                   );
@@ -469,20 +466,19 @@ export function StudentQuizPlayer({ quiz, attemptId, onExit, onComplete, isPrevi
             </div>
 
             {/* Motivation Card */}
-            <div className="group relative rounded-[32px] border border-accent/20 bg-accent-gradient/5 p-8 text-center backdrop-blur-md overflow-hidden transition-all hover:bg-accent-gradient/10">
+            <div className="group relative rounded-[40px] border border-accent/20 bg-accent-gradient/5 p-10 text-center backdrop-blur-xl overflow-hidden transition-all hover:bg-accent-gradient/10">
               <motion.div
-                animate={{ rotate: [0, 10, -10, 0] }}
-                transition={{ duration: 5, repeat: Infinity }}
-                className="inline-flex items-center justify-center w-14 h-14 rounded-2xl bg-accent-gradient shadow-lg mb-4"
+                animate={{ rotate: [0, 15, -15, 0] }}
+                transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" }}
+                className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-accent-gradient shadow-2xl mb-8"
               >
-                <Sparkles className="w-7 h-7 text-white" />
+                <Sparkles className="w-8 h-8 text-white" />
               </motion.div>
-              <h4 className="text-lg font-bold mb-2">Sharpen Your Mind</h4>
-              <p className="text-xs text-text-secondary leading-relaxed">
-                You are currently tackling <span className="text-white font-bold">{totalQuestions} challenges</span>.
-                Accuracy is the key to achieving the top rank!
+              <h4 className="text-2xl font-black mb-3 text-white tracking-tight">Sharpen Your Mind</h4>
+              <p className="text-[11px] text-text-secondary leading-relaxed font-bold uppercase tracking-wider">
+                Precision is the catalyst for <span className="text-white">superiority</span>.
               </p>
-              <div className="absolute top-0 left-0 w-full h-1 bg-accent-gradient opacity-20" />
+              <div className="absolute top-0 left-0 w-full h-1 bg-accent-gradient opacity-40" />
             </div>
           </aside>
         </div>
