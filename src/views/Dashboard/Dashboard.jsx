@@ -7,27 +7,37 @@ import StatsCard from "./components/StatsCard.jsx";
 import EventItem from "./components/EventItem.jsx";
 import StudentItem from "./components/StudentItem.jsx";
 import QuizCard from "./components/QuizCard.jsx";
-import { fetchTeacherQuizzes, fetchTeacherStudents } from "../../lib/quiz-client.js";
+import { fetchTeacherQuizzes, fetchTeacherStudents, fetchTeacherEvents } from "../../lib/quiz-client.js";
 
 export default function Dashboard() {
   const router = useRouter();
   const { user } = useAuth();
   const [quizzes, setQuizzes] = useState([]);
   const [students, setStudents] = useState([]);
+  const [events, setEvents] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     const loadData = async () => {
       try {
         setIsLoading(true);
-        const [quizzesData, studentsData] = await Promise.all([
+        const results = await Promise.allSettled([
           fetchTeacherQuizzes(),
           fetchTeacherStudents(),
+          fetchTeacherEvents(),
         ]);
-        setQuizzes(quizzesData.quizzes || []);
-        setStudents(studentsData.students || []);
+
+        if (results[0].status === "fulfilled") setQuizzes(results[0].value.quizzes || []);
+        else console.error("Quizzes failed:", results[0].reason);
+
+        if (results[1].status === "fulfilled") setStudents(results[1].value.students || []);
+        else console.error("Students failed:", results[1].reason);
+
+        if (results[2].status === "fulfilled") setEvents(results[2].value.events || []);
+        else console.error("Events failed:", results[2].reason);
+
       } catch (error) {
-        console.error("Failed to load dashboard data:", error);
+        console.error("Critical dashboard error:", error);
       } finally {
         setIsLoading(false);
       }
@@ -99,26 +109,22 @@ export default function Dashboard() {
             Manage your upcoming and active quiz events
           </p>
 
-          <EventItem
-            title="Science Mid-term Quiz"
-            time="Today, 2:30 PM"
-            participants="32 participants"
-            button="View Live"
-          />
-
-          <EventItem
-            title="Mathematics Weekly Test"
-            time="Tomorrow, 10:00 AM"
-            participants="28 participants"
-            button="Manage"
-          />
-
-          <EventItem
-            title="History Final Exam"
-            time="May 20, 9:00 AM"
-            participants="45 participants"
-            button="Manage"
-          />
+          {isLoading ? (
+            <p className="text-gray-500">Loading events...</p>
+          ) : events.length > 0 ? (
+            events.slice(0, 3).map((event) => (
+              <EventItem
+                key={event._id}
+                title={event.title}
+                time={new Date(event.startTime).toLocaleString([], { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })}
+                participants={`${event.participants?.length || 0} participants`}
+                button={event.currentStatus === 'active' ? 'View Live' : 'Manage'}
+                onClick={() => router.push('/events')}
+              />
+            ))
+          ) : (
+            <p className="text-gray-500">No events scheduled.</p>
+          )}
         </div>
 
         <div className="bg-[#1a1a1f] p-6 rounded-xl">

@@ -12,10 +12,12 @@ import {
   Sparkles,
   Trophy,
   Users,
+  Calendar,
 } from "lucide-react";
 import { useAuth } from "../../context/AuthContext.jsx";
 import { 
   fetchStudentQuizzes, 
+  fetchStudentEvents,
   createQuizAttemptRequest, 
   submitQuizAttemptRequest 
 } from "../../lib/quiz-client.js";
@@ -182,13 +184,20 @@ export default function StudentQuizPortal() {
   const searchParams = useSearchParams();
   const initialQuizId = searchParams.get("quizId");
   const [search, setSearch] = useState("");
+  const [viewType, setViewType] = useState("quizzes"); // "quizzes" or "events"
   const [difficulty, setDifficulty] = useState("All Levels");
   const [category, setCategory] = useState("All Categories");
   const [activeQuiz, setActiveQuiz] = useState(null);
   const [activeAttemptId, setActiveAttemptId] = useState(null);
   const [quizzes, setQuizzes] = useState([]);
+  const [events, setEvents] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState("");
+  const [isMounted, setIsMounted] = useState(false);
+
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
 
   const handleJoinQuiz = async (quiz) => {
     try {
@@ -210,18 +219,23 @@ export default function StudentQuizPortal() {
   }, [initialQuizId, quizzes]);
 
   useEffect(() => {
-    const loadQuizzes = async () => {
+    const loadData = async () => {
       try {
-        const data = await fetchStudentQuizzes();
-        setQuizzes(data.quizzes || []);
+        setIsLoading(true);
+        const [quizzesData, eventsData] = await Promise.all([
+          fetchStudentQuizzes(),
+          fetchStudentEvents()
+        ]);
+        setQuizzes(quizzesData.quizzes || []);
+        setEvents(eventsData.events || []);
       } catch (loadError) {
-        setError(loadError instanceof Error ? loadError.message : "Unable to load quizzes.");
+        setError(loadError instanceof Error ? loadError.message : "Unable to load data.");
       } finally {
         setIsLoading(false);
       }
     };
 
-    loadQuizzes();
+    loadData();
   }, []);
 
   const categoryOptions = useMemo(
@@ -229,20 +243,29 @@ export default function StudentQuizPortal() {
     [quizzes],
   );
 
-  const filteredQuizzes = useMemo(() => {
-    return quizzes
-      .filter((quiz) =>
-        difficulty === "All Levels" ? true : quiz.difficulty === difficulty,
-      )
-      .filter((quiz) =>
-        category === "All Categories" ? true : quiz.category === category,
-      )
-      .filter((quiz) =>
-        `${quiz.title} ${quiz.category} ${quiz.description} ${(quiz.tags || []).join(" ")}`
-          .toLowerCase()
-          .includes(search.toLowerCase()),
-      );
-  }, [category, difficulty, quizzes, search]);
+  const filteredItems = useMemo(() => {
+    if (viewType === "quizzes") {
+      return quizzes
+        .filter((quiz) =>
+          difficulty === "All Levels" ? true : quiz.difficulty === difficulty,
+        )
+        .filter((quiz) =>
+          category === "All Categories" ? true : quiz.category === category,
+        )
+        .filter((quiz) =>
+          `${quiz.title} ${quiz.category} ${quiz.description} ${(quiz.tags || []).join(" ")}`
+            .toLowerCase()
+            .includes(search.toLowerCase()),
+        );
+    } else {
+      return events
+        .filter((event) =>
+          `${event.title} ${event.description}`
+            .toLowerCase()
+            .includes(search.toLowerCase())
+        );
+    }
+  }, [category, difficulty, quizzes, events, search, viewType]);
 
   if (activeQuiz) {
     return (
@@ -300,9 +323,28 @@ export default function StudentQuizPortal() {
           <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
             <div>
               <h2 className="text-2xl font-semibold">Quiz Library</h2>
-              <p className="mt-2 text-text-muted">
-                Results update as you type or switch filters.
-              </p>
+              <div className="flex items-center gap-1 mt-4 p-1 bg-bg-input rounded-xl border border-border-main w-fit">
+                <button
+                  onClick={() => setViewType("quizzes")}
+                  className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${
+                    viewType === "quizzes"
+                      ? "bg-accent text-text-on-accent shadow-md shadow-accent/20"
+                      : "text-text-secondary hover:text-text-main hover:bg-bg-tertiary"
+                  }`}
+                >
+                  Standard Quizzes
+                </button>
+                <button
+                  onClick={() => setViewType("events")}
+                  className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${
+                    viewType === "events"
+                      ? "bg-accent text-text-on-accent shadow-md shadow-accent/20"
+                      : "text-text-secondary hover:text-text-main hover:bg-bg-tertiary"
+                  }`}
+                >
+                  Events & Exams
+                </button>
+              </div>
             </div>
 
             <div className="flex flex-col gap-3 md:flex-row">
@@ -312,40 +354,44 @@ export default function StudentQuizPortal() {
                   type="text"
                   value={search}
                   onChange={(event) => setSearch(event.target.value)}
-                  placeholder="Search by title or subject"
+                  placeholder={`Search ${viewType}...`}
                   className="m-0 w-full border-none bg-transparent p-0 text-sm text-text-main outline-none"
                 />
               </div>
 
-              <div className="flex items-center gap-3 rounded-xl border border-border-main bg-bg-input px-4 py-3 text-sm text-text-secondary transition-all hover:bg-bg-tertiary">
-                <Filter size={16} className="text-text-muted" />
-                <select
-                  value={category}
-                  onChange={(event) => setCategory(event.target.value)}
-                  className="m-0 border-none bg-transparent p-0 text-sm text-text-main outline-none cursor-pointer"
-                >
-                  {categoryOptions.map((option) => (
-                    <option key={option} value={option} className="bg-bg-card">
-                      {option}
-                    </option>
-                  ))}
-                </select>
-              </div>
+              {viewType === "quizzes" && (
+                <>
+                  <div className="flex items-center gap-3 rounded-xl border border-border-main bg-bg-input px-4 py-3 text-sm text-text-secondary transition-all hover:bg-bg-tertiary">
+                    <Filter size={16} className="text-text-muted" />
+                    <select
+                      value={category}
+                      onChange={(event) => setCategory(event.target.value)}
+                      className="m-0 border-none bg-transparent p-0 text-sm text-text-main outline-none cursor-pointer"
+                    >
+                      {categoryOptions.map((option) => (
+                        <option key={option} value={option} className="bg-bg-card">
+                          {option}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
 
-              <div className="flex items-center gap-3 rounded-xl border border-border-main bg-bg-input px-4 py-3 text-sm text-text-secondary transition-all hover:bg-bg-tertiary">
-                <Sparkles size={16} className="text-text-muted" />
-                <select
-                  value={difficulty}
-                  onChange={(event) => setDifficulty(event.target.value)}
-                  className="m-0 border-none bg-transparent p-0 text-sm text-text-main outline-none cursor-pointer"
-                >
-                  {difficultyOptions.map((option) => (
-                    <option key={option} value={option} className="bg-bg-card">
-                      {option}
-                    </option>
-                  ))}
-                </select>
-              </div>
+                  <div className="flex items-center gap-3 rounded-xl border border-border-main bg-bg-input px-4 py-3 text-sm text-text-secondary transition-all hover:bg-bg-tertiary">
+                    <Sparkles size={16} className="text-text-muted" />
+                    <select
+                      value={difficulty}
+                      onChange={(event) => setDifficulty(event.target.value)}
+                      className="m-0 border-none bg-transparent p-0 text-sm text-text-main outline-none cursor-pointer"
+                    >
+                      {difficultyOptions.map((option) => (
+                        <option key={option} value={option} className="bg-bg-card">
+                          {option}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                </>
+              )}
             </div>
           </div>
 
@@ -363,58 +409,99 @@ export default function StudentQuizPortal() {
 
           {!isLoading && !error ? (
             <div className="mt-8 grid gap-5 xl:grid-cols-2">
-              {filteredQuizzes.map((quiz) => (
-                <article
-                  key={quiz._id || quiz.slug}
-                  className="rounded-2xl border border-border-main bg-bg-secondary p-6 transition-all duration-300 hover:border-accent hover:bg-bg-tertiary hover:shadow-lg hover:shadow-accent/5 group"
-                >
-                  <div className="flex items-start justify-between gap-4">
-                    <div>
-                      <div className="flex items-center gap-3">
-                        <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-accent/15 text-accent group-hover:scale-110 transition-transform">
-                          <BookOpen size={22} />
-                        </div>
-                        <div>
-                          <p className="text-sm text-text-muted">{quiz.category}</p>
-                          <h3 className="text-xl font-semibold group-hover:text-accent transition-colors">{quiz.title}</h3>
-                          <p className="mt-2 text-sm leading-6 text-text-muted">{quiz.description}</p>
-                        </div>
-                      </div>
-                      <div className="mt-5 flex flex-wrap gap-3 text-sm text-text-secondary">
-                        <span className="rounded-full border border-border-main bg-bg-input px-3 py-1">{quiz.difficulty}</span>
-                        <span className="flex items-center gap-2 rounded-full border border-border-main bg-bg-input px-3 py-1">
-                          <Clock3 size={14} />
-                          {quiz.durationMinutes} min
-                        </span>
-                        <span className="flex items-center gap-2 rounded-full border border-border-main bg-bg-input px-3 py-1">
-                          <Users size={14} />
-                          {quiz.estimatedPlayers || 0} players
-                        </span>
-                        <span className="flex items-center gap-2 rounded-full border border-border-main bg-bg-input px-3 py-1">
-                          <Trophy size={14} />
-                          {quiz.questions.length} questions
-                        </span>
-                      </div>
-                    </div>
+              {filteredItems.map((item) => {
+                const isEvent = viewType === "events";
+                const quiz = isEvent ? item.quizId : item;
+                const status = isEvent ? item.currentStatus : "active";
+                const isDisabled = isEvent && status !== "active";
 
-                    <button
-                      type="button"
-                      onClick={() => handleJoinQuiz(quiz)}
-                      className="rounded-xl bg-accent-gradient px-6 py-2.5 text-sm font-semibold text-text-on-accent shadow-lg shadow-accent/20 hover:opacity-90 transition-opacity whitespace-nowrap"
-                    >
-                      Join now
-                    </button>
-                  </div>
-                </article>
-              ))}
+                return (
+                  <article
+                    key={item._id || item.slug}
+                    className={`rounded-2xl border border-border-main bg-bg-secondary p-6 transition-all duration-300 group ${
+                      isDisabled ? "opacity-60" : "hover:border-accent hover:bg-bg-tertiary hover:shadow-lg hover:shadow-accent/5"
+                    }`}
+                  >
+                    <div className="flex items-start justify-between gap-4">
+                      <div>
+                        <div className="flex items-center gap-3">
+                          <div className={`flex h-12 w-12 items-center justify-center rounded-xl bg-accent/15 text-accent ${!isDisabled && "group-hover:scale-110"} transition-transform`}>
+                            {isEvent ? <Calendar size={22} /> : <BookOpen size={22} />}
+                          </div>
+                          <div>
+                            <div className="flex items-center gap-2">
+                              <p className="text-sm text-text-muted">{quiz?.category || "Event"}</p>
+                              {isEvent && (
+                                <span className={`text-[10px] uppercase font-bold px-2 py-0.5 rounded-full ${
+                                  status === 'active' ? 'bg-green-500/20 text-green-400' : 
+                                  status === 'upcoming' ? 'bg-blue-500/20 text-blue-400' : 'bg-gray-500/20 text-gray-400'
+                                }`}>
+                                  {status}
+                                </span>
+                              )}
+                            </div>
+                            <h3 className={`text-xl font-semibold ${!isDisabled && "group-hover:text-accent"} transition-colors line-clamp-1`}>
+                              {isEvent ? item.title : quiz.title}
+                            </h3>
+                            <p className="mt-2 text-sm leading-6 text-text-muted line-clamp-2">
+                              {isEvent ? item.description : quiz.description}
+                            </p>
+                          </div>
+                        </div>
+                        <div className="mt-5 flex flex-wrap gap-3 text-sm text-text-secondary">
+                          {isEvent ? (
+                            <>
+                              <span className="flex items-center gap-2 rounded-full border border-border-main bg-bg-input px-3 py-1">
+                                <Clock3 size={14} />
+                                {isMounted ? (
+                                  <>
+                                    {new Date(item.startTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })} - 
+                                    {new Date(item.endTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                                  </>
+                                ) : "Loading time..."}
+                              </span>
+                              <span className="rounded-full border border-border-main bg-bg-input px-3 py-1">
+                                {isMounted ? new Date(item.startTime).toLocaleDateString() : "Loading date..."}
+                              </span>
+                            </>
+                          ) : (
+                            <span className="rounded-full border border-border-main bg-bg-input px-3 py-1">{quiz.difficulty}</span>
+                          )}
+                          <span className="flex items-center gap-2 rounded-full border border-border-main bg-bg-input px-3 py-1">
+                            <Users size={14} />
+                            {isEvent ? item.participants?.length || 0 : quiz.estimatedPlayers || 0} {isEvent ? "joined" : "players"}
+                          </span>
+                          <span className="flex items-center gap-2 rounded-full border border-border-main bg-bg-input px-3 py-1">
+                            <Trophy size={14} />
+                            {quiz?.questions?.length || 0} questions
+                          </span>
+                        </div>
+                      </div>
+
+                      <button
+                        type="button"
+                        onClick={() => !isDisabled && handleJoinQuiz(quiz)}
+                        disabled={isDisabled}
+                        className={`rounded-xl px-6 py-2.5 text-sm font-semibold transition-all whitespace-nowrap ${
+                          isDisabled 
+                            ? "bg-bg-tertiary text-text-muted cursor-not-allowed border border-border-main" 
+                            : "bg-accent-gradient text-text-on-accent shadow-lg shadow-accent/20 hover:opacity-90"
+                        }`}
+                      >
+                        {isEvent ? (status === 'active' ? "Start now" : status === 'upcoming' ? "Wait..." : "Ended") : "Join now"}
+                      </button>
+                    </div>
+                  </article>
+                );
+              })}
             </div>
           ) : null}
 
-          {!isLoading && !error && filteredQuizzes.length === 0 ? (
+          {!isLoading && !error && filteredItems.length === 0 ? (
             <div className="mt-8 rounded-2xl border border-dashed border-border-main bg-bg-input px-6 py-14 text-center">
-              <h3 className="text-xl font-semibold">No quizzes matched that filter</h3>
+              <h3 className="text-xl font-semibold">No {viewType} matched that filter</h3>
               <p className="mt-3 text-text-muted">
-                Try another keyword, difficulty level, or subject.
+                Try another keyword or check back later.
               </p>
             </div>
           ) : null}

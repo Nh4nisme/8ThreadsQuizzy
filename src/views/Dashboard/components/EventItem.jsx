@@ -1,4 +1,4 @@
-export default function EventItem({ title, time, participants, button }) {
+export default function EventItem({ title, time, participants, button, onClick }) {
   return (
     <div className="flex justify-between items-center bg-[#121216] p-4 rounded-lg mb-3">
       <div className="flex items-center gap-3">
@@ -18,7 +18,10 @@ export default function EventItem({ title, time, participants, button }) {
         </div>
       </div>
 
-      <button className="bg-purple-600 px-3 py-1 rounded-lg text-sm hover:bg-purple-500">
+      <button 
+        onClick={onClick}
+        className="bg-purple-600 px-3 py-1 rounded-lg text-sm hover:bg-purple-500 transition-colors"
+      >
         {button}
       </button>
     </div>
