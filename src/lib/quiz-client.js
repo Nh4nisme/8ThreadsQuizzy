@@ -158,3 +158,78 @@ export const assignStudentToClassRequest = async (studentIds, className) => {
   console.log("Assigning students:", { studentIds, className });
   return getJson(response);
 };
+
+// EVENT API
+const EVENT_API_BASE = AUTH_API_BASE.replace(/\/auth$/, "/events");
+
+export const fetchTeacherEvents = async () => {
+  const response = await fetch(`${EVENT_API_BASE}`, {
+    headers: {
+      ...getAuthHeaders(),
+    },
+    cache: "no-store",
+  });
+
+  return getJson(response);
+};
+
+export const fetchStudentEvents = async () => {
+  const response = await fetch(`${EVENT_API_BASE}/student`, {
+    headers: {
+      ...getAuthHeaders(),
+    },
+    cache: "no-store",
+  });
+
+  return getJson(response);
+};
+
+export const createEventRequest = async (payload) => {
+  const response = await fetch(`${EVENT_API_BASE}`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      ...getAuthHeaders(),
+    },
+    body: JSON.stringify(payload),
+  });
+
+  return getJson(response);
+};
+
+export const updateEventStatusRequest = async (eventId, status) => {
+  const response = await fetch(`${EVENT_API_BASE}/${eventId}/status`, {
+    method: "PATCH",
+    headers: {
+      "Content-Type": "application/json",
+      ...getAuthHeaders(),
+    },
+    body: JSON.stringify({ status }),
+  });
+
+  return getJson(response);
+};
+
+export const updateEventRequest = async (eventId, payload) => {
+  const response = await fetch(`${EVENT_API_BASE}/${eventId}`, {
+    method: "PUT",
+    headers: {
+      "Content-Type": "application/json",
+      ...getAuthHeaders(),
+    },
+    body: JSON.stringify(payload),
+  });
+
+  return getJson(response);
+};
+
+export const deleteEventRequest = async (eventId) => {
+  const response = await fetch(`${EVENT_API_BASE}/${eventId}`, {
+    method: "DELETE",
+    headers: {
+      ...getAuthHeaders(),
+    },
+  });
+
+  return getJson(response);
+};
