@@ -8,6 +8,7 @@ import EventItem from "./components/EventItem.jsx";
 import StudentItem from "./components/StudentItem.jsx";
 import QuizCard from "./components/QuizCard.jsx";
 import { fetchTeacherQuizzes, fetchTeacherStudents, fetchTeacherEvents } from "../../lib/quiz-client.js";
+import { FadeIn, StaggerContainer, StaggerItem } from "../../components/ui/Motion.jsx";
 
 export default function Dashboard() {
   const router = useRouter();
@@ -60,127 +61,143 @@ export default function Dashboard() {
   const recentQuizzes = quizzes.slice(0, 3);
 
   return (
-    <div className=" text-white p-8">
-      <div className="flex justify-between items-center mb-6">
-        <div>
-          <h1 className="text-2xl font-bold">Dashboard</h1>
-          <p className="text-gray-400">
-            Welcome back, {user?.fullName || user?.username || "there"}! Here&apos;s what&apos;s happening with your
-            quizzes
-          </p>
-        </div>
-      </div>
+    <div className="relative min-h-screen overflow-hidden p-8">
+      {/* Immersive Background Orbs from Landing Page */}
+      <div className="pointer-events-none absolute -top-24 -left-24 h-96 w-96 rounded-full bg-purple-600/20 blur-[120px]" />
+      <div className="pointer-events-none absolute top-1/2 -right-24 h-96 w-96 -translate-y-1/2 rounded-full bg-orange-600/10 blur-[120px]" />
+      <div className="pointer-events-none absolute -bottom-24 left-1/2 h-96 w-96 -translate-x-1/2 rounded-full bg-blue-600/10 blur-[120px]" />
 
-      <div className="grid grid-cols-4 gap-4 mb-6">
-        <StatsCard
-          title="Total Quizzes"
-          number={totalQuizzes.toLocaleString()}
-          percent="+0%"
-          icon="/assets/openbook.png"
-        />
+      <StaggerContainer className="relative z-10 text-white">
+        <FadeIn className="flex justify-between items-center mb-8">
+          <div>
+            <h1 className="text-2xl font-bold">Dashboard</h1>
+            <p className="text-gray-400">
+              Welcome back, {user?.fullName || user?.username || "there"}! Here&apos;s what&apos;s happening with your
+              quizzes
+            </p>
+          </div>
+        </FadeIn>
 
-        <StatsCard
-          title="Active Quizzes"
-          number={activeEvents.toLocaleString()}
-          percent="+0%"
-          icon="/assets/calendar.png"
-        />
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+          <StaggerItem>
+            <StatsCard
+              title="Total Quizzes"
+              number={totalQuizzes.toLocaleString()}
+              percent="+0%"
+              icon="/assets/openbook.png"
+            />
+          </StaggerItem>
 
-        <StatsCard
-          title="Students"
-          number={totalStudents.toLocaleString()}
-          percent="+0%"
-          icon="/assets/students.png"
-        />
+          <StaggerItem>
+            <StatsCard
+              title="Active Quizzes"
+              number={activeEvents.toLocaleString()}
+              percent="+0%"
+              icon="/assets/calendar.png"
+            />
+          </StaggerItem>
 
-        <StatsCard
-          title="Avg. Completions"
-          number={avgCompletion.toLocaleString()}
-          percent="+0%"
-          icon="/assets/average.png"
-        />
-      </div>
+          <StaggerItem>
+            <StatsCard
+              title="Students"
+              number={totalStudents.toLocaleString()}
+              percent="+0%"
+              icon="/assets/students.png"
+            />
+          </StaggerItem>
 
-      <div className="grid grid-cols-3 gap-6 mb-6">
-        <div className="col-span-2 bg-[#1a1a1f] p-6 rounded-xl">
-          <h1 className="text-lg font-semibold mb-1">Recent Events</h1>
-
-          <p className="text-gray-400 mb-4">
-            Manage your upcoming and active quiz events
-          </p>
-
-          {isLoading ? (
-            <p className="text-gray-500">Loading events...</p>
-          ) : events.length > 0 ? (
-            events.slice(0, 3).map((event) => (
-              <EventItem
-                key={event._id}
-                title={event.title}
-                time={new Date(event.startTime).toLocaleString([], { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })}
-                participants={`${event.participants?.length || 0} participants`}
-                button={event.currentStatus === 'active' ? 'View Live' : 'Manage'}
-                onClick={() => router.push('/events')}
-              />
-            ))
-          ) : (
-            <p className="text-gray-500">No events scheduled.</p>
-          )}
+          <StaggerItem>
+            <StatsCard
+              title="Avg. Completions"
+              number={avgCompletion.toLocaleString()}
+              percent="+0%"
+              icon="/assets/average.png"
+            />
+          </StaggerItem>
         </div>
 
-        <div className="bg-[#1a1a1f] p-6 rounded-xl">
-          <h2 className="text-lg font-semibold mb-4">Top Students</h2>
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
+          <StaggerItem className="lg:col-span-2 bg-[#1a1a1f] p-6 rounded-xl border border-white/5">
+            <h1 className="text-lg font-semibold mb-1">Recent Events</h1>
+            <p className="text-gray-400 mb-4">
+              Manage your upcoming and active quiz events
+            </p>
 
-          {isLoading ? (
-            <p className="text-gray-500">Loading students...</p>
-          ) : topStudents.length > 0 ? (
-            topStudents.map((student, index) => (
-              <StudentItem
-                key={student.id}
-                rank={index + 1}
-                name={student.name}
-                subject={student.class || "N/A"}
-                score={`${student.averageScore || 0}`}
-                icon="/assets/achieve.png"
-              />
-            ))
-          ) : (
-            <p className="text-gray-500">No students found.</p>
-          )}
+            <div className="space-y-2">
+              {isLoading ? (
+                <p className="text-gray-500">Loading events...</p>
+              ) : events.length > 0 ? (
+                events.slice(0, 3).map((event) => (
+                  <EventItem
+                    key={event._id}
+                    title={event.title}
+                    time={new Date(event.startTime).toLocaleString([], { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })}
+                    participants={`${event.participants?.length || 0} participants`}
+                    button={event.currentStatus === 'active' ? 'View Live' : 'Manage'}
+                    onClick={() => router.push('/events')}
+                  />
+                ))
+              ) : (
+                <p className="text-gray-500">No events scheduled.</p>
+              )}
+            </div>
+          </StaggerItem>
+
+          <StaggerItem className="bg-[#1a1a1f] p-6 rounded-xl border border-white/5">
+            <h2 className="text-lg font-semibold mb-4">Top Students</h2>
+            <div className="space-y-2">
+              {isLoading ? (
+                <p className="text-gray-500">Loading students...</p>
+              ) : topStudents.length > 0 ? (
+                topStudents.map((student, index) => (
+                  <StudentItem
+                    key={student.id}
+                    rank={index + 1}
+                    name={student.name}
+                    subject={student.class || "N/A"}
+                    score={`${student.averageScore || 0}`}
+                    icon="/assets/achieve.png"
+                  />
+                ))
+              ) : (
+                <p className="text-gray-500">No students found.</p>
+              )}
+            </div>
+          </StaggerItem>
         </div>
-      </div>
 
-      <div className="bg-[#1a1a1f] p-6 rounded-xl">
-        <h2 className="text-lg font-semibold mb-4">Recent Quizzes</h2>
+        <StaggerItem className="bg-[#1a1a1f] p-6 rounded-xl border border-white/5">
+          <h2 className="text-lg font-semibold mb-4">Recent Quizzes</h2>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+            {isLoading ? (
+              <div className="col-span-full text-gray-500">Loading quizzes...</div>
+            ) : (
+              recentQuizzes.map((quiz) => (
+                <QuizCard
+                  key={quiz._id}
+                  title={quiz.title}
+                  questions={quiz.questions?.length || 0}
+                  completions={quiz.completions || 0}
+                  percent={quiz.status === "published" ? 100 : 0}
+                  questionIcon="/assets/openbook.png"
+                  completionIcon="/assets/students.png"
+                  onClick={() => router.push(`/quizzes?quizId=${quiz._id}`)}
+                />
+              ))
+            )}
 
-        <div className="grid grid-cols-4 gap-4">
-          {isLoading ? (
-            <div className="col-span-3 text-gray-500">Loading quizzes...</div>
-          ) : (
-            recentQuizzes.map((quiz) => (
-              <QuizCard
-                key={quiz._id}
-                title={quiz.title}
-                questions={quiz.questions?.length || 0}
-                completions={quiz.completions || 0}
-                percent={quiz.status === "published" ? 100 : 0}
-                questionIcon="/assets/openbook.png"
-                completionIcon="/assets/students.png"
-                onClick={() => router.push(`/quizzes?quizId=${quiz._id}`)}
-              />
-            ))
-          )}
-
-          <div
-            className="border border-dashed border-gray-600 rounded-xl flex items-center justify-center cursor-pointer hover:border-purple-500 hover:bg-purple-500/5 transition-all group"
-            onClick={() => router.push("/quizzes/create")}
-          >
-            <div className="flex flex-col items-center gap-2">
-              <span className="text-purple-400 text-3xl group-hover:scale-110 transition-transform">+</span>
-              <span className="text-purple-400 font-medium">Create Quiz</span>
+            <div
+              className="border border-dashed border-gray-600 rounded-xl flex items-center justify-center cursor-pointer hover:border-purple-500 hover:bg-purple-500/5 transition-all group min-h-[140px]"
+              onClick={() => router.push("/quizzes/create")}
+            >
+              <div className="flex flex-col items-center gap-2">
+                <span className="text-purple-400 text-3xl group-hover:scale-110 transition-transform">+</span>
+                <span className="text-purple-400 font-medium text-sm">Create Quiz</span>
+              </div>
             </div>
           </div>
-        </div>
-      </div>
+        </StaggerItem>
+      </StaggerContainer>
     </div>
   );
 }
