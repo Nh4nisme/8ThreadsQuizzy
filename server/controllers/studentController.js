@@ -20,8 +20,26 @@ exports.getTeacherStudents = async (req, res) => {
       classAssignments.map((ca) => [String(ca.studentId), ca.className]),
     );
 
+    // Get info for students who have class assignments from this teacher
+    const assignedStudentIds = classAssignments.map((ca) => ca.studentId);
+    const assignedUsers = await User.find({ _id: { $in: assignedStudentIds } }).lean();
+
     // 4. Group attempts by student
     const studentStats = {};
+
+    // Pre-populate with assigned students so they show up even with 0 quizzes taken
+    assignedUsers.forEach((user) => {
+      const studentId = String(user._id);
+      studentStats[studentId] = {
+        id: studentId,
+        name: user.fullName || user.username,
+        email: user.email,
+        quizzesTaken: 0,
+        totalScore: 0,
+        lastActivity: null,
+        class: classMap.get(studentId) || "Unassigned",
+      };
+    });
 
     attempts.forEach((attempt) => {
       if (!attempt.studentId) return; // Skip guest attempts if they don't have a user ID
@@ -43,17 +61,46 @@ exports.getTeacherStudents = async (req, res) => {
       studentStats[studentId].totalScore += attempt.score || 0;
       
       const activityDate = attempt.completedAt || attempt.startedAt;
-      if (new Date(activityDate) > new Date(studentStats[studentId].lastActivity)) {
+      if (!studentStats[studentId].lastActivity || new Date(activityDate) > new Date(studentStats[studentId].lastActivity)) {
         studentStats[studentId].lastActivity = activityDate;
       }
     });
 
     const students = Object.values(studentStats).map((s) => ({
       ...s,
-      averageScore: Math.round(s.totalScore / s.quizzesTaken),
+      averageScore: s.quizzesTaken > 0 ? Math.round(s.totalScore / s.quizzesTaken) : 0,
     }));
 
     res.json({ students });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: error.message });
+  }
+};
+
+exports.searchStudentByEmail = async (req, res) => {
+  try {
+    const { email } = req.query;
+    if (!email) {
+      return res.status(400).json({ message: "Email is required" });
+    }
+
+    const student = await User.findOne({
+      email: { $regex: new RegExp("^" + email.trim() + "$", "i") },
+      role: "student",
+    }).select("_id fullName username email");
+
+    if (!student) {
+      return res.status(404).json({ message: "Student not found with this email" });
+    }
+
+    res.json({
+      student: {
+        id: student._id,
+        name: student.fullName || student.username,
+        email: student.email,
+      },
+    });
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: error.message });

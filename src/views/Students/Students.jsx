@@ -2,7 +2,7 @@
 
 import { useEffect, useState, useMemo } from "react";
 import StudentRow from "./components/StudentRow.jsx";
-import { fetchTeacherStudents, assignStudentToClassRequest } from "../../lib/quiz-client.js";
+import { fetchTeacherStudents, assignStudentToClassRequest, searchStudentByEmailRequest } from "../../lib/quiz-client.js";
 import { X } from "lucide-react";
 import { toast } from "../../components/ui/Toast.jsx";
 
@@ -59,6 +59,142 @@ function AssignModal({ isOpen, onClose, onConfirm, selectedCount }) {
   );
 }
 
+function AddStudentModal({ isOpen, onClose, onConfirm }) {
+  const [email, setEmail] = useState("");
+  const [isSearching, setIsSearching] = useState(false);
+  const [student, setStudent] = useState(null);
+  const [className, setClassName] = useState("");
+  const [errorMsg, setErrorMsg] = useState("");
+
+  useEffect(() => {
+    if (!isOpen) {
+      setEmail("");
+      setStudent(null);
+      setClassName("");
+      setErrorMsg("");
+      setIsSearching(false);
+    }
+  }, [isOpen]);
+
+  const handleSearch = async () => {
+    if (!email.trim()) return;
+    setIsSearching(true);
+    setErrorMsg("");
+    setStudent(null);
+    try {
+      const data = await searchStudentByEmailRequest(email.trim());
+      if (data.student) {
+        setStudent(data.student);
+      } else {
+        setErrorMsg("No student found with this email");
+      }
+    } catch (err) {
+      setErrorMsg(err.message || "Failed to search student");
+    } finally {
+      setIsSearching(false);
+    }
+  };
+
+  const handleConfirm = () => {
+    if (!student || !className.trim()) return;
+    onConfirm(student.id, className.trim());
+  };
+
+  if (!isOpen) return null;
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
+      <div className="w-full max-w-md bg-[#1a1a1f] border border-gray-800 rounded-2xl p-6 shadow-2xl animate-in fade-in zoom-in duration-200">
+        <div className="flex justify-between items-center mb-6">
+          <h3 className="text-xl font-semibold text-white">Add Student</h3>
+          <button onClick={onClose} className="p-2 hover:bg-gray-800 rounded-lg transition">
+            <X size={20} className="text-gray-400" />
+          </button>
+        </div>
+
+        <div className="space-y-4">
+          <div>
+            <label className="block text-sm font-medium text-gray-400 mb-2">Student Email</label>
+            <div className="flex gap-2">
+              <input
+                type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                placeholder="student@gmail.com"
+                className="flex-1 bg-[#111115] border border-gray-700 px-4 py-2.5 rounded-xl text-white outline-none focus:border-purple-500 transition text-sm"
+                onKeyDown={(e) => {
+                  if (e.key === "Enter") {
+                    e.preventDefault();
+                    handleSearch();
+                  }
+                }}
+              />
+              <button
+                onClick={handleSearch}
+                disabled={!email.trim() || isSearching}
+                className="bg-purple-600 hover:bg-purple-500 disabled:opacity-50 disabled:cursor-not-allowed px-4 py-2.5 rounded-xl text-white font-medium text-sm transition font-semibold"
+              >
+                {isSearching ? "Searching..." : "Search"}
+              </button>
+            </div>
+          </div>
+
+          {errorMsg && (
+            <div className="p-3 bg-red-950/30 border border-red-900/50 rounded-xl text-red-400 text-sm">
+              {errorMsg}
+            </div>
+          )}
+
+          {student && (
+            <div className="p-4 bg-[#111115] border border-gray-800 rounded-xl space-y-4">
+              <div>
+                <p className="text-xs text-gray-500 uppercase font-bold tracking-wider">Found Student</p>
+                <div className="mt-2 flex items-center gap-3">
+                  <div className="w-8 h-8 rounded-full bg-purple-600 flex items-center justify-center font-bold text-white text-sm">
+                    {student.name.charAt(0)}
+                  </div>
+                  <div>
+                    <p className="font-semibold text-white text-sm">{student.name}</p>
+                    <p className="text-xs text-gray-400">{student.email}</p>
+                  </div>
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-400 mb-2">Assign to Class</label>
+                <input
+                  type="text"
+                  value={className}
+                  onChange={(e) => setClassName(e.target.value)}
+                  placeholder="e.g. 10A, Math-2024"
+                  className="w-full bg-[#0a0a0c] border border-gray-700 px-4 py-2.5 rounded-xl text-white outline-none focus:border-purple-500 transition text-sm"
+                  autoFocus
+                />
+              </div>
+            </div>
+          )}
+
+          <div className="flex gap-3 pt-4 border-t border-gray-800">
+            <button
+              onClick={onClose}
+              className="flex-1 px-4 py-3 rounded-xl border border-gray-700 font-medium text-gray-300 hover:bg-gray-800 transition text-sm"
+            >
+              Cancel
+            </button>
+            <button
+              onClick={handleConfirm}
+              disabled={!student || !className.trim()}
+              className="flex-1 px-4 py-3 rounded-xl bg-purple-600 hover:bg-purple-500 disabled:opacity-50 disabled:cursor-not-allowed font-medium text-white transition shadow-lg shadow-purple-500/20 text-sm font-semibold"
+            >
+              Add & Assign
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 export default function Students() {
   const [students, setStudents] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -66,6 +202,7 @@ export default function Students() {
   const [activeTab, setActiveTab] = useState("All Students");
   const [selectedIds, setSelectedIds] = useState([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isAddModalOpen, setIsAddModalOpen] = useState(false);
 
   const loadStudents = async (showLoading = true) => {
     try {
@@ -131,6 +268,17 @@ export default function Students() {
     }
   };
 
+  const handleConfirmAdd = async (studentId, className) => {
+    try {
+      await assignStudentToClassRequest([studentId], className.trim());
+      toast.success(`Assigned student to ${className.trim()}`);
+      setIsAddModalOpen(false);
+      loadStudents();
+    } catch (err) {
+      toast.error("Failed to assign student: " + err.message);
+    }
+  };
+
   return (
     <div className="text-white min-h-screen">
       {/* PAGE HEADER */}
@@ -143,10 +291,16 @@ export default function Students() {
         </div>
 
         <div className="flex gap-3">
+          <button
+            onClick={() => setIsAddModalOpen(true)}
+            className="bg-purple-600 hover:bg-purple-500 px-6 py-2.5 rounded-xl font-semibold transition flex items-center gap-2 shadow-lg shadow-purple-500/20 text-sm"
+          >
+            + Add Student
+          </button>
           {selectedIds.length > 0 && (
             <button
               onClick={() => setIsModalOpen(true)}
-              className="bg-purple-600 hover:bg-purple-500 px-6 py-2.5 rounded-xl font-semibold transition flex items-center gap-2 shadow-lg shadow-purple-500/20"
+              className="bg-purple-600 hover:bg-purple-500 px-6 py-2.5 rounded-xl font-semibold transition flex items-center gap-2 shadow-lg shadow-purple-500/20 text-sm"
             >
               Assign {selectedIds.length} to Class
             </button>
@@ -246,6 +400,12 @@ export default function Students() {
         onClose={() => setIsModalOpen(false)}
         onConfirm={handleConfirmAssign}
         selectedCount={selectedIds.length}
+      />
+
+      <AddStudentModal
+        isOpen={isAddModalOpen}
+        onClose={() => setIsAddModalOpen(false)}
+        onConfirm={handleConfirmAdd}
       />
     </div>
   );

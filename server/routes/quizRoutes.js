@@ -16,6 +16,7 @@ const {
 const {
   getTeacherStudents,
   assignStudentToClass,
+  searchStudentByEmail,
 } = require("../controllers/studentController");
 const authMiddleware = require("../middleware/authMiddleware");
 const requireRole = require("../middleware/requireRole");
@@ -40,6 +41,7 @@ router.delete("/:id", authMiddleware, requireRole("teacher"), deleteQuiz);
 
 // Student management
 router.get("/teacher/students", authMiddleware, requireRole("teacher"), getTeacherStudents);
+router.get("/teacher/students/search", authMiddleware, requireRole("teacher"), searchStudentByEmail);
 router.post("/teacher/students/assign", authMiddleware, requireRole("teacher"), assignStudentToClass);
 
 module.exports = router;
