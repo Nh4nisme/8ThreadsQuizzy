@@ -136,6 +136,17 @@ export const submitQuizAttemptRequest = async (quizId, attemptId, responses) => 
   return getJson(response);
 };
 
+export const searchStudentByEmailRequest = async (email) => {
+  const response = await fetch(`${QUIZ_API_BASE}/teacher/students/search?email=${encodeURIComponent(email)}`, {
+    headers: {
+      ...getAuthHeaders(),
+    },
+    cache: "no-store",
+  });
+
+  return getJson(response);
+};
+
 export const fetchTeacherStudents = async () => {
   const response = await fetch(`${QUIZ_API_BASE}/teacher/students`, {
     headers: {
